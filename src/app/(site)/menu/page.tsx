@@ -45,7 +45,7 @@ export default async function MenuPage({ searchParams }: MenuPageProps) {
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-xl leading-relaxed text-muted">
             Premium ingredients and Vietnamese tradition — browse by location,
-            jump to a section, and reserve when you are ready.
+            ask our menu helper about any dish, and reserve when you are ready.
           </p>
           <div className="gold-line mx-auto mt-8 w-20" />
         </div>
