@@ -27,7 +27,7 @@ export default async function BookPage({
         <h1 className="mt-2 font-serif text-4xl text-[#1a3c34]">Book a Table</h1>
         <p className="mt-4 text-[#5c534a]">
           Choose your location, time, and seating preference. We&apos;ll confirm
-          by email and SMS, and remind you 2 hours before.
+          by email and SMS, and send a reminder before your visit.
         </p>
       </div>
 

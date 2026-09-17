@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
+import { filterBookingsNeedingReminder } from "../bookings/reminders";
 import {
   createServerClient,
   isSupabaseConfigured,
@@ -371,24 +372,8 @@ export async function updateBooking(
 }
 
 export async function getBookingsNeedingReminder(): Promise<Booking[]> {
-  const now = new Date();
-  const reminderWindowStart = new Date(
-    now.getTime() + (2 * 60 - 15) * 60 * 1000,
-  );
-  const reminderWindowEnd = new Date(
-    now.getTime() + (2 * 60 + 15) * 60 * 1000,
-  );
-
   const all = await listBookings({ status: "confirmed" });
-
-  return all.filter((booking) => {
-    if (booking.reminderSentAt) return false;
-    const bookingDateTime = new Date(`${booking.date}T${booking.time}:00`);
-    return (
-      bookingDateTime >= reminderWindowStart &&
-      bookingDateTime <= reminderWindowEnd
-    );
-  });
+  return filterBookingsNeedingReminder(all);
 }
 
 export function isUsingLocalStore(): boolean {
