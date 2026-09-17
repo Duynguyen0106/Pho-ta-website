@@ -230,6 +230,70 @@ export function AdminMenuManager() {
     }
   }
 
+  async function handleRenameCategory(category: MenuCategory) {
+    const name = prompt("Category name", category.name);
+    if (!name?.trim() || name.trim() === category.name) return;
+    setSaving(true);
+    try {
+      await menuAction({
+        action: "updateCategory",
+        id: category.id,
+        name: name.trim(),
+      });
+      await loadMenu();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Rename failed");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleSaveCategoryNote(
+    category: MenuCategory,
+    note: string,
+  ) {
+    setSaving(true);
+    try {
+      await menuAction({
+        action: "updateCategory",
+        id: category.id,
+        note,
+      });
+      await loadMenu();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Update failed");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleReorderCategory(
+    categoryId: string,
+    direction: "up" | "down",
+  ) {
+    setSaving(true);
+    try {
+      await menuAction({ action: "reorderCategory", id: categoryId, direction });
+      await loadMenu();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Reorder failed");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleReorderItem(itemId: string, direction: "up" | "down") {
+    setSaving(true);
+    try {
+      await menuAction({ action: "reorderItem", id: itemId, direction });
+      await loadMenu();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Reorder failed");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center gap-3 py-12 text-xl text-muted">
@@ -362,23 +426,63 @@ export function AdminMenuManager() {
                 </span>
               </button>
 
-              {expandedCategory === category.id && (
-                <div className="border-t border-gold/15 px-6 pb-6">
-                  <div className="mb-4 flex flex-wrap gap-3 pt-5">
-                    <Button size="md" onClick={() => openNewItem(category)}>
-                      Add item
-                    </Button>
-                    <Button
-                      size="md"
-                      variant="outline"
-                      onClick={() => handleDeleteCategory(category)}
-                    >
-                      Delete category
-                    </Button>
-                  </div>
+            {expandedCategory === category.id && (
+              <div className="border-t border-gold/15 px-6 pb-6">
+                <div className="mb-4 flex flex-wrap gap-3 pt-5">
+                  <Button size="md" onClick={() => openNewItem(category)}>
+                    Add item
+                  </Button>
+                  <Button
+                    size="md"
+                    variant="outline"
+                    onClick={() => handleRenameCategory(category)}
+                  >
+                    Rename
+                  </Button>
+                  <Button
+                    size="md"
+                    variant="outline"
+                    onClick={() => handleReorderCategory(category.id, "up")}
+                    disabled={saving}
+                  >
+                    Move up
+                  </Button>
+                  <Button
+                    size="md"
+                    variant="outline"
+                    onClick={() => handleReorderCategory(category.id, "down")}
+                    disabled={saving}
+                  >
+                    Move down
+                  </Button>
+                  <Button
+                    size="md"
+                    variant="outline"
+                    onClick={() => handleDeleteCategory(category)}
+                  >
+                    Delete category
+                  </Button>
+                </div>
 
-                  <ul className="space-y-4">
-                    {category.items.map((item) => (
+                <label className="mb-6 block">
+                  <span className="label-caps">Category note (optional)</span>
+                  <div className="mt-3 flex flex-wrap gap-3">
+                    <input
+                      key={category.id}
+                      defaultValue={category.note ?? ""}
+                      placeholder="Shown on the public menu under this section"
+                      className="luxury-input min-w-[240px] flex-1"
+                      onBlur={(e) => {
+                        if (e.target.value !== (category.note ?? "")) {
+                          handleSaveCategoryNote(category, e.target.value);
+                        }
+                      }}
+                    />
+                  </div>
+                </label>
+
+                <ul className="space-y-4">
+                  {category.items.map((item, itemIndex) => (
                       <li
                         key={item.id}
                         className="rounded border border-gold/15 bg-surface-alt/40 p-5"
@@ -414,22 +518,40 @@ export function AdminMenuManager() {
                               </p>
                             )}
                           </div>
-                          <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-                            <button
-                              type="button"
-                              onClick={() => openEditItem(item)}
-                              className="text-lg text-gold hover:text-gold-light"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteItem(item)}
-                              className="text-lg text-red-300 hover:text-red-200"
-                            >
-                              Delete
-                            </button>
-                          </div>
+                        <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-start">
+                          <button
+                            type="button"
+                            disabled={itemIndex === 0 || saving}
+                            onClick={() => handleReorderItem(item.id, "up")}
+                            className="text-base text-muted hover:text-gold disabled:opacity-30"
+                          >
+                            ↑
+                          </button>
+                          <button
+                            type="button"
+                            disabled={
+                              itemIndex === category.items.length - 1 || saving
+                            }
+                            onClick={() => handleReorderItem(item.id, "down")}
+                            className="text-base text-muted hover:text-gold disabled:opacity-30"
+                          >
+                            ↓
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => openEditItem(item)}
+                            className="text-lg text-gold hover:text-gold-light"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteItem(item)}
+                            className="text-lg text-red-300 hover:text-red-200"
+                          >
+                            Delete
+                          </button>
+                        </div>
                         </div>
                       </li>
                     ))}

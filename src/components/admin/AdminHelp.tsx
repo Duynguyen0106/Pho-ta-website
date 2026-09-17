@@ -69,16 +69,24 @@ export function AdminHelp() {
             </div>
             <div>
               <h4 className="font-display text-xl text-foreground">
-                Menu management
+                Menu, customers & closures
               </h4>
               <ul className="mt-4 space-y-2 leading-relaxed">
                 <li>
-                  Open the <strong className="text-foreground">Menu</strong> tab
-                  to edit daily and lunch menus per branch
+                  <strong className="text-foreground">Menu</strong> — edit
+                  dishes, prices, and order per branch
                 </li>
-                <li>Add protein options with individual prices per dish</li>
                 <li>
-                  Changes appear on the public menu immediately after saving
+                  <strong className="text-foreground">Customers</strong> — guest
+                  notes and booking history
+                </li>
+                <li>
+                  <strong className="text-foreground">Closures</strong> — block
+                  dates when the restaurant is closed
+                </li>
+                <li>
+                  <strong className="text-foreground">Reports</strong> — weekly
+                  booking summary and export CSV from Bookings
                 </li>
               </ul>
             </div>

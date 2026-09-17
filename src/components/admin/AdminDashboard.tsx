@@ -3,14 +3,22 @@
 import { format } from "date-fns";
 import { Search } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { AdminBlackouts } from "@/components/admin/AdminBlackouts";
+import { AdminBookingEdit } from "@/components/admin/AdminBookingEdit";
+import { AdminCustomers } from "@/components/admin/AdminCustomers";
 import { AdminHelp } from "@/components/admin/AdminHelp";
 import { AdminMenuManager } from "@/components/admin/AdminMenuManager";
+import { AdminReports } from "@/components/admin/AdminReports";
 import { AdminShell, type AdminView } from "@/components/admin/AdminShell";
 import { AdminStatCard } from "@/components/admin/AdminStatCard";
 import { AdminStatusBadge } from "@/components/admin/AdminStatusBadge";
 import { ManualBookingForm } from "@/components/admin/ManualBookingForm";
 import { Button } from "@/components/ui/Button";
-import { BOOKING_STATUS_LABELS, SEATING_LABELS } from "@/lib/constants";
+import {
+  BOOKING_SOURCE_LABELS,
+  BOOKING_STATUS_LABELS,
+  SEATING_LABELS,
+} from "@/lib/constants";
 import { locations } from "@/lib/data/locations";
 import type { Booking, BookingStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -35,6 +43,8 @@ export function AdminDashboard() {
   const [selected, setSelected] = useState<Booking | null>(null);
   const [tableNumber, setTableNumber] = useState("");
   const [savingTable, setSavingTable] = useState(false);
+  const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
+  const [resending, setResending] = useState(false);
 
   const fetchBookings = useCallback(async () => {
     setLoading(true);
@@ -109,6 +119,27 @@ export function AdminDashboard() {
     window.location.href = "/admin/login";
   }
 
+  async function resendConfirmation(booking: Booking) {
+    setResending(true);
+    try {
+      await fetch("/api/admin/bookings/resend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: booking.id }),
+      });
+      fetchBookings();
+    } finally {
+      setResending(false);
+    }
+  }
+
+  function exportCsv() {
+    const params = new URLSearchParams({ date });
+    if (location) params.set("location", location);
+    if (statusFilter) params.set("status", statusFilter);
+    window.location.href = `/api/admin/bookings/export?${params}`;
+  }
+
   const today = format(new Date(), "yyyy-MM-dd");
   const activeBookings = bookings.filter((b) => b.status !== "cancelled");
   const confirmedCount = bookings.filter((b) => b.status === "confirmed").length;
@@ -121,6 +152,12 @@ export function AdminDashboard() {
 
       {view === "menu" ? (
         <AdminMenuManager />
+      ) : view === "customers" ? (
+        <AdminCustomers />
+      ) : view === "blackouts" ? (
+        <AdminBlackouts />
+      ) : view === "reports" ? (
+        <AdminReports />
       ) : (
         <div className="space-y-8">
           <div className="flex flex-wrap items-start justify-between gap-4">
@@ -132,7 +169,12 @@ export function AdminDashboard() {
                 Manage reservations, seating, and walk-ins
               </p>
             </div>
-            <ManualBookingForm onCreated={fetchBookings} />
+            <div className="flex flex-wrap gap-3">
+              <Button type="button" variant="outline" onClick={exportCsv}>
+                Export CSV
+              </Button>
+              <ManualBookingForm onCreated={fetchBookings} />
+            </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
@@ -268,6 +310,9 @@ export function AdminDashboard() {
                             <p className="mt-1 font-serif text-lg text-gold/80">
                               {booking.referenceCode}
                             </p>
+                            <p className="mt-1 text-base text-muted">
+                              {BOOKING_SOURCE_LABELS[booking.source]}
+                            </p>
                           </div>
                           <AdminStatusBadge status={booking.status} />
                         </div>
@@ -290,6 +335,29 @@ export function AdminDashboard() {
                       status={selected.status}
                       className="mt-4"
                     />
+                    <p className="mt-3 text-lg text-muted">
+                      Source: {BOOKING_SOURCE_LABELS[selected.source]}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setEditingBooking(selected)}
+                    >
+                      Edit booking
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={resending}
+                      onClick={() => resendConfirmation(selected)}
+                    >
+                      {resending ? "Sending…" : "Resend email"}
+                    </Button>
                   </div>
 
                   <dl className="space-y-4 text-lg">
@@ -397,6 +465,17 @@ export function AdminDashboard() {
             </aside>
           </div>
         </div>
+      )}
+
+      {editingBooking && (
+        <AdminBookingEdit
+          booking={editingBooking}
+          onClose={() => setEditingBooking(null)}
+          onSaved={(booking) => {
+            setSelected(booking);
+            fetchBookings();
+          }}
+        />
       )}
     </AdminShell>
   );

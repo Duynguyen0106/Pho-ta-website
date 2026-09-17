@@ -4,11 +4,19 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 
-export type AdminView = "bookings" | "menu";
+export type AdminView =
+  | "bookings"
+  | "menu"
+  | "customers"
+  | "blackouts"
+  | "reports";
 
 const NAV_ITEMS: { id: AdminView; label: string }[] = [
   { id: "bookings", label: "Bookings" },
   { id: "menu", label: "Menu" },
+  { id: "customers", label: "Customers" },
+  { id: "blackouts", label: "Closures" },
+  { id: "reports", label: "Reports" },
 ];
 
 interface AdminShellProps {
@@ -48,7 +56,7 @@ export function AdminShell({
           aria-label="Admin sections"
           className="border-t border-gold/10 bg-surface-alt/50"
         >
-          <div className="mx-auto flex max-w-7xl gap-2 px-6">
+          <div className="mx-auto flex max-w-7xl flex-wrap gap-1 px-6">
             {NAV_ITEMS.map(({ id, label }) => (
               <button
                 key={id}

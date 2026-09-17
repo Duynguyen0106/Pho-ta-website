@@ -16,6 +16,13 @@ export type BookingStatus =
 
 export type BookingSource = "website" | "phone" | "walk_in";
 
+export interface BlackoutDate {
+  id: string;
+  locationSlug?: LocationSlug;
+  date: string;
+  reason?: string;
+}
+
 export interface Location {
   slug: LocationSlug;
   name: string;
