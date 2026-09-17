@@ -3,11 +3,7 @@ import Link from "next/link";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/Button";
 import { MenuTabs } from "@/components/menu/MenuTabs";
-import {
-  dailyMenuCategories,
-  lunchMenuCategories,
-  lunchMenuNote,
-} from "@/lib/data/menu";
+import { getMenu } from "@/lib/db/menu-store";
 
 export const metadata: Metadata = {
   title: "Menu",
@@ -15,7 +11,9 @@ export const metadata: Metadata = {
     "Explore Pho Ta's full Vietnamese menu — daily selections, lunch specials, pho, wok & grill, and more.",
 };
 
-export default function MenuPage() {
+export default async function MenuPage() {
+  const menu = await getMenu();
+
   return (
     <div className="mx-auto max-w-4xl px-6 py-24">
       <SectionHeading
@@ -25,9 +23,9 @@ export default function MenuPage() {
       />
 
       <MenuTabs
-        dailyCategories={dailyMenuCategories}
-        lunchCategories={lunchMenuCategories}
-        lunchNote={lunchMenuNote}
+        dailyCategories={menu.daily}
+        lunchCategories={menu.lunch}
+        lunchNote={menu.lunchNote}
       />
 
       <p className="mt-16 text-center text-[11px] uppercase tracking-[0.2em] text-[#6b635a]">
