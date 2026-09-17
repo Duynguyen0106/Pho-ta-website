@@ -127,6 +127,10 @@ Share the admin URL and password with managers only:
 
 Without Supabase credentials, bookings are stored locally in `.data/` for development only.
 
+**Email confirmations:** Add `RESEND_API_KEY` in Vercel (from [resend.com](https://resend.com)). Until `photarestaurants.com` is verified on Resend, use `EMAIL_FROM=Pho Ta <onboarding@resend.dev>` — guest emails only work after domain verification; staff notifications go to the Resend account inbox.
+
+**SMS:** Add Twilio credentials in Vercel to enable text confirmations.
+
 ### Vercel env vars checklist
 
 Copy these into **Project → Settings → Environment Variables** (all three environments):
@@ -135,8 +139,8 @@ Copy these into **Project → Settings → Environment Variables** (all three en
 NEXT_PUBLIC_SITE_URL=https://www.photarestaurants.com
 NEXT_PUBLIC_SUPABASE_URL=https://sccrvdqrllsgnxctyrhr.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-key
-RESEND_API_KEY=your-key
-EMAIL_FROM=Pho Ta <bookings@photarestaurants.com>
+RESEND_API_KEY=your-resend-api-key
+EMAIL_FROM=Pho Ta <onboarding@resend.dev>
 TWILIO_ACCOUNT_SID=your-sid
 TWILIO_AUTH_TOKEN=your-token
 TWILIO_PHONE_NUMBER=+44...
