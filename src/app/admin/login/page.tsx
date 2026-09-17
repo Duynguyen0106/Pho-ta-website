@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { Logo } from "@/components/layout/Logo";
 import { AdminLoginForm } from "@/components/admin/AdminLoginForm";
 import { isAdminAuthenticated } from "@/lib/auth/admin";
 
@@ -10,10 +11,10 @@ export default async function AdminLoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-6 py-16">
       <div className="w-full max-w-md luxury-card p-10 sm:p-12">
-        <p className="text-center label-caps">Staff</p>
-        <h1 className="mt-4 text-center font-display text-5xl font-normal text-foreground">
-          Pho Ta Admin
-        </h1>
+        <div className="flex justify-center">
+          <Logo linked={false} />
+        </div>
+        <p className="mt-6 text-center label-caps">Staff admin</p>
         <p className="mt-4 text-center text-xl text-muted">
           Sign in to manage bookings and menus
         </p>
