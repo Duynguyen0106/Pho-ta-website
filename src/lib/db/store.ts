@@ -276,6 +276,21 @@ export async function createBooking(
   return booking;
 }
 
+export async function getBookingById(id: string): Promise<Booking | null> {
+  if (useSupabase()) {
+    const supabase = getSupabase();
+    const { data } = await supabase
+      .from("bookings")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+    return data ? mapSupabaseBooking(data) : null;
+  }
+
+  const store = await readLocalStore();
+  return store.bookings.find((b) => b.id === id) ?? null;
+}
+
 export async function getBookingByReference(
   referenceCode: string,
 ): Promise<Booking | null> {
@@ -344,6 +359,11 @@ export async function updateBooking(
       | "reminderSentAt"
       | "confirmationSentAt"
       | "specialRequests"
+      | "customerName"
+      | "customerEmail"
+      | "customerPhone"
+      | "seatingPreference"
+      | "locationSlug"
     >
   > & { date?: string; time?: string; partySize?: number },
 ): Promise<Booking | null> {
@@ -351,6 +371,7 @@ export async function updateBooking(
     const supabase = getSupabase();
     const payload: Record<string, unknown> = {};
     if (updates.status) payload.status = updates.status;
+    if (updates.locationSlug) payload.location_slug = updates.locationSlug;
     if (updates.seatedAtTable !== undefined) {
       payload.seated_at_table = updates.seatedAtTable;
     }
@@ -364,6 +385,16 @@ export async function updateBooking(
     if (updates.date) payload.booking_date = updates.date;
     if (updates.time) payload.booking_time = `${updates.time}:00`;
     if (updates.partySize) payload.party_size = updates.partySize;
+    if (updates.customerName) payload.customer_name = updates.customerName.trim();
+    if (updates.customerEmail) {
+      payload.customer_email = updates.customerEmail.toLowerCase().trim();
+    }
+    if (updates.customerPhone) {
+      payload.customer_phone = updates.customerPhone.replace(/\s/g, "");
+    }
+    if (updates.seatingPreference) {
+      payload.seating_preference = updates.seatingPreference;
+    }
 
     const { data, error } = await supabase
       .from("bookings")
@@ -387,6 +418,142 @@ export async function updateBooking(
   };
   await writeLocalStore(store);
   return store.bookings[index];
+}
+
+export async function listCustomers(search?: string): Promise<Customer[]> {
+  if (useSupabase()) {
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from("customers")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) throw new Error(error.message);
+
+    let customers = (data ?? []).map((row) => ({
+      id: row.id as string,
+      name: row.name as string,
+      email: row.email as string,
+      phone: row.phone as string,
+      notes: (row.notes as string) || undefined,
+      createdAt: row.created_at as string,
+    }));
+
+    if (search?.trim()) {
+      const q = search.trim().toLowerCase();
+      customers = customers.filter(
+        (c) =>
+          c.name.toLowerCase().includes(q) ||
+          c.email.toLowerCase().includes(q) ||
+          c.phone.includes(q),
+      );
+    }
+
+    return customers;
+  }
+
+  const store = await readLocalStore();
+  let customers = [...store.customers].sort((a, b) =>
+    b.createdAt.localeCompare(a.createdAt),
+  );
+
+  if (search?.trim()) {
+    const q = search.trim().toLowerCase();
+    customers = customers.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.email.toLowerCase().includes(q) ||
+        c.phone.includes(q),
+    );
+  }
+
+  return customers;
+}
+
+export async function updateCustomerNotes(
+  id: string,
+  notes: string,
+): Promise<Customer | null> {
+  if (useSupabase()) {
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from("customers")
+      .update({ notes: notes.trim() || null })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw new Error(error.message);
+    return {
+      id: data.id,
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      notes: data.notes ?? undefined,
+      createdAt: data.created_at,
+    };
+  }
+
+  const store = await readLocalStore();
+  const customer = store.customers.find((c) => c.id === id);
+  if (!customer) return null;
+
+  customer.notes = notes.trim() || undefined;
+  await writeLocalStore(store);
+  return customer;
+}
+
+export async function listBookingsForCustomer(
+  customerId: string,
+): Promise<Booking[]> {
+  if (useSupabase()) {
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from("bookings")
+      .select("*")
+      .eq("customer_id", customerId)
+      .order("booking_date", { ascending: false });
+
+    if (error) throw new Error(error.message);
+    return (data ?? []).map(mapSupabaseBooking);
+  }
+
+  const store = await readLocalStore();
+  return store.bookings
+    .filter((b) => b.customerId === customerId)
+    .sort((a, b) => `${b.date}${b.time}`.localeCompare(`${a.date}${a.time}`));
+}
+
+export async function getBookingStats(days = 7): Promise<{
+  totalBookings: number;
+  totalCovers: number;
+  cancelled: number;
+  noShow: number;
+  bySource: Record<string, number>;
+}> {
+  const end = new Date();
+  const start = new Date();
+  start.setDate(start.getDate() - (days - 1));
+  const from = start.toISOString().slice(0, 10);
+  const to = end.toISOString().slice(0, 10);
+
+  const all = await listBookings();
+  const inRange = all.filter((b) => b.date >= from && b.date <= to);
+
+  const bySource: Record<string, number> = {};
+  for (const b of inRange) {
+    bySource[b.source] = (bySource[b.source] ?? 0) + 1;
+  }
+
+  return {
+    totalBookings: inRange.filter((b) => b.status !== "cancelled").length,
+    totalCovers: inRange
+      .filter((b) => b.status !== "cancelled")
+      .reduce((sum, b) => sum + b.partySize, 0),
+    cancelled: inRange.filter((b) => b.status === "cancelled").length,
+    noShow: inRange.filter((b) => b.status === "no_show").length,
+    bySource,
+  };
 }
 
 export async function getBookingsNeedingReminder(): Promise<Booking[]> {

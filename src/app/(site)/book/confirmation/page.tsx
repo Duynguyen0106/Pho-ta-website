@@ -47,6 +47,7 @@ export default async function ConfirmationPage({
       </h1>
       <p className="mt-6 text-lg leading-relaxed text-muted">
         Thank you, {booking.customerName}. Your table at Pho Ta{" "}
+<<<<<<< HEAD
         {location.shortName} is reserved for {dateTime}.
         {booking.confirmationSentAt ? (
           <>
@@ -62,6 +63,10 @@ export default async function ConfirmationPage({
           </>
         )}{" "}
         Please also save this page or print it before you leave.
+=======
+        {location.shortName} is reserved for {dateTime}. This screen is your
+        confirmation — please save or print it before you leave.
+>>>>>>> origin/main
       </p>
 
       <div

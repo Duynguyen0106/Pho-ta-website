@@ -28,8 +28,12 @@ export default async function BookPage({
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-xl leading-relaxed text-muted">
             An intimate evening awaits. Select your venue, time, and seating —
+<<<<<<< HEAD
             we will confirm your reservation by email and show a reference on
             screen to save or print.
+=======
+            you will receive an on-screen confirmation to save or print.
+>>>>>>> origin/main
           </p>
           <div className="gold-line mx-auto mt-8 w-20" />
         </div>

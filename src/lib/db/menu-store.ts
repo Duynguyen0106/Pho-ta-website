@@ -307,3 +307,60 @@ export async function updateLunchNote(
   getBranchMenu(menu, locationSlug).lunchNote = note.trim();
   await persistMenu(menu);
 }
+
+function reorderList<T extends { sortOrder: number }>(
+  list: T[],
+  id: string,
+  direction: "up" | "down",
+  getId: (item: T) => string,
+): boolean {
+  const index = list.findIndex((item) => getId(item) === id);
+  if (index === -1) return false;
+  const swapIndex = direction === "up" ? index - 1 : index + 1;
+  if (swapIndex < 0 || swapIndex >= list.length) return false;
+  [list[index], list[swapIndex]] = [list[swapIndex], list[index]];
+  list.forEach((item, i) => {
+    item.sortOrder = i;
+  });
+  return true;
+}
+
+export async function reorderMenuCategory(
+  categoryId: string,
+  direction: "up" | "down",
+): Promise<boolean> {
+  const menu = await getMenu();
+  for (const locationSlug of ["kentish-town", "finchley-road"] as const) {
+    const branch = getBranchMenu(menu, locationSlug);
+    for (const menuType of ["daily", "lunch"] as const) {
+      const list = categoriesForType(branch, menuType);
+      if (reorderList(list, categoryId, direction, (c) => c.id)) {
+        await persistMenu(menu);
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+export async function reorderMenuItem(
+  itemId: string,
+  direction: "up" | "down",
+): Promise<boolean> {
+  const menu = await getMenu();
+  const found = findItem(menu, itemId);
+  if (!found) return false;
+
+  if (
+    reorderList(
+      found.category.items,
+      itemId,
+      direction,
+      (item) => item.id,
+    )
+  ) {
+    await persistMenu(menu);
+    return true;
+  }
+  return false;
+}

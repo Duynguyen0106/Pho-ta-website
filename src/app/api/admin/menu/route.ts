@@ -10,6 +10,8 @@ import {
   updateLunchNote,
   updateMenuCategory,
   updateMenuItem,
+  reorderMenuCategory,
+  reorderMenuItem,
 } from "@/lib/db/menu-store";
 import type { MenuData } from "@/lib/menu/types";
 
@@ -86,6 +88,20 @@ export async function POST(request: NextRequest) {
       }
       case "deleteItem": {
         const ok = await deleteMenuItem(body.id);
+        if (!ok) {
+          return NextResponse.json({ error: "Item not found" }, { status: 404 });
+        }
+        return NextResponse.json({ ok: true });
+      }
+      case "reorderCategory": {
+        const ok = await reorderMenuCategory(body.id, body.direction);
+        if (!ok) {
+          return NextResponse.json({ error: "Category not found" }, { status: 404 });
+        }
+        return NextResponse.json({ ok: true });
+      }
+      case "reorderItem": {
+        const ok = await reorderMenuItem(body.id, body.direction);
         if (!ok) {
           return NextResponse.json({ error: "Item not found" }, { status: 404 });
         }

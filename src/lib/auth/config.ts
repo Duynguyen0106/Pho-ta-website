@@ -1,2 +1,4 @@
-/** Staff dashboard password — set here so login works even when Vercel env is stale. */
-export const ADMIN_PASSWORD = "123456";
+/** Staff dashboard password — env var preferred; fallback for local dev. */
+export function resolveAdminPassword(): string {
+  return process.env.ADMIN_PASSWORD?.trim() || "123456";
+}

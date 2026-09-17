@@ -4,6 +4,7 @@ import {
   MIN_LEAD_MINUTES,
 } from "../constants";
 import { getLocation } from "../data/locations";
+import { isDateBlackout } from "../db/blackout-store";
 import { getBookingsForSlot } from "../db/store";
 import type { AvailabilitySlot, LocationSlug } from "../types";
 
@@ -46,6 +47,18 @@ export async function getAvailability(
 
   if (selectedDate < today || selectedDate > maxDate) {
     return [];
+  }
+
+  if (await isDateBlackout(locationSlug, date)) {
+    return generateTimeSlots(
+      location.openTime,
+      location.closeTime,
+      location.slotIntervalMinutes,
+    ).map((time) => ({
+      time,
+      available: false,
+      remainingCovers: 0,
+    }));
   }
 
   const slots = generateTimeSlots(
