@@ -51,8 +51,8 @@ export function getEnvStatus(): EnvStatus {
   if (isProd && !hasCronSecret) {
     warnings.push("CRON_SECRET is not set — reminder endpoint is unprotected.");
   }
-  if (isProd && process.env.ADMIN_PASSWORD === "phota-admin-dev") {
-    warnings.push("Change ADMIN_PASSWORD from the default dev value.");
+  if (isProd && (!process.env.ADMIN_PASSWORD || process.env.ADMIN_PASSWORD === "123456")) {
+    warnings.push("Set a strong ADMIN_PASSWORD for production.");
   }
 
   return {

@@ -50,7 +50,7 @@ for (const check of checks) {
     } else {
       console.log(`○ ${check.name} (${check.key}) — not set (recommended)`);
     }
-  } else if (check.key === "ADMIN_PASSWORD" && value === "phota-admin-dev") {
+  } else if (check.key === "ADMIN_PASSWORD" && value === "123456") {
     console.log(`⚠ ${check.name} — still using default dev password`);
     hasWarnings = true;
   } else {
