@@ -1,3 +1,5 @@
+import { siteImages } from "./images";
+
 export interface MenuItem {
   name: string;
   description: string;
@@ -94,21 +96,18 @@ export const featuredDishes = [
     name: "Bun Cha",
     description:
       "A traditional Vietnamese pork dish from Hanoi — grilled pork with vermicelli, pickles, and fresh herbs.",
-    image:
-      "https://images.unsplash.com/photo-1555126634-323283e090fa?w=800&q=80",
+    image: siteImages.dishes.bunCha,
   },
   {
     name: "Vegetable Pho",
     description:
       "Fresh, healthy, and full of flavour — a customer favourite any time of day.",
-    image:
-      "https://images.unsplash.com/photo-1617093727343-374698b1b08d?w=800&q=80",
+    image: siteImages.dishes.vegetablePho,
   },
   {
     name: "Special Pho",
     description:
       "Our signature take on the classic — rich broth, fresh ingredients, and extras on the side.",
-    image:
-      "https://images.unsplash.com/photo-1591814468924-caf87d6592d3?w=800&q=80",
+    image: siteImages.dishes.specialPho,
   },
 ];

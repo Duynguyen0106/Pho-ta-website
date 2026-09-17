@@ -2,6 +2,8 @@
 
 import { format } from "date-fns";
 import { useCallback, useEffect, useState } from "react";
+import { AdminHelp } from "@/components/admin/AdminHelp";
+import { ManualBookingForm } from "@/components/admin/ManualBookingForm";
 import { Button } from "@/components/ui/Button";
 import {
   BOOKING_STATUS_LABELS,
@@ -86,6 +88,12 @@ export function AdminDashboard() {
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+        <AdminHelp />
+
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+          <ManualBookingForm onCreated={fetchBookings} />
+        </div>
+
         <div className="mb-6 grid gap-4 sm:grid-cols-3">
           <div className="rounded-xl bg-white p-4 shadow-sm">
             <p className="text-sm text-[#5c534a]">Today&apos;s bookings</p>
