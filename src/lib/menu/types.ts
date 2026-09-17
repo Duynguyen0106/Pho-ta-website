@@ -1,5 +1,12 @@
 export type MenuType = "daily" | "lunch";
 
+export type MenuLocationSlug = "kentish-town" | "finchley-road";
+
+export const MENU_LOCATION_SLUGS: MenuLocationSlug[] = [
+  "kentish-town",
+  "finchley-road",
+];
+
 export interface MenuVariant {
   id: string;
   protein: string;
@@ -27,19 +34,25 @@ export interface MenuCategory {
   items: MenuItem[];
 }
 
-export interface MenuData {
+export interface BranchMenu {
   daily: MenuCategory[];
   lunch: MenuCategory[];
   lunchNote: string;
 }
 
+export interface MenuData {
+  branches: Record<MenuLocationSlug, BranchMenu>;
+}
+
 export interface CreateMenuCategoryInput {
+  locationSlug: MenuLocationSlug;
   menuType: MenuType;
   name: string;
   note?: string;
 }
 
 export interface CreateMenuItemInput {
+  locationSlug: MenuLocationSlug;
   categoryId: string;
   name: string;
   description: string;

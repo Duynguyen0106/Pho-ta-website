@@ -92,9 +92,21 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ ok: true });
       }
       case "updateLunchNote": {
-        await updateLunchNote(body.note ?? "");
+        const locationSlug = body.locationSlug as
+          | "kentish-town"
+          | "finchley-road"
+          | undefined;
+        if (!locationSlug) {
+          return NextResponse.json(
+            { error: "locationSlug is required" },
+            { status: 400 },
+          );
+        }
+        await updateLunchNote(locationSlug, body.note ?? "");
         const menu = await getMenu();
-        return NextResponse.json({ lunchNote: menu.lunchNote });
+        return NextResponse.json({
+          lunchNote: menu.branches[locationSlug].lunchNote,
+        });
       }
       default:
         return NextResponse.json({ error: "Unknown action" }, { status: 400 });

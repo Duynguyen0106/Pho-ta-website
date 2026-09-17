@@ -7,9 +7,11 @@ import type {
   MenuCategory,
   MenuData,
   MenuItem,
+  MenuLocationSlug,
   MenuType,
   MenuVariant,
 } from "@/lib/menu/types";
+import { locations } from "@/lib/data/locations";
 import { cn } from "@/lib/utils";
 
 async function menuAction(body: Record<string, unknown>) {
@@ -49,6 +51,8 @@ function draftToVariants(drafts: VariantDraft[]) {
 
 export function AdminMenuManager() {
   const [menu, setMenu] = useState<MenuData | null>(null);
+  const [locationSlug, setLocationSlug] =
+    useState<MenuLocationSlug>("kentish-town");
   const [menuType, setMenuType] = useState<MenuType>("daily");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -83,10 +87,11 @@ export function AdminMenuManager() {
     loadMenu();
   }, [loadMenu]);
 
-  const categories = menu
+  const branchMenu = menu?.branches[locationSlug];
+  const categories = branchMenu
     ? menuType === "daily"
-      ? menu.daily
-      : menu.lunch
+      ? branchMenu.daily
+      : branchMenu.lunch
     : [];
 
   function openNewItem(category: MenuCategory) {
@@ -134,6 +139,7 @@ export function AdminMenuManager() {
       } else {
         await menuAction({
           action: "createItem",
+          locationSlug,
           categoryId: draft.categoryId,
           ...payload,
         });
@@ -167,7 +173,12 @@ export function AdminMenuManager() {
     if (!name?.trim()) return;
     setSaving(true);
     try {
-      await menuAction({ action: "createCategory", menuType, name: name.trim() });
+      await menuAction({
+        action: "createCategory",
+        locationSlug,
+        menuType,
+        name: name.trim(),
+      });
       await loadMenu();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to add category");
@@ -203,6 +214,25 @@ export function AdminMenuManager() {
 
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="inline-flex rounded-lg border border-[#e8e0d4] bg-white p-1">
+          {locations.map((location) => (
+            <button
+              key={location.slug}
+              type="button"
+              onClick={() =>
+                setLocationSlug(location.slug as MenuLocationSlug)
+              }
+              className={cn(
+                "rounded-md px-4 py-2 text-sm transition",
+                locationSlug === location.slug
+                  ? "bg-[#9a7b32] text-white"
+                  : "text-[#5c534a] hover:bg-[#f5f2ed]",
+              )}
+            >
+              {location.shortName}
+            </button>
+          ))}
+        </div>
+        <div className="inline-flex rounded-lg border border-[#e8e0d4] bg-white p-1">
           {(["daily", "lunch"] as const).map((type) => (
             <button
               key={type}
@@ -211,7 +241,7 @@ export function AdminMenuManager() {
               className={cn(
                 "rounded-md px-4 py-2 text-sm capitalize transition",
                 menuType === type
-                  ? "bg-[#1a3c34] text-white"
+                  ? "bg-[#9a7b32] text-white"
                   : "text-[#5c534a] hover:bg-[#f5f2ed]",
               )}
             >
@@ -224,16 +254,25 @@ export function AdminMenuManager() {
         </Button>
       </div>
 
-      {menuType === "lunch" && menu && (
+      {menuType === "lunch" && menu && branchMenu && (
         <div className="rounded-xl bg-white p-4 shadow-sm">
           <label className="block text-sm font-medium text-[#5c534a]">
-            Lunch hours note
+            Lunch hours note — {locations.find((l) => l.slug === locationSlug)?.shortName}
           </label>
           <div className="mt-2 flex gap-2">
             <input
-              value={menu.lunchNote}
+              value={branchMenu.lunchNote}
               onChange={(e) =>
-                setMenu({ ...menu, lunchNote: e.target.value })
+                setMenu({
+                  ...menu,
+                  branches: {
+                    ...menu.branches,
+                    [locationSlug]: {
+                      ...branchMenu,
+                      lunchNote: e.target.value,
+                    },
+                  },
+                })
               }
               className="flex-1 rounded-lg border border-[#e8e0d4] px-3 py-2 text-sm"
             />
@@ -246,7 +285,8 @@ export function AdminMenuManager() {
                 try {
                   await menuAction({
                     action: "updateLunchNote",
-                    note: menu.lunchNote,
+                    locationSlug,
+                    note: branchMenu.lunchNote,
                   });
                 } catch (e) {
                   setError(e instanceof Error ? e.message : "Update failed");

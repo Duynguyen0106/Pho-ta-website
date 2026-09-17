@@ -2,16 +2,19 @@ import { promises as fs } from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
 import { buildSeedMenu } from "@/lib/menu/normalize";
+import { getBranchMenu, normalizeMenuData } from "@/lib/menu/migrate";
 import {
   createServerClient,
   isSupabaseConfigured,
 } from "../supabase/client";
 import type {
+  BranchMenu,
   CreateMenuCategoryInput,
   CreateMenuItemInput,
   MenuCategory,
   MenuData,
   MenuItem,
+  MenuLocationSlug,
   MenuType,
   UpdateMenuItemInput,
 } from "@/lib/menu/types";
@@ -32,7 +35,7 @@ function getSupabase() {
 async function readLocalMenu(): Promise<MenuData | null> {
   try {
     const raw = await fs.readFile(MENU_FILE, "utf-8");
-    return JSON.parse(raw) as MenuData;
+    return normalizeMenuData(JSON.parse(raw));
   } catch {
     return null;
   }
@@ -53,7 +56,6 @@ async function readSupabaseMenu(): Promise<MenuData | null> {
     .maybeSingle();
 
   if (error) {
-    // Table not migrated yet — fall back to seed on first getMenu()
     if (
       error.message.includes("menu_settings") ||
       error.code === "PGRST205"
@@ -64,21 +66,25 @@ async function readSupabaseMenu(): Promise<MenuData | null> {
   }
   if (!data) return null;
 
-  return {
-    ...(data.data as Omit<MenuData, "lunchNote">),
-    lunchNote: data.lunch_note as string,
-  };
+  const menu = normalizeMenuData(data.data);
+
+  if (
+    !menu.branches["kentish-town"].lunchNote &&
+    typeof data.lunch_note === "string"
+  ) {
+    menu.branches["kentish-town"].lunchNote = data.lunch_note;
+    menu.branches["finchley-road"].lunchNote = data.lunch_note;
+  }
+
+  return menu;
 }
 
 async function writeSupabaseMenu(menu: MenuData): Promise<void> {
   const supabase = getSupabase();
   const { error } = await supabase.from("menu_settings").upsert({
     id: "default",
-    lunch_note: menu.lunchNote,
-    data: {
-      daily: menu.daily,
-      lunch: menu.lunch,
-    },
+    lunch_note: menu.branches["kentish-town"].lunchNote,
+    data: menu,
     updated_at: new Date().toISOString(),
   });
 
@@ -103,19 +109,29 @@ async function persistMenu(menu: MenuData): Promise<void> {
   }
 }
 
-function categoriesForType(menu: MenuData, menuType: MenuType): MenuCategory[] {
-  return menuType === "daily" ? menu.daily : menu.lunch;
+function categoriesForType(
+  branch: BranchMenu,
+  menuType: MenuType,
+): MenuCategory[] {
+  return menuType === "daily" ? branch.daily : branch.lunch;
 }
 
-function findItem(menu: MenuData, itemId: string): {
+function findItem(
+  menu: MenuData,
+  itemId: string,
+): {
+  locationSlug: MenuLocationSlug;
   menuType: MenuType;
   category: MenuCategory;
   item: MenuItem;
 } | null {
-  for (const menuType of ["daily", "lunch"] as const) {
-    for (const category of categoriesForType(menu, menuType)) {
-      const item = category.items.find((i) => i.id === itemId);
-      if (item) return { menuType, category, item };
+  for (const locationSlug of ["kentish-town", "finchley-road"] as const) {
+    const branch = getBranchMenu(menu, locationSlug);
+    for (const menuType of ["daily", "lunch"] as const) {
+      for (const category of categoriesForType(branch, menuType)) {
+        const item = category.items.find((i) => i.id === itemId);
+        if (item) return { locationSlug, menuType, category, item };
+      }
     }
   }
   return null;
@@ -140,16 +156,25 @@ export async function getMenu(): Promise<MenuData> {
   return menu;
 }
 
+export async function getBranchMenuForLocation(
+  locationSlug: MenuLocationSlug,
+): Promise<BranchMenu> {
+  const menu = await getMenu();
+  return getBranchMenu(menu, locationSlug);
+}
+
 export async function saveMenu(menu: MenuData): Promise<MenuData> {
-  await persistMenu(menu);
-  return menu;
+  const normalized = normalizeMenuData(menu);
+  await persistMenu(normalized);
+  return normalized;
 }
 
 export async function createMenuCategory(
   input: CreateMenuCategoryInput,
 ): Promise<MenuCategory> {
   const menu = await getMenu();
-  const list = categoriesForType(menu, input.menuType);
+  const branch = getBranchMenu(menu, input.locationSlug);
+  const list = categoriesForType(branch, input.menuType);
   const category: MenuCategory = {
     id: `cat-${randomUUID().slice(0, 8)}`,
     menuType: input.menuType,
@@ -168,30 +193,36 @@ export async function updateMenuCategory(
   updates: { name?: string; note?: string },
 ): Promise<MenuCategory | null> {
   const menu = await getMenu();
-  for (const menuType of ["daily", "lunch"] as const) {
-    const category = categoriesForType(menu, menuType).find(
-      (c) => c.id === categoryId,
-    );
-    if (!category) continue;
-    if (updates.name !== undefined) category.name = updates.name.trim();
-    if (updates.note !== undefined) {
-      category.note = updates.note.trim() || undefined;
+  for (const locationSlug of ["kentish-town", "finchley-road"] as const) {
+    const branch = getBranchMenu(menu, locationSlug);
+    for (const menuType of ["daily", "lunch"] as const) {
+      const category = categoriesForType(branch, menuType).find(
+        (c) => c.id === categoryId,
+      );
+      if (!category) continue;
+      if (updates.name !== undefined) category.name = updates.name.trim();
+      if (updates.note !== undefined) {
+        category.note = updates.note.trim() || undefined;
+      }
+      await persistMenu(menu);
+      return category;
     }
-    await persistMenu(menu);
-    return category;
   }
   return null;
 }
 
 export async function deleteMenuCategory(categoryId: string): Promise<boolean> {
   const menu = await getMenu();
-  for (const menuType of ["daily", "lunch"] as const) {
-    const list = categoriesForType(menu, menuType);
-    const index = list.findIndex((c) => c.id === categoryId);
-    if (index === -1) continue;
-    list.splice(index, 1);
-    await persistMenu(menu);
-    return true;
+  for (const locationSlug of ["kentish-town", "finchley-road"] as const) {
+    const branch = getBranchMenu(menu, locationSlug);
+    for (const menuType of ["daily", "lunch"] as const) {
+      const list = categoriesForType(branch, menuType);
+      const index = list.findIndex((c) => c.id === categoryId);
+      if (index === -1) continue;
+      list.splice(index, 1);
+      await persistMenu(menu);
+      return true;
+    }
   }
   return false;
 }
@@ -200,7 +231,8 @@ export async function createMenuItem(
   input: CreateMenuItemInput,
 ): Promise<MenuItem | null> {
   const menu = await getMenu();
-  const category = [...menu.daily, ...menu.lunch].find(
+  const branch = getBranchMenu(menu, input.locationSlug);
+  const category = [...branch.daily, ...branch.lunch].find(
     (c) => c.id === input.categoryId,
   );
   if (!category) return null;
@@ -264,8 +296,11 @@ export async function deleteMenuItem(itemId: string): Promise<boolean> {
   return true;
 }
 
-export async function updateLunchNote(note: string): Promise<void> {
+export async function updateLunchNote(
+  locationSlug: MenuLocationSlug,
+  note: string,
+): Promise<void> {
   const menu = await getMenu();
-  menu.lunchNote = note.trim();
+  getBranchMenu(menu, locationSlug).lunchNote = note.trim();
   await persistMenu(menu);
 }
