@@ -42,12 +42,12 @@ export function Footer() {
 
         <div>
           <h4 className="text-base font-medium uppercase tracking-[0.16em] text-gold">
-            Information
+            Guest information
           </h4>
           <ul className="mt-4 space-y-3 text-lg">
             <li>
               <Link href="/faq" className="text-muted transition hover:text-gold">
-                Questions & Answers
+                Questions & answers
               </Link>
             </li>
             <li>
@@ -59,16 +59,17 @@ export function Footer() {
               </Link>
             </li>
             <li>
-              <Link href="/book" className="text-muted transition hover:text-gold">
-                Reservations
-              </Link>
-            </li>
-            <li>
               <Link href="/privacy" className="text-muted transition hover:text-gold">
                 Privacy policy
               </Link>
             </li>
           </ul>
+          <Link
+            href="/book"
+            className="mt-6 inline-flex border border-gold px-5 py-2.5 text-base font-medium uppercase tracking-[0.1em] text-gold transition hover:bg-gold hover:text-white"
+          >
+            Reserve
+          </Link>
           <p className="mt-6 text-lg text-muted">
             Mon – Sun · 11:30am – 9:30pm
           </p>
