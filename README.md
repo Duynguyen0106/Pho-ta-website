@@ -53,9 +53,9 @@ npm run check-setup
    SMTP_HOST=smtp.gmail.com
    SMTP_PORT=587
    SMTP_SECURE=false
-   SMTP_USER=Phovagrill@gmail.com
+   SMTP_USER=Photafinchley@gmail.com
    SMTP_PASS=your-16-char-app-password
-   EMAIL_FROM="Pho Ta <Phovagrill@gmail.com>"
+   EMAIL_FROM="Pho Ta <Photafinchley@gmail.com>"
    STAFF_NOTIFICATION_EMAIL=duydichdanh@gmail.com
    ```
 
