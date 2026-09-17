@@ -99,7 +99,7 @@ export function Header() {
           <button
             type="button"
             className={cn(
-              "rounded border p-2 transition lg:hidden",
+              "flex min-h-11 min-w-11 items-center justify-center rounded border transition lg:hidden",
               onHero
                 ? "border-white/30 text-white hover:border-white"
                 : "border-gold/30 text-gold hover:border-gold",
@@ -143,15 +143,20 @@ export function Header() {
             <Link href="/book" className={cn(reserveClass, "w-full text-center")}>
               Reserve a table
             </Link>
-            <p className="mt-4 text-center text-sm text-muted">
-              <Link href="/faq" className="hover:text-gold">
-                Q&A
+            <div className="mt-4 flex flex-col gap-1">
+              <Link
+                href="/faq"
+                className="flex min-h-11 items-center justify-center rounded px-3 text-base text-muted transition hover:bg-surface-alt hover:text-gold"
+              >
+                Questions & answers
               </Link>
-              <span className="mx-2 text-gold/40">·</span>
-              <Link href="/food-safety" className="hover:text-gold">
+              <Link
+                href="/food-safety"
+                className="flex min-h-11 items-center justify-center rounded px-3 text-base text-muted transition hover:bg-surface-alt hover:text-gold"
+              >
                 Allergies & hygiene
               </Link>
-            </p>
+            </div>
           </div>
         </nav>
       )}

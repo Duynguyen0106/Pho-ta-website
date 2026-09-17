@@ -100,7 +100,7 @@ export function AdminCalendar({
         onToday={() => onAnchorChange(format(new Date(), "yyyy-MM-dd"))}
       />
 
-      <div className="grid gap-4 lg:grid-cols-7">
+      <div className="flex gap-4 overflow-x-auto pb-2 lg:grid lg:grid-cols-7 lg:overflow-visible lg:pb-0">
         {days.map((day) => {
           const dateStr = format(day, "yyyy-MM-dd");
           const dayBookings = bookings
@@ -112,14 +112,14 @@ export function AdminCalendar({
             <div
               key={dateStr}
               className={cn(
-                "luxury-card min-h-[200px] p-4",
+                "luxury-card min-h-[200px] min-w-[260px] shrink-0 p-4 lg:min-w-0",
                 isToday && "border-gold/40 ring-1 ring-gold/30",
               )}
             >
               <button
                 type="button"
                 onClick={() => onAnchorChange(dateStr)}
-                className="mb-3 w-full text-left"
+                className="mb-3 flex min-h-11 w-full items-center text-left"
               >
                 <p className="text-sm uppercase tracking-[0.12em] text-gold">
                   {format(day, "EEE")}
@@ -139,7 +139,7 @@ export function AdminCalendar({
                         type="button"
                         onClick={() => onSelect(booking)}
                         className={cn(
-                          "w-full rounded border-l-4 bg-surface-alt/50 px-2 py-2 text-left text-sm transition hover:bg-surface-alt",
+                          "min-h-11 w-full rounded border-l-4 bg-surface-alt/50 px-3 py-2.5 text-left text-sm transition hover:bg-surface-alt",
                           STATUS_BORDER[booking.status],
                           selectedId === booking.id &&
                             "ring-1 ring-gold/50",
@@ -219,21 +219,23 @@ function CalendarNav({
         <button
           type="button"
           onClick={onPrev}
-          className="rounded border border-gold/25 px-4 py-2 text-base text-muted hover:border-gold hover:text-foreground"
+          className="flex min-h-11 min-w-11 items-center justify-center rounded border border-gold/25 text-base text-muted hover:border-gold hover:text-foreground"
+          aria-label="Previous"
         >
           ←
         </button>
         <button
           type="button"
           onClick={onNext}
-          className="rounded border border-gold/25 px-4 py-2 text-base text-muted hover:border-gold hover:text-foreground"
+          className="flex min-h-11 min-w-11 items-center justify-center rounded border border-gold/25 text-base text-muted hover:border-gold hover:text-foreground"
+          aria-label="Next"
         >
           →
         </button>
         <button
           type="button"
           onClick={onToday}
-          className="rounded border border-gold/25 px-4 py-2 text-base text-muted hover:border-gold hover:text-foreground"
+          className="min-h-11 rounded border border-gold/25 px-4 py-2 text-base text-muted hover:border-gold hover:text-foreground"
         >
           Today
         </button>

@@ -23,20 +23,19 @@ export default async function MenuPage({ searchParams }: MenuPageProps) {
   return (
     <>
       <section className="border-b border-gold/15 bg-surface-alt/60">
-        <div className="mx-auto max-w-6xl px-6 py-16 text-center sm:py-20">
+        <div className="mx-auto max-w-6xl px-6 py-10 text-center sm:py-20">
           <p className="label-caps">Cuisine</p>
-          <h1 className="mt-4 font-display text-5xl font-normal tracking-wide text-foreground sm:text-6xl">
+          <h1 className="mt-3 font-display text-4xl font-normal tracking-wide text-foreground sm:mt-4 sm:text-6xl">
             The Menu
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-xl leading-relaxed text-muted">
-            Premium ingredients and Vietnamese tradition — ask our menu helper
-            about any dish, and reserve when you are ready.
+          <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-muted sm:mt-6 sm:text-xl">
+            Browse our dishes, filter by dietary tags, or ask the menu helper.
           </p>
-          <div className="gold-line mx-auto mt-8 w-20" />
+          <div className="gold-line mx-auto mt-6 w-20 sm:mt-8" />
         </div>
       </section>
 
-      <div className="mx-auto min-w-0 max-w-6xl overflow-x-hidden px-6 py-12 sm:py-16">
+      <div className="mx-auto min-w-0 max-w-6xl overflow-x-hidden px-6 py-6 pb-24 sm:py-16 sm:pb-16">
         <MenuTabs
           branchMenu={branchMenu}
           initialTab={initialTab}

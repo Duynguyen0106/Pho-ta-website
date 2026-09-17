@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  --site-header-height: 5.5625rem;
   --background: #100e0c;
   --foreground: #f7f2ea;
   --surface: #1a1714;

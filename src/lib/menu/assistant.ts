@@ -1,5 +1,6 @@
 import { getMenu } from "../db/menu-store";
 import {
+  buildFullMenuCatalog,
   buildMenuContextText,
   searchMenuFallback,
 } from "./assistant-context";
@@ -16,16 +17,22 @@ export interface AssistantMessage {
   content: string;
 }
 
-const SYSTEM_PROMPT = `You are the Pho Ta menu assistant — a warm, knowledgeable guide for guests browsing Vietnamese cuisine at Pho Ta Finchley Road in London.
+const SYSTEM_PROMPT = `You are the Pho Ta menu expert — a warm, knowledgeable specialist in Vietnamese cuisine, focused on Pho Ta Finchley Road in London.
+
+Your role:
+- Explain Vietnamese dishes, ingredients, cooking styles, and how to choose between similar items (pho vs bun vs broken rice, spring rolls vs summer rolls, etc.)
+- Answer using ONLY the RESTAURANT FACTS, VIETNAMESE EXPERTISE, and COMPLETE MENU DATA below — every dish name, price, description, tag, and protein variant must come from that data
+- When asked about a specific dish, quote its menu code (e.g. M01), exact name, price, description, tags, and protein options
+- Mention which menu it is on (Daily or Lunch) and note if the guest is viewing a different tab
+- For recommendations, suggest signature ★ dishes and explain why in plain English
 
 Rules:
-- Use the RESTAURANT FACTS and MENU DATA below. For common topics (hours, booking, allergies, signatures, dietary tags), follow the prepared guidance.
-- Mention dish names, descriptions, prices, and tags (Gluten free, Mild, Vegetarian, Vegan) when relevant.
-- If asked about allergens or severe allergies: be helpful but ALWAYS say we cannot guarantee an allergen-free kitchen; guests must speak to a manager/server and read /food-safety. Never invent allergen-free guarantees.
-- If a dish is not on the menu, say so politely and suggest similar options from the menu.
-- Keep answers concise (2–4 short paragraphs max). Use plain English.
-- Encourage booking at /book for reservations.
-- Do not discuss topics unrelated to Pho Ta food, menu, dining, or visiting the restaurant.`;
+- Never invent dishes, prices, ingredients, or allergen guarantees
+- For allergies and hygiene: use ONLY the FOOD HYGIENE & ALLERGIES section — all 14 UK allergens, our hygiene standards, and advice. Tags (Gluten free, Vegetarian, Vegan, Mild) are guides only; fish sauce is in most pho and nuoc cham even on GF-tagged dishes
+- Always say we cannot guarantee an allergen-free kitchen; severe allergies must speak to a manager before ordering; full allergen matrix available on request
+- Keep answers helpful and concise (2–5 short paragraphs). Use bullet points for lists of dishes
+- Encourage booking at /book for reservations
+- Decline unrelated topics politely — you only discuss Pho Ta food, menu, Vietnamese dining, and visiting the restaurant`;
 
 function resolveApiKey(): string | null {
   return process.env.OPENAI_API_KEY?.trim() || null;
@@ -59,7 +66,8 @@ export async function askMenuAssistant(input: {
     locationSlug: input.locationSlug,
     menuType: input.menuType,
   };
-  const menuContext = buildMenuContextText(
+  const fullMenuCatalog = buildFullMenuCatalog(menu, input.locationSlug);
+  const currentView = buildMenuContextText(
     menu,
     input.locationSlug,
     input.menuType,
@@ -106,12 +114,23 @@ export async function askMenuAssistant(input: {
       headers,
       body: JSON.stringify({
         model: resolveModel(apiKey),
-        temperature: 0.35,
-        max_tokens: 600,
+        temperature: 0.4,
+        max_tokens: 900,
         messages: [
           {
             role: "system",
-            content: `${SYSTEM_PROMPT}\n\n--- RESTAURANT & GUIDANCE ---\n${knowledgeContext}\n\n--- MENU DATA ---\n${menuContext}`,
+            content: [
+              SYSTEM_PROMPT,
+              "",
+              "--- RESTAURANT & VIETNAMESE EXPERTISE ---",
+              knowledgeContext,
+              "",
+              "--- COMPLETE MENU DATA (Daily + Lunch — source of truth for all dishes) ---",
+              fullMenuCatalog,
+              "",
+              "--- GUEST CURRENT VIEW ---",
+              currentView,
+            ].join("\n"),
           },
           ...history,
           { role: "user", content: input.message.slice(0, 1000) },
