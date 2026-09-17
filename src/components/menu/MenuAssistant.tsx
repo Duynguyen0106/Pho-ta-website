@@ -105,7 +105,7 @@ export function MenuAssistant({ menuTab, branchLabel }: MenuAssistantProps) {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-40 flex items-center gap-3 rounded-full border border-gold/40 bg-gold px-5 py-4 text-base font-medium uppercase tracking-[0.1em] text-white shadow-lg transition hover:bg-gold-light sm:bottom-8 sm:right-8"
+          className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-4 z-40 flex min-h-12 items-center gap-2 rounded-full border border-gold/40 bg-gold px-4 py-3 text-sm font-medium uppercase tracking-[0.1em] text-white shadow-lg transition hover:bg-gold-light sm:bottom-8 sm:right-8 sm:gap-3 sm:px-5 sm:py-4 sm:text-base"
           aria-label="Open menu assistant"
         >
           <MessageCircle size={22} strokeWidth={1.5} />
@@ -115,7 +115,7 @@ export function MenuAssistant({ menuTab, branchLabel }: MenuAssistantProps) {
 
       {open && (
         <div
-          className="fixed bottom-0 right-0 z-50 flex h-[min(560px,100dvh)] w-full flex-col border border-gold/20 bg-background shadow-2xl sm:bottom-8 sm:right-8 sm:h-[520px] sm:max-w-md sm:rounded-lg"
+          className="fixed inset-x-0 bottom-0 z-50 flex h-[min(560px,85dvh)] w-full flex-col border border-gold/20 bg-background shadow-2xl sm:inset-x-auto sm:bottom-8 sm:right-8 sm:h-[520px] sm:max-w-md sm:rounded-lg"
           role="dialog"
           aria-label="Menu assistant"
         >
@@ -164,14 +164,14 @@ export function MenuAssistant({ menuTab, branchLabel }: MenuAssistantProps) {
           </div>
 
           <div className="border-t border-gold/15 px-5 py-4">
-            <div className="mb-3 flex flex-wrap gap-2">
+            <div className="menu-category-rail mb-3 flex gap-2 overflow-x-auto pb-1">
               {SUGGESTIONS.map((suggestion) => (
                 <button
                   key={suggestion}
                   type="button"
                   disabled={loading}
                   onClick={() => sendMessage(suggestion)}
-                  className="rounded-full border border-gold/20 px-3 py-1.5 text-xs uppercase tracking-[0.06em] text-muted transition hover:border-gold/40 hover:text-gold disabled:opacity-50"
+                  className="min-h-11 shrink-0 whitespace-nowrap rounded-full border border-gold/20 px-4 py-2 text-xs uppercase tracking-[0.06em] text-muted transition hover:border-gold/40 hover:text-gold disabled:opacity-50"
                 >
                   {suggestion}
                 </button>

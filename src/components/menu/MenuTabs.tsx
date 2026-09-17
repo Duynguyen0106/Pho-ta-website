@@ -113,7 +113,7 @@ function MenuItemRow({ item }: { item: MenuItem }) {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-            <h3 className="font-serif text-2xl font-normal text-foreground sm:text-[1.65rem]">
+            <h3 className="font-serif text-xl font-normal text-foreground sm:text-[1.65rem]">
               {item.name}
             </h3>
             {item.featured && (
@@ -146,20 +146,23 @@ function MenuItemRow({ item }: { item: MenuItem }) {
 }
 
 function categoryPillLabel(name: string): string {
+  const normalized = name.replace(/[\u2018\u2019]/g, "'").trim();
   const labels: Record<string, string> = {
     STARTERS: "Starters",
     "VIETNAMESE NOM SALAD": "Salads",
-    "CHEF’s SPECIAL MENU": "Chef's special",
+    "CHEF's SPECIAL MENU": "Chef's special",
+    "CHEF’S SPECIAL MENU": "Chef's special",
     "MAIN COURSES PHO SOUP STYLE": "Pho & noodles",
     "WOK AND GRILL": "Wok & grill",
     "VIETNAMESE BROKEN RICE": "Broken rice",
     "VEGETERIAN MENU": "Vegetarian",
-    "KID’s CORNER": "Kids",
+    "KID's CORNER": "Kids",
+    "KID’S CORNER": "Kids",
     "Noodle Soup": "Noodle soup",
     "Wok & Grill": "Wok & grill",
     "Broken Rice": "Broken rice",
   };
-  return labels[name] ?? name.replace(/\s+MENU$/i, "").trim();
+  return labels[normalized] ?? normalized.replace(/\s+MENU$/i, "").trim();
 }
 
 function CategoryScrollBar({
@@ -270,7 +273,7 @@ function CategoryScrollBar({
             title={category.name}
             onClick={() => onSelect(category.id)}
             className={cn(
-              "max-w-[11rem] shrink-0 snap-start truncate rounded-full border px-4 py-2.5 text-sm uppercase tracking-[0.08em] transition sm:max-w-none sm:whitespace-nowrap",
+              "min-h-11 shrink-0 snap-start whitespace-nowrap rounded-full border px-4 py-2.5 text-sm uppercase tracking-[0.08em] transition",
               activeCategory === category.id
                 ? "border-gold bg-gold/15 text-gold"
                 : "border-gold/20 text-muted hover:border-gold/40 hover:text-foreground",
@@ -294,7 +297,7 @@ function MenuCategorySection({ category }: { category: MenuCategory }) {
   return (
     <section
       id={`menu-${category.id}`}
-      className="scroll-mt-48 luxury-card overflow-hidden"
+      className="scroll-mt-36 md:scroll-mt-48 luxury-card overflow-hidden"
     >
       <div className="border-b border-gold/15 bg-surface-alt/40 px-6 py-5 sm:px-8">
         <div className="flex flex-wrap items-end justify-between gap-3">
@@ -407,9 +410,9 @@ export function MenuTabs({
 
   return (
     <>
-      <div className="sticky top-[4.5rem] z-30 -mx-6 min-w-0 overflow-hidden border-b border-gold/10 bg-background/95 px-6 py-4 backdrop-blur-xl sm:-mx-0">
-        <div className="mx-auto min-w-0 max-w-5xl space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="sticky top-[var(--site-header-height)] z-30 -mx-6 min-w-0 overflow-hidden border-b border-gold/10 bg-background/95 px-6 py-3 backdrop-blur-xl sm:-mx-0 sm:py-4">
+        <div className="mx-auto min-w-0 max-w-5xl space-y-3 sm:space-y-4">
+          <div className="flex items-center justify-between gap-3">
             <div
               role="tablist"
               aria-label="Menu type"
@@ -428,7 +431,7 @@ export function MenuTabs({
                   aria-selected={tab === id}
                   onClick={() => setTab(id)}
                   className={cn(
-                    "px-5 py-3 text-sm font-medium uppercase tracking-[0.1em] transition sm:px-8 sm:py-3.5 sm:text-base",
+                    "min-h-11 px-5 py-3 text-sm font-medium uppercase tracking-[0.1em] transition sm:px-8 sm:py-3.5 sm:text-base",
                     tab === id
                       ? "bg-gold text-white"
                       : "text-muted hover:text-foreground",
@@ -438,7 +441,7 @@ export function MenuTabs({
                 </button>
               ))}
             </div>
-            <p className="text-sm text-muted">
+            <p className="hidden text-sm text-muted sm:block">
               {isFiltering ? (
                 <>
                   <span className="text-gold">{filteredItemCount}</span> of{" "}
@@ -464,13 +467,13 @@ export function MenuTabs({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search dishes…"
               aria-label="Search menu"
-              className="luxury-input w-full py-3 pl-11 pr-11"
+              className="luxury-input w-full py-2.5 pl-11 pr-11 text-base sm:py-3"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-muted hover:text-foreground"
+                className="absolute right-1 top-1/2 flex min-h-11 min-w-11 -translate-y-1/2 items-center justify-center rounded text-muted hover:text-foreground"
                 aria-label="Clear search"
               >
                 <X size={18} strokeWidth={1.5} />
@@ -479,14 +482,26 @@ export function MenuTabs({
           </div>
 
           {!isFiltering && (
-            <CategoryScrollBar
-              categories={filteredCategories}
-              activeCategory={activeCategory}
-              onSelect={scrollToCategory}
-            />
+            <div className="hidden md:block">
+              <CategoryScrollBar
+                categories={filteredCategories}
+                activeCategory={activeCategory}
+                onSelect={scrollToCategory}
+              />
+            </div>
           )}
         </div>
       </div>
+
+      {!isFiltering && (
+        <div className="-mx-6 border-b border-gold/10 bg-background px-6 py-3 md:hidden">
+          <CategoryScrollBar
+            categories={filteredCategories}
+            activeCategory={activeCategory}
+            onSelect={scrollToCategory}
+          />
+        </div>
+      )}
 
       <div className="mx-auto mt-8 max-w-5xl">
         <div className="space-y-4 rounded border border-gold/15 bg-surface-alt/30 px-5 py-4">
@@ -514,7 +529,7 @@ export function MenuTabs({
               type="button"
               onClick={() => setDietaryFilter("all")}
               className={cn(
-                "shrink-0 rounded-full border px-3 py-1 transition",
+                "flex min-h-11 shrink-0 items-center rounded-full border px-4 py-2 text-sm transition",
                 dietaryFilter === "all"
                   ? "border-gold bg-gold/15 text-gold"
                   : "border-gold/20 text-muted hover:border-gold/40",
@@ -530,9 +545,10 @@ export function MenuTabs({
                   setDietaryFilter((current) => (current === id ? "all" : id))
                 }
                 className={cn(
-                  "shrink-0 rounded-full transition",
+                  "flex min-h-11 shrink-0 items-center rounded-full transition",
                   dietaryFilter === id && "ring-1 ring-gold/50",
                 )}
+                aria-label={`Filter ${label}`}
               >
                 <MenuTagBadge tag={tag} />
               </button>
