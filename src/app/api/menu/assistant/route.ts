@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { askMenuAssistant } from "@/lib/menu/assistant";
 import type { MenuLocationSlug, MenuType } from "@/lib/menu/types";
 
-const VALID_LOCATIONS = new Set<MenuLocationSlug>([
-  "kentish-town",
-  "finchley-road",
-]);
+const VALID_LOCATIONS = new Set<MenuLocationSlug>(["finchley-road"]);
 
 export async function POST(request: NextRequest) {
   try {

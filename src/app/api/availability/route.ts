@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  if (!["kentish-town", "finchley-road"].includes(location)) {
+  if (location !== "finchley-road") {
     return NextResponse.json({ error: "Invalid location" }, { status: 400 });
   }
 

@@ -49,7 +49,7 @@ export function AdminHelp() {
                 Daily workflow
               </h4>
               <ol className="mt-4 list-decimal space-y-2 pl-6 leading-relaxed">
-                <li>Open today&apos;s date and filter by your location</li>
+                <li>Open today&apos;s date to see reservations</li>
                 <li>
                   When a guest arrives, select their booking and tap{" "}
                   <strong className="text-foreground">Seated</strong>
@@ -75,7 +75,7 @@ export function AdminHelp() {
               <ul className="mt-4 space-y-2 leading-relaxed">
                 <li>
                   <strong className="text-foreground">Menu</strong> — edit
-                  dishes, prices, and order per branch
+                  dishes, prices, and category order
                 </li>
                 <li>
                   <strong className="text-foreground">Customers</strong> — guest

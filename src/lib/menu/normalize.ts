@@ -153,13 +153,9 @@ function buildBranchMenu(): BranchMenu {
 }
 
 export function buildSeedMenu(): MenuData {
-  const kentishTown = buildBranchMenu();
-  const finchleyRoad = buildBranchMenu();
-
   return {
     branches: {
-      "kentish-town": kentishTown,
-      "finchley-road": finchleyRoad,
+      "finchley-road": buildBranchMenu(),
     },
   };
 }

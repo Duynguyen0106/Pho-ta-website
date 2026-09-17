@@ -8,6 +8,7 @@ import {
   createServerClient,
   isSupabaseConfigured,
 } from "../supabase/client";
+import { MENU_LOCATION_SLUGS } from "@/lib/menu/types";
 import type {
   BranchMenu,
   CreateMenuCategoryInput,
@@ -72,10 +73,9 @@ async function readSupabaseMenu(): Promise<MenuData | null> {
   const menu = normalizeMenuData(data.data);
 
   if (
-    !menu.branches["kentish-town"].lunchNote &&
+    !menu.branches["finchley-road"].lunchNote &&
     typeof data.lunch_note === "string"
   ) {
-    menu.branches["kentish-town"].lunchNote = data.lunch_note;
     menu.branches["finchley-road"].lunchNote = data.lunch_note;
   }
 
@@ -86,7 +86,7 @@ async function writeSupabaseMenu(menu: MenuData): Promise<void> {
   const supabase = getSupabase();
   const { error } = await supabase.from("menu_settings").upsert({
     id: "default",
-    lunch_note: menu.branches["kentish-town"].lunchNote,
+    lunch_note: menu.branches["finchley-road"].lunchNote,
     data: menu,
     updated_at: new Date().toISOString(),
   });
@@ -128,7 +128,7 @@ function findItem(
   category: MenuCategory;
   item: MenuItem;
 } | null {
-  for (const locationSlug of ["kentish-town", "finchley-road"] as const) {
+  for (const locationSlug of MENU_LOCATION_SLUGS) {
     const branch = getBranchMenu(menu, locationSlug);
     for (const menuType of ["daily", "lunch"] as const) {
       for (const category of categoriesForType(branch, menuType)) {
@@ -196,7 +196,7 @@ export async function updateMenuCategory(
   updates: { name?: string; note?: string },
 ): Promise<MenuCategory | null> {
   const menu = await getMenu();
-  for (const locationSlug of ["kentish-town", "finchley-road"] as const) {
+  for (const locationSlug of MENU_LOCATION_SLUGS) {
     const branch = getBranchMenu(menu, locationSlug);
     for (const menuType of ["daily", "lunch"] as const) {
       const category = categoriesForType(branch, menuType).find(
@@ -216,7 +216,7 @@ export async function updateMenuCategory(
 
 export async function deleteMenuCategory(categoryId: string): Promise<boolean> {
   const menu = await getMenu();
-  for (const locationSlug of ["kentish-town", "finchley-road"] as const) {
+  for (const locationSlug of MENU_LOCATION_SLUGS) {
     const branch = getBranchMenu(menu, locationSlug);
     for (const menuType of ["daily", "lunch"] as const) {
       const list = categoriesForType(branch, menuType);
@@ -330,7 +330,7 @@ export async function reorderMenuCategory(
   direction: "up" | "down",
 ): Promise<boolean> {
   const menu = await getMenu();
-  for (const locationSlug of ["kentish-town", "finchley-road"] as const) {
+  for (const locationSlug of MENU_LOCATION_SLUGS) {
     const branch = getBranchMenu(menu, locationSlug);
     for (const menuType of ["daily", "lunch"] as const) {
       const list = categoriesForType(branch, menuType);

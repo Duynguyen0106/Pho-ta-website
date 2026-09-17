@@ -5,7 +5,7 @@ import {
   LegalSection,
 } from "@/components/legal/LegalLayout";
 import { LEGAL_CONTACT_EMAIL } from "@/lib/data/legal";
-import { locations } from "@/lib/data/locations";
+import { location } from "@/lib/data/locations";
 
 export const metadata: Metadata = {
   title: "Terms of Use",
@@ -34,10 +34,10 @@ export default function TermsPage() {
 
       <LegalSection title="2. About Pho Ta">
         <p>
-          Pho Ta Restaurant trades at two London venues operated as part of the
-          Pho Ta group. Contact details for each branch are on our{" "}
+          Pho Ta Restaurant trades at {location.name}, {location.address},{" "}
+          {location.postcode}. Contact details are on our{" "}
           <a href="/locations" className="text-gold hover:underline">
-            Locations
+            Visit
           </a>{" "}
           page.
         </p>
@@ -133,18 +133,12 @@ export default function TermsPage() {
             {LEGAL_CONTACT_EMAIL}
           </a>
           , or call{" "}
-          {locations.map((l) => (
-            <span key={l.slug}>
-              {l.shortName}{" "}
-              <a
-                href={`tel:${l.phone.replace(/\s/g, "")}`}
-                className="text-gold hover:underline"
-              >
-                {l.phone}
-              </a>
-              {l.slug === "kentish-town" ? " · " : ""}
-            </span>
-          ))}
+          <a
+            href={`tel:${location.phone.replace(/\s/g, "")}`}
+            className="text-gold hover:underline"
+          >
+            {location.phone}
+          </a>
           .
         </p>
       </LegalSection>

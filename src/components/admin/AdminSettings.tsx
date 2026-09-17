@@ -80,7 +80,7 @@ export function AdminSettings() {
           Venue settings
         </h2>
         <p className="mt-2 text-xl text-muted">
-          Opening hours, slot intervals, and capacity per location
+          Opening hours, slot intervals, and booking capacity
         </p>
       </div>
 

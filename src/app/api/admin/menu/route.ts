@@ -109,7 +109,6 @@ export async function POST(request: NextRequest) {
       }
       case "updateLunchNote": {
         const locationSlug = body.locationSlug as
-          | "kentish-town"
           | "finchley-road"
           | undefined;
         if (!locationSlug) {

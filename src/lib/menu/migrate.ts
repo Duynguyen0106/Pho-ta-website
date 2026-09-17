@@ -44,6 +44,11 @@ export function normalizeMenuData(raw: unknown): MenuData {
       }
     }
 
+    const legacyKentish = (branches as Record<string, unknown>)["kentish-town"];
+    if (!normalized["finchley-road"] && isBranchMenu(legacyKentish)) {
+      normalized["finchley-road"] = cloneBranchMenu(legacyKentish);
+    }
+
     if (MENU_LOCATION_SLUGS.every((slug) => normalized[slug])) {
       return { branches: normalized };
     }
@@ -58,7 +63,6 @@ export function normalizeMenuData(raw: unknown): MenuData {
 
     return {
       branches: {
-        "kentish-town": shared,
         "finchley-road": cloneBranchMenu(shared),
       },
     };
@@ -66,7 +70,6 @@ export function normalizeMenuData(raw: unknown): MenuData {
 
   return {
     branches: {
-      "kentish-town": { daily: [], lunch: [], lunchNote: lunchMenuNote },
       "finchley-road": { daily: [], lunch: [], lunchNote: lunchMenuNote },
     },
   };

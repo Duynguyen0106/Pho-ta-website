@@ -8,24 +8,12 @@ import { MenuAssistant } from "@/components/menu/MenuAssistant";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { formatPricePence, priceRangeLabel } from "@/lib/menu/format";
-import type {
-  BranchMenu,
-  MenuCategory,
-  MenuItem,
-  MenuLocationSlug,
-} from "@/lib/menu/types";
+import type { BranchMenu, MenuCategory, MenuItem } from "@/lib/menu/types";
 
 type MenuTab = "daily" | "lunch";
 
-interface BranchOption {
-  slug: MenuLocationSlug;
-  label: string;
-}
-
 interface MenuTabsProps {
-  branches: BranchOption[];
-  branchMenus: Record<MenuLocationSlug, BranchMenu>;
-  initialLocation?: MenuLocationSlug;
+  branchMenu: BranchMenu;
   initialTab?: MenuTab;
 }
 
@@ -176,17 +164,14 @@ function MenuCategorySection({ category }: { category: MenuCategory }) {
 }
 
 export function MenuTabs({
-  branches,
-  branchMenus,
-  initialLocation = "kentish-town",
+  branchMenu,
   initialTab = "daily",
 }: MenuTabsProps) {
   const router = useRouter();
-  const [location, setLocation] = useState<MenuLocationSlug>(initialLocation);
   const [tab, setTab] = useState<MenuTab>(initialTab);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  const activeBranch = branchMenus[location];
+  const activeBranch = branchMenu;
   const categories = useMemo(
     () => (tab === "daily" ? activeBranch.daily : activeBranch.lunch),
     [activeBranch, tab],
@@ -198,18 +183,18 @@ export function MenuTabs({
   );
 
   const syncUrl = useCallback(
-    (loc: MenuLocationSlug, menuTab: MenuTab) => {
+    (menuTab: MenuTab) => {
       const params = new URLSearchParams();
-      params.set("location", loc);
       if (menuTab === "lunch") params.set("type", "lunch");
-      router.replace(`/menu?${params.toString()}`, { scroll: false });
+      const query = params.toString();
+      router.replace(query ? `/menu?${query}` : "/menu", { scroll: false });
     },
     [router],
   );
 
   useEffect(() => {
-    syncUrl(location, tab);
-  }, [location, tab, syncUrl]);
+    syncUrl(tab);
+  }, [tab, syncUrl]);
 
   useEffect(() => {
     setActiveCategory(categories[0]?.id ?? null);
@@ -246,38 +231,13 @@ export function MenuTabs({
     setActiveCategory(categoryId);
   }
 
-  const branchLabel =
-    branches.find((b) => b.slug === location)?.label ?? location;
+  const branchLabel = "Finchley Road";
 
   return (
     <>
       <div className="sticky top-[4.5rem] z-30 -mx-6 border-b border-gold/10 bg-background/95 px-6 py-4 backdrop-blur-xl sm:-mx-0 sm:rounded-none">
         <div className="mx-auto max-w-5xl space-y-4">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div
-              role="tablist"
-              aria-label="Restaurant location"
-              className="fine-dining-panel inline-flex self-start"
-            >
-              {branches.map(({ slug, label }) => (
-                <button
-                  key={slug}
-                  type="button"
-                  role="tab"
-                  aria-selected={location === slug}
-                  onClick={() => setLocation(slug)}
-                  className={cn(
-                    "px-5 py-3 text-sm font-medium uppercase tracking-[0.1em] transition sm:px-8 sm:py-3.5 sm:text-base",
-                    location === slug
-                      ? "bg-gold text-white"
-                      : "text-muted hover:text-foreground",
-                  )}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-
             <div
               role="tablist"
               aria-label="Menu type"
@@ -372,20 +332,16 @@ export function MenuTabs({
             Allergies or dietary needs? Please tell us when you book or ask your
             server.
           </p>
-          <Link href={`/book?location=${location}`} className="mt-8 inline-block">
+          <Link href="/book" className="mt-8 inline-block">
             <Button size="lg" className="gap-2">
-              Reserve at {branchLabel}
+              Reserve a table
               <ArrowRight size={18} strokeWidth={1.5} />
             </Button>
           </Link>
         </div>
       </div>
 
-      <MenuAssistant
-        locationSlug={location}
-        menuTab={tab}
-        branchLabel={branchLabel}
-      />
+      <MenuAssistant menuTab={tab} branchLabel={branchLabel} />
     </>
   );
 }

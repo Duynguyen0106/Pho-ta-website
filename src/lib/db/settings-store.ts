@@ -113,8 +113,10 @@ export async function getSiteSettings(): Promise<SiteSettings> {
 
   cache = {
     locations: {
-      "kentish-town": { ...base.locations["kentish-town"], ...stored.locations["kentish-town"] },
-      "finchley-road": { ...base.locations["finchley-road"], ...stored.locations["finchley-road"] },
+      "finchley-road": {
+        ...base.locations["finchley-road"],
+        ...stored.locations["finchley-road"],
+      },
     },
   };
   return cache;
@@ -124,7 +126,7 @@ export async function saveSiteSettings(
   updates: Partial<Record<LocationSlug, Partial<LocationSettings>>>,
 ): Promise<SiteSettings> {
   const current = await getSiteSettings();
-  for (const slug of ["kentish-town", "finchley-road"] as const) {
+  for (const slug of ["finchley-road"] as const) {
     if (updates[slug]) {
       current.locations[slug] = {
         ...current.locations[slug],
@@ -150,6 +152,5 @@ export async function getResolvedLocation(slug: LocationSlug): Promise<Location>
 }
 
 export async function getResolvedLocations(): Promise<Location[]> {
-  const slugs: LocationSlug[] = ["kentish-town", "finchley-road"];
-  return Promise.all(slugs.map((slug) => getResolvedLocation(slug)));
+  return [await getResolvedLocation("finchley-road")];
 }

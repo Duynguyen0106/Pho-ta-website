@@ -1,4 +1,4 @@
-export type LocationSlug = "kentish-town" | "finchley-road";
+export type LocationSlug = "finchley-road";
 
 export type SeatingPreference =
   | "side"

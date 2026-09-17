@@ -5,7 +5,6 @@ import { Search } from "lucide-react";
 import { AdminStatusBadge } from "@/components/admin/AdminStatusBadge";
 import { Button } from "@/components/ui/Button";
 import { BOOKING_SOURCE_LABELS } from "@/lib/constants";
-import { locations } from "@/lib/data/locations";
 import type { Booking, Customer } from "@/lib/types";
 
 export function AdminCustomers() {
@@ -214,10 +213,7 @@ export function AdminCustomers() {
                               {booking.date} · {booking.time}
                             </p>
                             <p className="mt-1 text-base text-muted">
-                              {locations.find(
-                                (l) => l.slug === booking.locationSlug,
-                              )?.shortName}{" "}
-                              · {booking.partySize} guests ·{" "}
+                              {booking.partySize} guests ·{" "}
                               {BOOKING_SOURCE_LABELS[booking.source]}
                             </p>
                             <p className="mt-1 font-serif text-base text-gold/80">

@@ -1,6 +1,6 @@
 # Pho Ta Restaurant Website
 
-Modern website and booking system for [Pho Ta](https://www.photarestaurants.com/) — Vietnamese restaurants in Kentish Town and Finchley Road, London.
+Modern website and booking system for [Pho Ta Finchley Road](https://www.photarestaurants.com/) — Vietnamese dining in South Hampstead, London.
 
 ## Features
 

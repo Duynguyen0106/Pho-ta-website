@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getBranchMenuForLocation, getMenu } from "@/lib/db/menu-store";
 import type { MenuLocationSlug } from "@/lib/menu/types";
 
-const VALID_LOCATIONS = new Set<MenuLocationSlug>([
-  "kentish-town",
-  "finchley-road",
-]);
+const VALID_LOCATIONS = new Set<MenuLocationSlug>(["finchley-road"]);
 
 export async function GET(request: NextRequest) {
   try {

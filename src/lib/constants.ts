@@ -1,5 +1,8 @@
 import type { SeatingPreference } from "./types";
 
+/** Single venue — Pho Ta Finchley Road */
+export const LOCATION_SLUG = "finchley-road" as const;
+
 export const SEATING_PREFERENCES: {
   value: SeatingPreference;
   label: string;

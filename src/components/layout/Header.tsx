@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 const navLinks: { href: string; label: string; exact?: boolean }[] = [
   { href: "/", label: "Home", exact: true },
   { href: "/menu", label: "Menu" },
-  { href: "/locations", label: "Locations" },
+  { href: "/locations", label: "Visit" },
 ];
 
 function isActive(pathname: string, href: string, exact?: boolean) {

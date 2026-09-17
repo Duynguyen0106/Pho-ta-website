@@ -70,7 +70,7 @@ async function writeLocalStore(store: LocalStore): Promise<void> {
 }
 
 function generateReferenceCode(locationSlug: string): string {
-  const prefix = locationSlug === "kentish-town" ? "KT" : "FR";
+  const prefix = "FR";
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let suffix = "";
   for (let i = 0; i < 4; i++) {

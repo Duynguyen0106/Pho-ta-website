@@ -2,7 +2,7 @@ import { z } from "zod";
 import { MAX_PARTY_SIZE, MIN_PARTY_SIZE } from "../constants";
 
 export const bookingSchema = z.object({
-  locationSlug: z.enum(["kentish-town", "finchley-road"]),
+  locationSlug: z.literal("finchley-road"),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   time: z.string().regex(/^\d{2}:\d{2}$/),
   partySize: z.coerce.number().int().min(MIN_PARTY_SIZE).max(MAX_PARTY_SIZE),

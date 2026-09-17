@@ -1,11 +1,8 @@
 export type MenuType = "daily" | "lunch";
 
-export type MenuLocationSlug = "kentish-town" | "finchley-road";
+export type MenuLocationSlug = "finchley-road";
 
-export const MENU_LOCATION_SLUGS: MenuLocationSlug[] = [
-  "kentish-town",
-  "finchley-road",
-];
+export const MENU_LOCATION_SLUGS: MenuLocationSlug[] = ["finchley-road"];
 
 export interface MenuVariant {
   id: string;
