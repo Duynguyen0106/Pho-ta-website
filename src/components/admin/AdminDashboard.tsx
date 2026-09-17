@@ -1,28 +1,28 @@
 "use client";
 
 import { format } from "date-fns";
-import { useCallback, useEffect, useState } from "react";
+import { Search } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AdminHelp } from "@/components/admin/AdminHelp";
 import { AdminMenuManager } from "@/components/admin/AdminMenuManager";
+import { AdminShell, type AdminView } from "@/components/admin/AdminShell";
+import { AdminStatCard } from "@/components/admin/AdminStatCard";
+import { AdminStatusBadge } from "@/components/admin/AdminStatusBadge";
 import { ManualBookingForm } from "@/components/admin/ManualBookingForm";
 import { Button } from "@/components/ui/Button";
-import {
-  BOOKING_STATUS_LABELS,
-  SEATING_LABELS,
-} from "@/lib/constants";
+import { BOOKING_STATUS_LABELS, SEATING_LABELS } from "@/lib/constants";
 import { locations } from "@/lib/data/locations";
 import type { Booking, BookingStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-const STATUS_COLORS: Record<BookingStatus, string> = {
-  confirmed: "bg-blue-100 text-blue-800",
-  seated: "bg-green-100 text-green-800",
-  completed: "bg-gray-100 text-gray-700",
-  cancelled: "bg-red-100 text-red-700",
-  no_show: "bg-orange-100 text-orange-800",
-};
-
-type AdminView = "bookings" | "menu";
+const STATUS_OPTIONS: (BookingStatus | "")[] = [
+  "",
+  "confirmed",
+  "seated",
+  "completed",
+  "cancelled",
+  "no_show",
+];
 
 export function AdminDashboard() {
   const [view, setView] = useState<AdminView>("bookings");
@@ -30,21 +30,42 @@ export function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [location, setLocation] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<BookingStatus | "">("");
+  const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Booking | null>(null);
+  const [tableNumber, setTableNumber] = useState("");
+  const [savingTable, setSavingTable] = useState(false);
 
   const fetchBookings = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams({ date });
     if (location) params.set("location", location);
+    if (statusFilter) params.set("status", statusFilter);
     const res = await fetch(`/api/admin/bookings?${params}`);
     const data = await res.json();
     if (res.ok) setBookings(data.bookings);
     setLoading(false);
-  }, [date, location]);
+  }, [date, location, statusFilter]);
 
   useEffect(() => {
     fetchBookings();
   }, [fetchBookings]);
+
+  useEffect(() => {
+    setTableNumber(selected?.seatedAtTable ?? "");
+  }, [selected]);
+
+  const filteredBookings = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return bookings;
+    return bookings.filter(
+      (b) =>
+        b.customerName.toLowerCase().includes(query) ||
+        b.referenceCode.toLowerCase().includes(query) ||
+        b.customerPhone.includes(query) ||
+        b.customerEmail.toLowerCase().includes(query),
+    );
+  }, [bookings, search]);
 
   async function updateStatus(id: string, status: BookingStatus) {
     const res = await fetch("/api/admin/bookings", {
@@ -61,249 +82,331 @@ export function AdminDashboard() {
     }
   }
 
+  async function saveTableNumber() {
+    if (!selected) return;
+    setSavingTable(true);
+    try {
+      const res = await fetch("/api/admin/bookings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: selected.id,
+          seatedAtTable: tableNumber.trim() || undefined,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSelected(data.booking);
+        fetchBookings();
+      }
+    } finally {
+      setSavingTable(false);
+    }
+  }
+
   async function handleLogout() {
     await fetch("/api/admin/logout", { method: "POST" });
     window.location.href = "/admin/login";
   }
 
+  const today = format(new Date(), "yyyy-MM-dd");
+  const activeBookings = bookings.filter((b) => b.status !== "cancelled");
   const confirmedCount = bookings.filter((b) => b.status === "confirmed").length;
   const seatedCount = bookings.filter((b) => b.status === "seated").length;
-  const totalCovers = bookings
-    .filter((b) => b.status !== "cancelled")
-    .reduce((sum, b) => sum + b.partySize, 0);
+  const totalCovers = activeBookings.reduce((sum, b) => sum + b.partySize, 0);
 
   return (
-    <div className="min-h-screen bg-[#f5f2ed]">
-      <header className="border-b border-[#e8e0d4] bg-[#1a3c34] text-[#faf7f2]">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-          <div>
-            <h1 className="font-serif text-xl">Pho Ta Admin</h1>
-            <p className="text-sm text-[#c9d5d0]">
-              Bookings & menu management
-            </p>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleLogout}
-            className="border-[#c9a962] text-[#c9a962] hover:bg-[#c9a962] hover:text-[#1a3c34]"
-          >
-            Log out
-          </Button>
-        </div>
+    <AdminShell view={view} onViewChange={setView} onLogout={handleLogout}>
+      <AdminHelp />
 
-        <nav
-          aria-label="Admin sections"
-          className="border-t border-[#c9a962]/20 bg-[#153029]"
-        >
-          <div className="mx-auto flex max-w-6xl gap-1 px-4 sm:px-6">
-            {(
-              [
-                { id: "bookings" as const, label: "Bookings" },
-                { id: "menu" as const, label: "Menu" },
-              ] as const
-            ).map(({ id, label }) => (
-              <button
-                key={id}
+      {view === "menu" ? (
+        <AdminMenuManager />
+      ) : (
+        <div className="space-y-8">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h2 className="font-display text-4xl font-normal text-foreground">
+                Today&apos;s service
+              </h2>
+              <p className="mt-2 text-xl text-muted">
+                Manage reservations, seating, and walk-ins
+              </p>
+            </div>
+            <ManualBookingForm onCreated={fetchBookings} />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            <AdminStatCard
+              label="Bookings"
+              value={activeBookings.length}
+            />
+            <AdminStatCard
+              label="Confirmed / Seated"
+              value={`${confirmedCount} / ${seatedCount}`}
+            />
+            <AdminStatCard label="Total covers" value={totalCovers} />
+          </div>
+
+          <div className="fine-dining-panel p-6">
+            <div className="flex flex-wrap gap-4">
+              <label className="min-w-[180px] flex-1">
+                <span className="label-caps">Date</span>
+                <input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="luxury-input mt-3"
+                />
+              </label>
+              <label className="min-w-[180px] flex-1">
+                <span className="label-caps">Location</span>
+                <select
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="luxury-input mt-3"
+                >
+                  <option value="" className="bg-surface">
+                    All locations
+                  </option>
+                  {locations.map((loc) => (
+                    <option key={loc.slug} value={loc.slug} className="bg-surface">
+                      {loc.shortName}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="min-w-[180px] flex-1">
+                <span className="label-caps">Status</span>
+                <select
+                  value={statusFilter}
+                  onChange={(e) =>
+                    setStatusFilter(e.target.value as BookingStatus | "")
+                  }
+                  className="luxury-input mt-3"
+                >
+                  <option value="" className="bg-surface">
+                    All statuses
+                  </option>
+                  {STATUS_OPTIONS.filter(Boolean).map((status) => (
+                    <option key={status} value={status} className="bg-surface">
+                      {BOOKING_STATUS_LABELS[status as BookingStatus]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <Button
                 type="button"
-                onClick={() => setView(id)}
-                aria-current={view === id ? "page" : undefined}
-                className={cn(
-                  "border-b-2 px-6 py-3 text-sm font-medium transition",
-                  view === id
-                    ? "border-[#c9a962] text-[#c9a962]"
-                    : "border-transparent text-[#c9d5d0] hover:border-[#c9a962]/40 hover:text-white",
-                )}
+                variant={date === today ? "primary" : "outline"}
+                size="sm"
+                onClick={() => setDate(today)}
               >
-                {label}
-              </button>
-            ))}
-          </div>
-        </nav>
-      </header>
-
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-        <AdminHelp />
-
-        {view === "menu" ? (
-          <AdminMenuManager />
-        ) : (
-          <>
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-          <ManualBookingForm onCreated={fetchBookings} />
-        </div>
-
-        <div className="mb-6 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-xl bg-white p-4 shadow-sm">
-            <p className="text-sm text-[#5c534a]">Today&apos;s bookings</p>
-            <p className="mt-1 text-2xl font-semibold text-[#1a3c34]">
-              {bookings.filter((b) => b.status !== "cancelled").length}
-            </p>
-          </div>
-          <div className="rounded-xl bg-white p-4 shadow-sm">
-            <p className="text-sm text-[#5c534a]">Confirmed / Seated</p>
-            <p className="mt-1 text-2xl font-semibold text-[#1a3c34]">
-              {confirmedCount} / {seatedCount}
-            </p>
-          </div>
-          <div className="rounded-xl bg-white p-4 shadow-sm">
-            <p className="text-sm text-[#5c534a]">Total covers</p>
-            <p className="mt-1 text-2xl font-semibold text-[#1a3c34]">
-              {totalCovers}
-            </p>
-          </div>
-        </div>
-
-        <div className="mb-6 flex flex-wrap gap-4">
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="rounded-lg border border-[#e8e0d4] bg-white px-4 py-2"
-          />
-          <select
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            className="rounded-lg border border-[#e8e0d4] bg-white px-4 py-2"
-          >
-            <option value="">All locations</option>
-            {locations.map((loc) => (
-              <option key={loc.slug} value={loc.slug}>
-                {loc.shortName}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            {loading ? (
-              <p className="text-[#5c534a]">Loading bookings…</p>
-            ) : bookings.length === 0 ? (
-              <div className="rounded-xl bg-white p-8 text-center text-[#5c534a] shadow-sm">
-                No bookings for this date
+                Today
+              </Button>
+              <div className="relative min-w-[240px] flex-1">
+                <Search
+                  size={20}
+                  className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gold/70"
+                />
+                <input
+                  type="search"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search name, reference, phone…"
+                  className="luxury-input pl-12"
+                />
               </div>
-            ) : (
-              <div className="space-y-3">
-                {bookings.map((booking) => (
-                  <button
-                    key={booking.id}
-                    type="button"
-                    onClick={() => setSelected(booking)}
-                    className={cn(
-                      "w-full rounded-xl bg-white p-4 text-left shadow-sm transition hover:shadow-md",
-                      selected?.id === booking.id && "ring-2 ring-[#1a3c34]",
-                    )}
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="font-medium text-[#1a3c34]">
-                          {booking.time} · {booking.customerName}
-                        </p>
-                        <p className="mt-1 text-sm text-[#5c534a]">
-                          {booking.partySize} guests ·{" "}
-                          {SEATING_LABELS[booking.seatingPreference]} ·{" "}
-                          {locations.find((l) => l.slug === booking.locationSlug)?.shortName}
-                        </p>
-                        <p className="mt-1 text-xs text-[#8a7f72]">
-                          {booking.referenceCode}
-                        </p>
-                      </div>
-                      <span
-                        className={cn(
-                          "shrink-0 rounded-full px-2.5 py-1 text-xs font-medium",
-                          STATUS_COLORS[booking.status],
-                        )}
-                      >
-                        {BOOKING_STATUS_LABELS[booking.status]}
-                      </span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
+            </div>
           </div>
 
-          <div className="rounded-xl bg-white p-6 shadow-sm">
-            {selected ? (
-              <div className="space-y-4">
-                <h3 className="font-serif text-lg text-[#1a3c34]">
-                  {selected.customerName}
-                </h3>
-                <dl className="space-y-2 text-sm">
-                  <div>
-                    <dt className="text-[#8a7f72]">Reference</dt>
-                    <dd>{selected.referenceCode}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-[#8a7f72]">Time</dt>
-                    <dd>
-                      {selected.date} at {selected.time}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-[#8a7f72]">Guests</dt>
-                    <dd>{selected.partySize}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-[#8a7f72]">Seating preference</dt>
-                    <dd>{SEATING_LABELS[selected.seatingPreference]}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-[#8a7f72]">Contact</dt>
-                    <dd>
-                      <a href={`mailto:${selected.customerEmail}`} className="text-[#1a3c34]">
-                        {selected.customerEmail}
-                      </a>
-                      <br />
-                      <a href={`tel:${selected.customerPhone}`} className="text-[#1a3c34]">
-                        {selected.customerPhone}
-                      </a>
-                    </dd>
-                  </div>
-                  {selected.specialRequests && (
-                    <div>
-                      <dt className="text-[#8a7f72]">Special requests</dt>
-                      <dd>{selected.specialRequests}</dd>
-                    </div>
-                  )}
-                </dl>
-
-                <div className="border-t border-[#e8e0d4] pt-4">
-                  <p className="mb-2 text-xs font-medium uppercase tracking-wider text-[#8a7f72]">
-                    Update status
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {(
-                      ["confirmed", "seated", "completed", "cancelled", "no_show"] as const
-                    ).map((status) => (
+          <div className="grid gap-8 xl:grid-cols-[1fr_380px]">
+            <div>
+              {loading ? (
+                <div className="flex items-center gap-3 py-12 text-xl text-muted">
+                  <span className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-gold/30 border-t-gold" />
+                  Loading bookings…
+                </div>
+              ) : filteredBookings.length === 0 ? (
+                <div className="luxury-card px-8 py-16 text-center text-xl text-muted">
+                  No bookings match your filters
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredBookings.map((booking) => {
+                    const loc = locations.find(
+                      (l) => l.slug === booking.locationSlug,
+                    );
+                    return (
                       <button
-                        key={status}
+                        key={booking.id}
                         type="button"
-                        onClick={() => updateStatus(selected.id, status)}
+                        onClick={() => setSelected(booking)}
                         className={cn(
-                          "rounded-full px-3 py-1 text-xs transition",
-                          selected.status === status
-                            ? "bg-[#1a3c34] text-white"
-                            : "bg-[#f5f2ed] text-[#5c534a] hover:bg-[#e8e0d4]",
+                          "luxury-card w-full p-6 text-left transition",
+                          selected?.id === booking.id &&
+                            "border-gold ring-1 ring-gold/40",
                         )}
                       >
-                        {BOOKING_STATUS_LABELS[status]}
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="min-w-0">
+                            <p className="font-display text-2xl text-foreground">
+                              {booking.time}{" "}
+                              <span className="text-gold">·</span>{" "}
+                              {booking.customerName}
+                            </p>
+                            <p className="mt-2 text-lg text-muted">
+                              {booking.partySize}{" "}
+                              {booking.partySize === 1 ? "guest" : "guests"}{" "}
+                              · {SEATING_LABELS[booking.seatingPreference]} ·{" "}
+                              {loc?.shortName}
+                              {booking.seatedAtTable
+                                ? ` · Table ${booking.seatedAtTable}`
+                                : ""}
+                            </p>
+                            <p className="mt-1 font-serif text-lg text-gold/80">
+                              {booking.referenceCode}
+                            </p>
+                          </div>
+                          <AdminStatusBadge status={booking.status} />
+                        </div>
                       </button>
-                    ))}
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <aside className="luxury-card h-fit p-8 xl:sticky xl:top-36">
+              {selected ? (
+                <div className="space-y-6">
+                  <div>
+                    <p className="label-caps">Guest</p>
+                    <h3 className="mt-2 font-display text-3xl text-foreground">
+                      {selected.customerName}
+                    </h3>
+                    <AdminStatusBadge
+                      status={selected.status}
+                      className="mt-4"
+                    />
+                  </div>
+
+                  <dl className="space-y-4 text-lg">
+                    <DetailRow label="Reference" value={selected.referenceCode} />
+                    <DetailRow
+                      label="When"
+                      value={`${selected.date} at ${selected.time}`}
+                    />
+                    <DetailRow
+                      label="Guests"
+                      value={String(selected.partySize)}
+                    />
+                    <DetailRow
+                      label="Seating"
+                      value={SEATING_LABELS[selected.seatingPreference]}
+                    />
+                    <DetailRow
+                      label="Venue"
+                      value={
+                        locations.find((l) => l.slug === selected.locationSlug)
+                          ?.shortName ?? selected.locationSlug
+                      }
+                    />
+                    <div>
+                      <dt className="label-caps">Contact</dt>
+                      <dd className="mt-2 space-y-1 text-foreground">
+                        <a
+                          href={`mailto:${selected.customerEmail}`}
+                          className="block hover:text-gold"
+                        >
+                          {selected.customerEmail}
+                        </a>
+                        <a
+                          href={`tel:${selected.customerPhone.replace(/\s/g, "")}`}
+                          className="block hover:text-gold"
+                        >
+                          {selected.customerPhone}
+                        </a>
+                      </dd>
+                    </div>
+                    {selected.specialRequests && (
+                      <DetailRow
+                        label="Requests"
+                        value={selected.specialRequests}
+                      />
+                    )}
+                  </dl>
+
+                  <div className="border-t border-gold/15 pt-6">
+                    <p className="label-caps">Table number</p>
+                    <div className="mt-3 flex gap-3">
+                      <input
+                        value={tableNumber}
+                        onChange={(e) => setTableNumber(e.target.value)}
+                        placeholder="e.g. 12"
+                        className="luxury-input flex-1"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={savingTable}
+                        onClick={saveTableNumber}
+                      >
+                        {savingTable ? "Saving…" : "Save"}
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-gold/15 pt-6">
+                    <p className="label-caps">Update status</p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {(
+                        [
+                          "confirmed",
+                          "seated",
+                          "completed",
+                          "cancelled",
+                          "no_show",
+                        ] as const
+                      ).map((status) => (
+                        <button
+                          key={status}
+                          type="button"
+                          onClick={() => updateStatus(selected.id, status)}
+                          className={cn(
+                            "rounded-full border px-4 py-2.5 text-base transition",
+                            selected.status === status
+                              ? "border-gold bg-gold text-background"
+                              : "border-gold/25 text-muted hover:border-gold hover:text-foreground",
+                          )}
+                        >
+                          {BOOKING_STATUS_LABELS[status]}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ) : (
-              <p className="text-sm text-[#5c534a]">
-                Select a booking to view details and update status
-              </p>
-            )}
+              ) : (
+                <p className="text-xl leading-relaxed text-muted">
+                  Select a booking to view guest details, assign a table, and
+                  update status.
+                </p>
+              )}
+            </aside>
           </div>
         </div>
-          </>
-        )}
-      </main>
+      )}
+    </AdminShell>
+  );
+}
+
+function DetailRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <dt className="label-caps">{label}</dt>
+      <dd className="mt-1 text-foreground">{value}</dd>
     </div>
   );
 }

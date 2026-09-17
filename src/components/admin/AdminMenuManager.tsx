@@ -49,6 +49,36 @@ function draftToVariants(drafts: VariantDraft[]) {
     }));
 }
 
+function AdminTabGroup<T extends string>({
+  value,
+  onChange,
+  options,
+}: {
+  value: T;
+  onChange: (v: T) => void;
+  options: { value: T; label: string }[];
+}) {
+  return (
+    <div className="inline-flex flex-wrap gap-2 rounded border border-gold/20 bg-surface-alt/60 p-1.5">
+      {options.map((opt) => (
+        <button
+          key={opt.value}
+          type="button"
+          onClick={() => onChange(opt.value)}
+          className={cn(
+            "rounded px-5 py-3 text-lg transition",
+            value === opt.value
+              ? "bg-gold text-background"
+              : "text-muted hover:bg-gold/10 hover:text-foreground",
+          )}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export function AdminMenuManager() {
   const [menu, setMenu] = useState<MenuData | null>(null);
   const [locationSlug, setLocationSlug] =
@@ -201,268 +231,274 @@ export function AdminMenuManager() {
   }
 
   if (loading) {
-    return <p className="text-[#5c534a]">Loading menu…</p>;
+    return (
+      <div className="flex items-center gap-3 py-12 text-xl text-muted">
+        <span className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-gold/30 border-t-gold" />
+        Loading menu…
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      <div>
+        <h2 className="font-display text-4xl font-normal text-foreground">
+          Menu management
+        </h2>
+        <p className="mt-2 text-xl text-muted">
+          Edit daily and lunch menus for each branch
+        </p>
+      </div>
+
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div
+          role="alert"
+          className="border border-red-800/40 bg-red-950/25 px-5 py-4 text-lg text-red-200"
+        >
           {error}
         </div>
       )}
 
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="inline-flex rounded-lg border border-[#e8e0d4] bg-white p-1">
-          {locations.map((location) => (
-            <button
-              key={location.slug}
-              type="button"
-              onClick={() =>
-                setLocationSlug(location.slug as MenuLocationSlug)
-              }
-              className={cn(
-                "rounded-md px-4 py-2 text-sm transition",
-                locationSlug === location.slug
-                  ? "bg-[#9a7b32] text-white"
-                  : "text-[#5c534a] hover:bg-[#f5f2ed]",
-              )}
-            >
-              {location.shortName}
-            </button>
-          ))}
-        </div>
-        <div className="inline-flex rounded-lg border border-[#e8e0d4] bg-white p-1">
-          {(["daily", "lunch"] as const).map((type) => (
-            <button
-              key={type}
-              type="button"
-              onClick={() => setMenuType(type)}
-              className={cn(
-                "rounded-md px-4 py-2 text-sm capitalize transition",
-                menuType === type
-                  ? "bg-[#9a7b32] text-white"
-                  : "text-[#5c534a] hover:bg-[#f5f2ed]",
-              )}
-            >
-              {type} menu
-            </button>
-          ))}
-        </div>
-        <Button size="sm" onClick={handleAddCategory} disabled={saving}>
+        <AdminTabGroup
+          value={locationSlug}
+          onChange={setLocationSlug}
+          options={locations.map((l) => ({
+            value: l.slug as MenuLocationSlug,
+            label: l.shortName,
+          }))}
+        />
+        <AdminTabGroup
+          value={menuType}
+          onChange={setMenuType}
+          options={[
+            { value: "daily" as const, label: "Daily menu" },
+            { value: "lunch" as const, label: "Lunch menu" },
+          ]}
+        />
+        <Button size="md" onClick={handleAddCategory} disabled={saving}>
           Add category
         </Button>
       </div>
 
       {menuType === "lunch" && menu && branchMenu && (
-        <div className="rounded-xl bg-white p-4 shadow-sm">
-          <label className="block text-sm font-medium text-[#5c534a]">
-            Lunch hours note — {locations.find((l) => l.slug === locationSlug)?.shortName}
-          </label>
-          <div className="mt-2 flex gap-2">
-            <input
-              value={branchMenu.lunchNote}
-              onChange={(e) =>
-                setMenu({
-                  ...menu,
-                  branches: {
-                    ...menu.branches,
-                    [locationSlug]: {
-                      ...branchMenu,
-                      lunchNote: e.target.value,
+        <div className="luxury-card p-6">
+          <label className="block">
+            <span className="label-caps">
+              Lunch hours note —{" "}
+              {locations.find((l) => l.slug === locationSlug)?.shortName}
+            </span>
+            <div className="mt-3 flex flex-wrap gap-3">
+              <input
+                value={branchMenu.lunchNote}
+                onChange={(e) =>
+                  setMenu({
+                    ...menu,
+                    branches: {
+                      ...menu.branches,
+                      [locationSlug]: {
+                        ...branchMenu,
+                        lunchNote: e.target.value,
+                      },
                     },
-                  },
-                })
-              }
-              className="flex-1 rounded-lg border border-[#e8e0d4] px-3 py-2 text-sm"
-            />
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={saving}
-              onClick={async () => {
-                setSaving(true);
-                try {
-                  await menuAction({
-                    action: "updateLunchNote",
-                    locationSlug,
-                    note: branchMenu.lunchNote,
-                  });
-                } catch (e) {
-                  setError(e instanceof Error ? e.message : "Update failed");
-                } finally {
-                  setSaving(false);
+                  })
                 }
-              }}
-            >
-              Save note
-            </Button>
-          </div>
+                className="luxury-input min-w-[240px] flex-1"
+              />
+              <Button
+                size="md"
+                variant="outline"
+                disabled={saving}
+                onClick={async () => {
+                  setSaving(true);
+                  try {
+                    await menuAction({
+                      action: "updateLunchNote",
+                      locationSlug,
+                      note: branchMenu.lunchNote,
+                    });
+                  } catch (e) {
+                    setError(e instanceof Error ? e.message : "Update failed");
+                  } finally {
+                    setSaving(false);
+                  }
+                }}
+              >
+                Save note
+              </Button>
+            </div>
+          </label>
         </div>
       )}
 
       <div className="space-y-4">
-        {categories.map((category) => (
-          <div key={category.id} className="rounded-xl bg-white shadow-sm">
-            <button
-              type="button"
-              onClick={() =>
-                setExpandedCategory(
-                  expandedCategory === category.id ? null : category.id,
-                )
-              }
-              className="flex w-full items-center justify-between px-4 py-4 text-left"
-            >
-              <div>
-                <h3 className="font-serif text-lg text-[#1a3c34]">
-                  {category.name}
-                </h3>
-                <p className="text-sm text-[#8a7f72]">
-                  {category.items.length} items
-                </p>
-              </div>
-              <span className="text-[#8a7f72]">
-                {expandedCategory === category.id ? "−" : "+"}
-              </span>
-            </button>
-
-            {expandedCategory === category.id && (
-              <div className="border-t border-[#e8e0d4] px-4 pb-4">
-                <div className="mb-3 flex gap-2 pt-3">
-                  <Button size="sm" onClick={() => openNewItem(category)}>
-                    Add item
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleDeleteCategory(category)}
-                  >
-                    Delete category
-                  </Button>
-                </div>
-
-                <ul className="space-y-3">
-                  {category.items.map((item) => (
-                    <li
-                      key={item.id}
-                      className="rounded-lg border border-[#e8e0d4] p-3"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="font-medium text-[#1a3c34]">
-                            {item.name}
-                            {item.featured && (
-                              <span className="ml-2 text-xs text-[#c9a962]">
-                                Signature
-                              </span>
-                            )}
-                          </p>
-                          {item.description && (
-                            <p className="mt-1 text-sm text-[#5c534a]">
-                              {item.description}
-                            </p>
-                          )}
-                          <ul className="mt-2 space-y-0.5 text-sm">
-                            {item.variants.map((v) => (
-                              <li key={v.id} className="text-[#5c534a]">
-                                {v.protein ? `${v.protein}: ` : ""}
-                                <span className="font-medium">
-                                  {formatPricePence(v.pricePence)}
-                                </span>
-                              </li>
-                            ))}
-                          </ul>
-                          {item.tags.length > 0 && (
-                            <p className="mt-2 text-xs text-[#8a7f72]">
-                              {item.tags.join(" · ")}
-                            </p>
-                          )}
-                        </div>
-                        <div className="flex shrink-0 gap-2">
-                          <button
-                            type="button"
-                            onClick={() => openEditItem(item)}
-                            className="text-sm text-[#1a3c34] underline"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteItem(item)}
-                            className="text-sm text-red-600 underline"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+        {categories.length === 0 ? (
+          <div className="luxury-card px-8 py-16 text-center text-xl text-muted">
+            No categories yet. Add one to start building this menu.
           </div>
-        ))}
+        ) : (
+          categories.map((category) => (
+            <div key={category.id} className="luxury-card overflow-hidden">
+              <button
+                type="button"
+                onClick={() =>
+                  setExpandedCategory(
+                    expandedCategory === category.id ? null : category.id,
+                  )
+                }
+                className="flex w-full items-center justify-between px-6 py-5 text-left"
+              >
+                <div>
+                  <h3 className="font-display text-2xl text-foreground">
+                    {category.name}
+                  </h3>
+                  <p className="mt-1 text-lg text-muted">
+                    {category.items.length}{" "}
+                    {category.items.length === 1 ? "item" : "items"}
+                  </p>
+                </div>
+                <span className="text-2xl text-gold">
+                  {expandedCategory === category.id ? "−" : "+"}
+                </span>
+              </button>
+
+              {expandedCategory === category.id && (
+                <div className="border-t border-gold/15 px-6 pb-6">
+                  <div className="mb-4 flex flex-wrap gap-3 pt-5">
+                    <Button size="md" onClick={() => openNewItem(category)}>
+                      Add item
+                    </Button>
+                    <Button
+                      size="md"
+                      variant="outline"
+                      onClick={() => handleDeleteCategory(category)}
+                    >
+                      Delete category
+                    </Button>
+                  </div>
+
+                  <ul className="space-y-4">
+                    {category.items.map((item) => (
+                      <li
+                        key={item.id}
+                        className="rounded border border-gold/15 bg-surface-alt/40 p-5"
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <p className="font-display text-xl text-foreground">
+                              {item.name}
+                              {item.featured && (
+                                <span className="ml-3 text-base text-gold">
+                                  Signature
+                                </span>
+                              )}
+                            </p>
+                            {item.description && (
+                              <p className="mt-2 text-lg text-muted">
+                                {item.description}
+                              </p>
+                            )}
+                            <ul className="mt-3 space-y-1 text-lg">
+                              {item.variants.map((v) => (
+                                <li key={v.id} className="text-muted">
+                                  {v.protein ? `${v.protein}: ` : ""}
+                                  <span className="font-medium text-gold-light">
+                                    {formatPricePence(v.pricePence)}
+                                  </span>
+                                </li>
+                              ))}
+                            </ul>
+                            {item.tags.length > 0 && (
+                              <p className="mt-3 text-base text-muted">
+                                {item.tags.join(" · ")}
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+                            <button
+                              type="button"
+                              onClick={() => openEditItem(item)}
+                              className="text-lg text-gold hover:text-gold-light"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteItem(item)}
+                              className="text-lg text-red-300 hover:text-red-200"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          ))
+        )}
       </div>
 
       {draft && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
-            <h3 className="font-serif text-xl text-[#1a3c34]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="max-h-[90vh] w-full max-w-xl overflow-y-auto luxury-card p-8 shadow-2xl">
+            <h3 className="font-display text-3xl text-foreground">
               {editingItem ? "Edit menu item" : "New menu item"}
             </h3>
 
-            <div className="mt-4 space-y-4">
-              <label className="block text-sm">
-                <span className="text-[#5c534a]">Name</span>
+            <div className="mt-6 space-y-5">
+              <label className="block">
+                <span className="label-caps">Name</span>
                 <input
                   value={draft.name}
                   onChange={(e) =>
                     setDraft({ ...draft, name: e.target.value })
                   }
-                  className="mt-1 w-full rounded-lg border border-[#e8e0d4] px-3 py-2"
+                  className="luxury-input mt-3"
                 />
               </label>
 
-              <label className="block text-sm">
-                <span className="text-[#5c534a]">Description</span>
+              <label className="block">
+                <span className="label-caps">Description</span>
                 <textarea
                   value={draft.description}
                   onChange={(e) =>
                     setDraft({ ...draft, description: e.target.value })
                   }
                   rows={3}
-                  className="mt-1 w-full rounded-lg border border-[#e8e0d4] px-3 py-2"
+                  className="luxury-input mt-3 resize-none"
                 />
               </label>
 
-              <label className="block text-sm">
-                <span className="text-[#5c534a]">Tags (comma-separated)</span>
+              <label className="block">
+                <span className="label-caps">Tags (comma-separated)</span>
                 <input
                   value={draft.tags}
                   onChange={(e) =>
                     setDraft({ ...draft, tags: e.target.value })
                   }
                   placeholder="Gluten free, Vegetarian"
-                  className="mt-1 w-full rounded-lg border border-[#e8e0d4] px-3 py-2"
+                  className="luxury-input mt-3"
                 />
               </label>
 
-              <label className="flex items-center gap-2 text-sm">
+              <label className="flex items-center gap-3 text-lg text-muted">
                 <input
                   type="checkbox"
                   checked={draft.featured}
                   onChange={(e) =>
                     setDraft({ ...draft, featured: e.target.checked })
                   }
+                  className="h-5 w-5 accent-gold"
                 />
                 Signature dish
               </label>
 
               <div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-[#5c534a]">
-                    Protein options & prices
-                  </span>
+                <div className="flex items-center justify-between gap-4">
+                  <span className="label-caps">Protein options & prices</span>
                   <button
                     type="button"
                     onClick={() =>
@@ -474,14 +510,14 @@ export function AdminMenuManager() {
                         ],
                       })
                     }
-                    className="text-sm text-[#1a3c34] underline"
+                    className="text-lg text-gold hover:text-gold-light"
                   >
                     Add option
                   </button>
                 </div>
-                <ul className="mt-2 space-y-2">
+                <ul className="mt-3 space-y-3">
                   {draft.variants.map((variant, index) => (
-                    <li key={index} className="flex gap-2">
+                    <li key={index} className="flex gap-3">
                       <input
                         value={variant.protein}
                         onChange={(e) => {
@@ -493,7 +529,7 @@ export function AdminMenuManager() {
                           setDraft({ ...draft, variants });
                         }}
                         placeholder="Chicken, Beef, etc."
-                        className="flex-1 rounded-lg border border-[#e8e0d4] px-3 py-2 text-sm"
+                        className="luxury-input flex-1"
                       />
                       <input
                         value={variant.price}
@@ -506,7 +542,7 @@ export function AdminMenuManager() {
                           setDraft({ ...draft, variants });
                         }}
                         placeholder="12.50"
-                        className="w-24 rounded-lg border border-[#e8e0d4] px-3 py-2 text-sm"
+                        className="luxury-input w-28"
                       />
                       <button
                         type="button"
@@ -518,24 +554,24 @@ export function AdminMenuManager() {
                             ),
                           })
                         }
-                        className="text-sm text-red-600"
+                        className="px-2 text-2xl text-red-300 hover:text-red-200"
                       >
                         ×
                       </button>
                     </li>
                   ))}
                 </ul>
-                <p className="mt-1 text-xs text-[#8a7f72]">
+                <p className="mt-2 text-base text-muted">
                   Leave protein blank for a single-price dish. Add one row per
                   protein option with its own price.
                 </p>
               </div>
             </div>
 
-            <div className="mt-6 flex justify-end gap-2">
+            <div className="mt-8 flex justify-end gap-3">
               <Button
                 variant="outline"
-                size="sm"
+                size="md"
                 onClick={() => {
                   setDraft(null);
                   setEditingItem(null);
@@ -543,7 +579,7 @@ export function AdminMenuManager() {
               >
                 Cancel
               </Button>
-              <Button size="sm" onClick={handleSaveItem} disabled={saving}>
+              <Button size="md" onClick={handleSaveItem} disabled={saving}>
                 {saving ? "Saving…" : "Save item"}
               </Button>
             </div>
