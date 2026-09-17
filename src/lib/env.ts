@@ -46,7 +46,7 @@ export function getEnvStatus(): EnvStatus {
     warnings.push("Twilio is not configured — SMS confirmations and reminders will not be sent.");
   }
   if (isProd && !hasAdminPassword) {
-    warnings.push("ADMIN_PASSWORD is not set — using insecure default password.");
+    warnings.push("ADMIN_PASSWORD is not set — using default password 123456.");
   }
   if (isProd && !hasCronSecret) {
     warnings.push("CRON_SECRET is not set — reminder endpoint is unprotected.");

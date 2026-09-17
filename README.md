@@ -140,7 +140,7 @@ EMAIL_FROM=Pho Ta <bookings@photarestaurants.com>
 TWILIO_ACCOUNT_SID=your-sid
 TWILIO_AUTH_TOKEN=your-token
 TWILIO_PHONE_NUMBER=+44...
-ADMIN_PASSWORD=your-strong-password
+ADMIN_PASSWORD=123456
 CRON_SECRET=your-generated-secret
 REMINDER_MODE=daily
 ```
