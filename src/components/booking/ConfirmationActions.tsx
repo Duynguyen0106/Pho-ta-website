@@ -106,18 +106,28 @@ export function ConfirmationActions({ details }: { details: ConfirmationDetails 
         your calendar, or email the details to yourself.
       </p>
 
-      <div className="flex flex-wrap justify-center gap-3">
-        <Button type="button" onClick={() => window.print()}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
+        <Button type="button" className="w-full sm:w-auto" onClick={() => window.print()}>
           Print confirmation
         </Button>
-        <Button type="button" variant="outline" onClick={copyReference}>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full sm:w-auto"
+          onClick={copyReference}
+        >
           {copied ? "Copied" : "Copy reference"}
         </Button>
-        <Button type="button" variant="outline" onClick={downloadCalendar}>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full sm:w-auto"
+          onClick={downloadCalendar}
+        >
           Add to calendar
         </Button>
-        <a href={buildMailtoHref(details)} className="inline-flex">
-          <Button type="button" variant="outline">
+        <a href={buildMailtoHref(details)} className="inline-flex w-full sm:w-auto">
+          <Button type="button" variant="outline" className="w-full">
             Email to myself
           </Button>
         </a>

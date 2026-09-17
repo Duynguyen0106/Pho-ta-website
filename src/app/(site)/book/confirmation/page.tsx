@@ -39,13 +39,13 @@ export default async function ConfirmationPage({
   const seatingLabel = SEATING_LABELS[booking.seatingPreference];
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-28 text-center">
+    <div className="mx-auto max-w-2xl px-6 py-16 pb-24 text-center sm:py-28 sm:pb-28">
       <div className="gold-line mx-auto mb-10 w-16 print:hidden" />
       <p className="text-base uppercase tracking-[0.16em] text-gold">Confirmed</p>
-      <h1 className="mt-4 font-display text-5xl font-normal text-foreground">
+      <h1 className="mt-4 font-display text-4xl font-normal text-foreground sm:text-5xl">
         We await your arrival
       </h1>
-      <p className="mt-6 text-lg leading-relaxed text-muted">
+      <p className="mt-4 text-base leading-relaxed text-muted sm:mt-6 sm:text-lg">
         Thank you, {booking.customerName}. Your table at Pho Ta{" "}
         {location.shortName} is reserved for {dateTime}.
         {booking.confirmationSentAt ? (
@@ -66,7 +66,7 @@ export default async function ConfirmationPage({
 
       <div
         id="confirmation-details"
-        className="confirmation-print mt-10 luxury-card p-8 text-left text-lg"
+        className="confirmation-print mt-8 luxury-card p-6 text-left text-base sm:mt-10 sm:p-8 sm:text-lg"
       >
         <div className="border-b border-gold/15 pb-6 text-center print:border-black/20">
           <p className="text-sm uppercase tracking-[0.2em] text-gold print:text-black">
@@ -132,9 +132,9 @@ const labelStyle = "text-base uppercase tracking-[0.1em] text-gold print:text-bl
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between gap-6 border-b border-gold/10 pb-3 print:border-black/15">
+    <div className="flex flex-col gap-1 border-b border-gold/10 pb-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6 print:border-black/15">
       <dt className={labelStyle}>{label}</dt>
-      <dd className="text-right text-foreground print:text-black">{value}</dd>
+      <dd className="text-foreground sm:text-right print:text-black">{value}</dd>
     </div>
   );
 }

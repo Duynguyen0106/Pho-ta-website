@@ -34,7 +34,7 @@ export function BookingStepper({ currentStep }: BookingStepperProps) {
                 )}
                 <div
                   className={cn(
-                    "flex h-10 w-10 shrink-0 items-center justify-center border font-display text-lg transition-all duration-500",
+                    "flex h-11 w-11 shrink-0 items-center justify-center border font-display text-lg transition-all duration-500",
                     done
                       ? "border-gold bg-gold text-background"
                       : active
@@ -56,7 +56,7 @@ export function BookingStepper({ currentStep }: BookingStepperProps) {
               </div>
               <span
                 className={cn(
-                  "mt-3 hidden text-center text-xs uppercase tracking-[0.18em] sm:block",
+                  "mt-2 max-w-[4.5rem] text-center text-[10px] uppercase leading-tight tracking-[0.14em] sm:mt-3 sm:max-w-none sm:text-xs sm:tracking-[0.18em]",
                   active ? "text-gold-light" : done ? "text-muted" : "text-muted/60",
                 )}
               >
