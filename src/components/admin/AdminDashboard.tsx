@@ -3,6 +3,7 @@
 import { format } from "date-fns";
 import { useCallback, useEffect, useState } from "react";
 import { AdminHelp } from "@/components/admin/AdminHelp";
+import { AdminMenuManager } from "@/components/admin/AdminMenuManager";
 import { ManualBookingForm } from "@/components/admin/ManualBookingForm";
 import { Button } from "@/components/ui/Button";
 import {
@@ -21,7 +22,10 @@ const STATUS_COLORS: Record<BookingStatus, string> = {
   no_show: "bg-orange-100 text-orange-800",
 };
 
+type AdminView = "bookings" | "menu";
+
 export function AdminDashboard() {
+  const [view, setView] = useState<AdminView>("bookings");
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
@@ -74,7 +78,9 @@ export function AdminDashboard() {
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <div>
             <h1 className="font-serif text-xl">Pho Ta Admin</h1>
-            <p className="text-sm text-[#c9d5d0]">Booking management</p>
+            <p className="text-sm text-[#c9d5d0]">
+              Bookings & menu management
+            </p>
           </div>
           <Button
             variant="outline"
@@ -90,6 +96,33 @@ export function AdminDashboard() {
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         <AdminHelp />
 
+        <div className="mb-6 inline-flex rounded-lg border border-[#e8e0d4] bg-white p-1">
+          {(
+            [
+              { id: "bookings" as const, label: "Bookings" },
+              { id: "menu" as const, label: "Menu" },
+            ] as const
+          ).map(({ id, label }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setView(id)}
+              className={cn(
+                "rounded-md px-5 py-2 text-sm transition",
+                view === id
+                  ? "bg-[#1a3c34] text-white"
+                  : "text-[#5c534a] hover:bg-[#f5f2ed]",
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {view === "menu" ? (
+          <AdminMenuManager />
+        ) : (
+          <>
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <ManualBookingForm onCreated={fetchBookings} />
         </div>
@@ -262,6 +295,8 @@ export function AdminDashboard() {
             )}
           </div>
         </div>
+          </>
+        )}
       </main>
     </div>
   );

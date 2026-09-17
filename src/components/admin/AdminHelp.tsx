@@ -49,12 +49,12 @@ export function AdminHelp() {
               </ol>
             </div>
             <div>
-              <h4 className="font-medium text-[#1a3c34]">Seating preferences</h4>
+              <h4 className="font-medium text-[#1a3c34]">Menu management</h4>
               <ul className="mt-2 space-y-1">
-                <li><strong>Near window</strong> — window tables first</li>
-                <li><strong>Quiet table</strong> — away from kitchen and door</li>
-                <li><strong>Centre / Side</strong> — main floor or side area</li>
-                <li><strong>No preference</strong> — any suitable table</li>
+                <li>Open the <strong>Menu</strong> tab to edit daily and lunch menus</li>
+                <li>Add protein options with individual prices per dish</li>
+                <li>Use <strong>Add item</strong> / <strong>Edit</strong> to update names, tags, and prices</li>
+                <li>Changes appear on the public menu immediately</li>
               </ul>
             </div>
           </div>
