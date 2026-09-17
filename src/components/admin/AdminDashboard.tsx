@@ -16,6 +16,7 @@ import { AdminCustomers } from "@/components/admin/AdminCustomers";
 import { AdminNotifications } from "@/components/admin/AdminNotifications";
 import { AdminSettings } from "@/components/admin/AdminSettings";
 import { AdminHelp } from "@/components/admin/AdminHelp";
+import { AdminMobileDetailSheet } from "@/components/admin/AdminMobileDetailSheet";
 import { AdminMenuManager } from "@/components/admin/AdminMenuManager";
 import { AdminReports } from "@/components/admin/AdminReports";
 import { AdminShell, type AdminView } from "@/components/admin/AdminShell";
@@ -261,7 +262,7 @@ export function AdminDashboard() {
                   </Button>
                 ))}
               </div>
-              <div className="relative min-w-[240px] flex-1">
+              <div className="relative min-w-0 w-full flex-1 sm:min-w-[240px]">
                 <Search
                   size={20}
                   className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gold/70"
@@ -340,150 +341,18 @@ export function AdminDashboard() {
               )}
             </div>
 
-            <aside className="luxury-card h-fit p-8 xl:sticky xl:top-36">
+            <aside className="hidden luxury-card h-fit p-8 xl:block xl:sticky xl:top-36">
               {selected ? (
-                <div className="space-y-6">
-                  <div>
-                    <p className="label-caps">Guest</p>
-                    <h3 className="mt-2 font-display text-3xl text-foreground">
-                      {selected.customerName}
-                    </h3>
-                    <AdminStatusBadge
-                      status={selected.status}
-                      className="mt-4"
-                    />
-                    <p className="mt-3 text-lg text-muted">
-                      Source: {BOOKING_SOURCE_LABELS[selected.source]}
-                    </p>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setEditingBooking(selected)}
-                    >
-                      Edit booking
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setEmailBooking(selected)}
-                    >
-                      Resend email
-                    </Button>
-                  </div>
-
-                  <dl className="space-y-4 text-lg">
-                    <DetailRow label="Reference" value={selected.referenceCode} />
-                    <DetailRow
-                      label="When"
-                      value={`${selected.date} at ${selected.time}`}
-                    />
-                    <DetailRow
-                      label="Guests"
-                      value={String(selected.partySize)}
-                    />
-                    <DetailRow
-                      label="Seating"
-                      value={SEATING_LABELS[selected.seatingPreference]}
-                    />
-                    <div>
-                      <dt className="label-caps">Contact</dt>
-                      <dd className="mt-2 space-y-1 text-foreground">
-                        <a
-                          href={`mailto:${selected.customerEmail}`}
-                          className="block hover:text-gold"
-                        >
-                          {selected.customerEmail}
-                        </a>
-                        <a
-                          href={`tel:${selected.customerPhone.replace(/\s/g, "")}`}
-                          className="block hover:text-gold"
-                        >
-                          {selected.customerPhone}
-                        </a>
-                      </dd>
-                    </div>
-                    {selected.specialRequests && (
-                      <DetailRow
-                        label="Requests"
-                        value={selected.specialRequests}
-                      />
-                    )}
-                  </dl>
-
-                  <div className="border-t border-gold/15 pt-6">
-                    <p className="label-caps">Table number</p>
-                    <div className="mt-3 flex gap-3">
-                      <input
-                        value={tableNumber}
-                        onChange={(e) => setTableNumber(e.target.value)}
-                        placeholder="e.g. 12"
-                        className="luxury-input flex-1"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        disabled={savingTable}
-                        onClick={saveTableNumber}
-                      >
-                        {savingTable ? "Saving…" : "Save"}
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="border-t border-gold/15 pt-6">
-                    <p className="label-caps">Update status</p>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {(
-                        [
-                          "confirmed",
-                          "seated",
-                          "completed",
-                          "no_show",
-                        ] as const
-                      ).map((status) => (
-                        <button
-                          key={status}
-                          type="button"
-                          onClick={() => updateStatus(selected.id, status)}
-                          className={cn(
-                            "rounded-full border px-4 py-2.5 text-base transition",
-                            selected.status === status
-                              ? "border-gold bg-gold text-background"
-                              : "border-gold/25 text-muted hover:border-gold hover:text-foreground",
-                          )}
-                        >
-                          {BOOKING_STATUS_LABELS[status]}
-                        </button>
-                      ))}
-                    </div>
-                    {selected.status !== "cancelled" && (
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        <button
-                          type="button"
-                          onClick={() => updateStatus(selected.id, "cancelled")}
-                          className="rounded-full border border-red-500/35 px-4 py-2.5 text-base text-red-300 transition hover:border-red-400 hover:bg-red-500/10"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            updateStatus(selected.id, "cancelled", true)
-                          }
-                          className="rounded-full border border-red-500/35 px-4 py-2.5 text-base text-red-300 transition hover:border-red-400 hover:bg-red-500/10"
-                        >
-                          Cancel & email guest
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <BookingDetailPanel
+                  booking={selected}
+                  tableNumber={tableNumber}
+                  savingTable={savingTable}
+                  onTableNumberChange={setTableNumber}
+                  onSaveTable={saveTableNumber}
+                  onEdit={() => setEditingBooking(selected)}
+                  onResendEmail={() => setEmailBooking(selected)}
+                  onUpdateStatus={updateStatus}
+                />
               ) : (
                 <p className="text-xl leading-relaxed text-muted">
                   Select a booking to view guest details, assign a table, and
@@ -492,6 +361,25 @@ export function AdminDashboard() {
               )}
             </aside>
           </div>
+
+          <AdminMobileDetailSheet
+            open={Boolean(selected)}
+            onClose={() => setSelected(null)}
+            title="Booking details"
+          >
+            {selected && (
+              <BookingDetailPanel
+                booking={selected}
+                tableNumber={tableNumber}
+                savingTable={savingTable}
+                onTableNumberChange={setTableNumber}
+                onSaveTable={saveTableNumber}
+                onEdit={() => setEditingBooking(selected)}
+                onResendEmail={() => setEmailBooking(selected)}
+                onUpdateStatus={updateStatus}
+              />
+            )}
+          </AdminMobileDetailSheet>
         </div>
       )}
 
@@ -527,6 +415,149 @@ function DetailRow({ label, value }: { label: string; value: string }) {
     <div>
       <dt className="label-caps">{label}</dt>
       <dd className="mt-1 text-foreground">{value}</dd>
+    </div>
+  );
+}
+
+function BookingDetailPanel({
+  booking,
+  tableNumber,
+  savingTable,
+  onTableNumberChange,
+  onSaveTable,
+  onEdit,
+  onResendEmail,
+  onUpdateStatus,
+}: {
+  booking: Booking;
+  tableNumber: string;
+  savingTable: boolean;
+  onTableNumberChange: (value: string) => void;
+  onSaveTable: () => void;
+  onEdit: () => void;
+  onResendEmail: () => void;
+  onUpdateStatus: (
+    id: string,
+    status: BookingStatus,
+    notifyGuest?: boolean,
+  ) => void;
+}) {
+  return (
+    <div className="space-y-6">
+      <div>
+        <p className="label-caps">Guest</p>
+        <h3 className="mt-2 font-display text-3xl text-foreground">
+          {booking.customerName}
+        </h3>
+        <AdminStatusBadge status={booking.status} className="mt-4" />
+        <p className="mt-3 text-lg text-muted">
+          Source: {BOOKING_SOURCE_LABELS[booking.source]}
+        </p>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <Button type="button" variant="outline" size="sm" onClick={onEdit}>
+          Edit booking
+        </Button>
+        <Button type="button" variant="outline" size="sm" onClick={onResendEmail}>
+          Resend email
+        </Button>
+      </div>
+
+      <dl className="space-y-4 text-lg">
+        <DetailRow label="Reference" value={booking.referenceCode} />
+        <DetailRow
+          label="When"
+          value={`${booking.date} at ${booking.time}`}
+        />
+        <DetailRow label="Guests" value={String(booking.partySize)} />
+        <DetailRow
+          label="Seating"
+          value={SEATING_LABELS[booking.seatingPreference]}
+        />
+        <div>
+          <dt className="label-caps">Contact</dt>
+          <dd className="mt-2 space-y-1 text-foreground">
+            <a
+              href={`mailto:${booking.customerEmail}`}
+              className="block min-h-11 leading-[2.75rem] hover:text-gold"
+            >
+              {booking.customerEmail}
+            </a>
+            <a
+              href={`tel:${booking.customerPhone.replace(/\s/g, "")}`}
+              className="block min-h-11 leading-[2.75rem] hover:text-gold"
+            >
+              {booking.customerPhone}
+            </a>
+          </dd>
+        </div>
+        {booking.specialRequests && (
+          <DetailRow label="Requests" value={booking.specialRequests} />
+        )}
+      </dl>
+
+      <div className="border-t border-gold/15 pt-6">
+        <p className="label-caps">Table number</p>
+        <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+          <input
+            value={tableNumber}
+            onChange={(e) => onTableNumberChange(e.target.value)}
+            placeholder="e.g. 12"
+            className="luxury-input flex-1"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={savingTable}
+            onClick={onSaveTable}
+          >
+            {savingTable ? "Saving…" : "Save"}
+          </Button>
+        </div>
+      </div>
+
+      <div className="border-t border-gold/15 pt-6">
+        <p className="label-caps">Update status</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {(["confirmed", "seated", "completed", "no_show"] as const).map(
+            (status) => (
+              <button
+                key={status}
+                type="button"
+                onClick={() => onUpdateStatus(booking.id, status)}
+                className={cn(
+                  "min-h-11 rounded-full border px-4 py-2.5 text-base transition",
+                  booking.status === status
+                    ? "border-gold bg-gold text-background"
+                    : "border-gold/25 text-muted hover:border-gold hover:text-foreground",
+                )}
+              >
+                {BOOKING_STATUS_LABELS[status]}
+              </button>
+            ),
+          )}
+        </div>
+        {booking.status !== "cancelled" && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => onUpdateStatus(booking.id, "cancelled")}
+              className="min-h-11 rounded-full border border-red-500/35 px-4 py-2.5 text-base text-red-300 transition hover:border-red-400 hover:bg-red-500/10"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => onUpdateStatus(booking.id, "cancelled", true)}
+              className="min-h-11 rounded-full border border-red-500/35 px-4 py-2.5 text-base text-red-300 transition hover:border-red-400 hover:bg-red-500/10"
+            >
+              Cancel & email guest
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

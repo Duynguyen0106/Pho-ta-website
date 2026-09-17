@@ -25,13 +25,13 @@ export function Footer() {
           </p>
           <a
             href={`tel:${location.phone.replace(/\s/g, "")}`}
-            className="mt-3 block text-lg text-foreground transition hover:text-gold"
+            className="mt-3 flex min-h-11 items-center text-lg text-foreground transition hover:text-gold"
           >
             {location.phone}
           </a>
           <a
             href={`mailto:${location.email}`}
-            className="mt-1 block text-lg text-muted transition hover:text-gold"
+            className="flex min-h-11 items-center text-lg text-muted transition hover:text-gold"
           >
             {location.email}
           </a>
@@ -41,39 +41,51 @@ export function Footer() {
           <h4 className="text-base font-medium uppercase tracking-[0.16em] text-gold">
             Guest information
           </h4>
-          <ul className="mt-4 space-y-3 text-lg">
+          <ul className="mt-4 space-y-1 text-lg">
             <li>
-              <Link href="/faq" className="text-muted transition hover:text-gold">
+              <Link
+                href="/faq"
+                className="flex min-h-11 items-center text-muted transition hover:text-gold"
+              >
                 Questions & answers
               </Link>
             </li>
             <li>
               <Link
                 href="/food-safety"
-                className="text-muted transition hover:text-gold"
+                className="flex min-h-11 items-center text-muted transition hover:text-gold"
               >
                 Food hygiene & allergies
               </Link>
             </li>
             <li>
-              <Link href="/privacy" className="text-muted transition hover:text-gold">
+              <Link
+                href="/privacy"
+                className="flex min-h-11 items-center text-muted transition hover:text-gold"
+              >
                 Privacy policy
               </Link>
             </li>
             <li>
-              <Link href="/terms" className="text-muted transition hover:text-gold">
+              <Link
+                href="/terms"
+                className="flex min-h-11 items-center text-muted transition hover:text-gold"
+              >
                 Terms of use
               </Link>
             </li>
             <li>
-              <Link href="/cookies" className="text-muted transition hover:text-gold">
+              <Link
+                href="/cookies"
+                className="flex min-h-11 items-center text-muted transition hover:text-gold"
+              >
                 Cookie policy
               </Link>
             </li>
           </ul>
           <Link
             href="/book"
-            className="mt-6 inline-flex border border-gold px-5 py-2.5 text-base font-medium uppercase tracking-[0.1em] text-gold transition hover:bg-gold hover:text-white"
+            className="mt-6 inline-flex min-h-11 items-center border border-gold px-5 py-3 text-base font-medium uppercase tracking-[0.1em] text-gold transition hover:bg-gold hover:text-white"
           >
             Reserve
           </Link>
@@ -87,19 +99,32 @@ export function Footer() {
         <p className="uppercase tracking-[0.1em]">
           © {new Date().getFullYear()} Pho Ta Restaurant
         </p>
-        <p className="mt-3 text-sm leading-relaxed">
-          <Link href="/privacy" className="hover:text-gold">
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-1 text-sm">
+          <Link
+            href="/privacy"
+            className="flex min-h-11 items-center px-3 hover:text-gold"
+          >
             Privacy
           </Link>
-          {" · "}
-          <Link href="/terms" className="hover:text-gold">
+          <span className="text-gold/40" aria-hidden>
+            ·
+          </span>
+          <Link
+            href="/terms"
+            className="flex min-h-11 items-center px-3 hover:text-gold"
+          >
             Terms
           </Link>
-          {" · "}
-          <Link href="/cookies" className="hover:text-gold">
+          <span className="text-gold/40" aria-hidden>
+            ·
+          </span>
+          <Link
+            href="/cookies"
+            className="flex min-h-11 items-center px-3 hover:text-gold"
+          >
             Cookies
           </Link>
-        </p>
+        </div>
       </div>
     </footer>
   );

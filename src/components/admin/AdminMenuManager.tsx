@@ -65,7 +65,7 @@ function AdminTabGroup<T extends string>({
           type="button"
           onClick={() => onChange(opt.value)}
           className={cn(
-            "rounded px-5 py-3 text-lg transition",
+            "min-h-11 rounded px-5 py-3 text-lg transition",
             value === opt.value
               ? "bg-gold text-background"
               : "text-muted hover:bg-gold/10 hover:text-foreground",
@@ -505,12 +505,13 @@ export function AdminMenuManager() {
                               </p>
                             )}
                           </div>
-                        <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-start">
+                        <div className="flex shrink-0 flex-wrap gap-2 sm:flex-col sm:items-end">
                           <button
                             type="button"
                             disabled={itemIndex === 0 || saving}
                             onClick={() => handleReorderItem(item.id, "up")}
-                            className="text-base text-muted hover:text-gold disabled:opacity-30"
+                            className="flex min-h-11 min-w-11 items-center justify-center rounded border border-gold/20 text-base text-muted hover:text-gold disabled:opacity-30"
+                            aria-label="Move item up"
                           >
                             ↑
                           </button>
@@ -520,21 +521,22 @@ export function AdminMenuManager() {
                               itemIndex === category.items.length - 1 || saving
                             }
                             onClick={() => handleReorderItem(item.id, "down")}
-                            className="text-base text-muted hover:text-gold disabled:opacity-30"
+                            className="flex min-h-11 min-w-11 items-center justify-center rounded border border-gold/20 text-base text-muted hover:text-gold disabled:opacity-30"
+                            aria-label="Move item down"
                           >
                             ↓
                           </button>
                           <button
                             type="button"
                             onClick={() => openEditItem(item)}
-                            className="text-lg text-gold hover:text-gold-light"
+                            className="min-h-11 rounded border border-gold/25 px-4 text-base text-gold hover:border-gold hover:text-gold-light"
                           >
                             Edit
                           </button>
                           <button
                             type="button"
                             onClick={() => handleDeleteItem(item)}
-                            className="text-lg text-red-300 hover:text-red-200"
+                            className="min-h-11 rounded border border-red-500/30 px-4 text-base text-red-300 hover:border-red-400 hover:text-red-200"
                           >
                             Delete
                           </button>
@@ -551,8 +553,8 @@ export function AdminMenuManager() {
       </div>
 
       {draft && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="max-h-[90vh] w-full max-w-xl overflow-y-auto luxury-card p-8 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-0 sm:items-center sm:p-4">
+          <div className="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-t-xl luxury-card p-6 shadow-2xl sm:rounded-lg sm:p-8">
             <h3 className="font-display text-3xl text-foreground">
               {editingItem ? "Edit menu item" : "New menu item"}
             </h3>
@@ -626,7 +628,10 @@ export function AdminMenuManager() {
                 </div>
                 <ul className="mt-3 space-y-3">
                   {draft.variants.map((variant, index) => (
-                    <li key={index} className="flex gap-3">
+                    <li
+                      key={index}
+                      className="flex flex-col gap-3 sm:flex-row sm:items-center"
+                    >
                       <input
                         value={variant.protein}
                         onChange={(e) => {
@@ -640,33 +645,36 @@ export function AdminMenuManager() {
                         placeholder="Chicken, Beef, etc."
                         className="luxury-input flex-1"
                       />
-                      <input
-                        value={variant.price}
-                        onChange={(e) => {
-                          const variants = [...draft.variants];
-                          variants[index] = {
-                            ...variants[index],
-                            price: e.target.value,
-                          };
-                          setDraft({ ...draft, variants });
-                        }}
-                        placeholder="12.50"
-                        className="luxury-input w-28"
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setDraft({
-                            ...draft,
-                            variants: draft.variants.filter(
-                              (_, i) => i !== index,
-                            ),
-                          })
-                        }
-                        className="px-2 text-2xl text-red-300 hover:text-red-200"
-                      >
-                        ×
-                      </button>
+                      <div className="flex gap-3">
+                        <input
+                          value={variant.price}
+                          onChange={(e) => {
+                            const variants = [...draft.variants];
+                            variants[index] = {
+                              ...variants[index],
+                              price: e.target.value,
+                            };
+                            setDraft({ ...draft, variants });
+                          }}
+                          placeholder="12.50"
+                          className="luxury-input w-full sm:w-28"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setDraft({
+                              ...draft,
+                              variants: draft.variants.filter(
+                                (_, i) => i !== index,
+                              ),
+                            })
+                          }
+                          className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded border border-red-500/30 text-xl text-red-300 hover:text-red-200"
+                          aria-label="Remove option"
+                        >
+                          ×
+                        </button>
+                      </div>
                     </li>
                   ))}
                 </ul>

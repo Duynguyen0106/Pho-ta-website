@@ -119,6 +119,49 @@ results.push(await auditPage(page, "mobile_book"));
 await page.goto("/locations");
 results.push(await auditPage(page, "mobile_visit"));
 
+await page.goto("/admin/login");
+await page.fill('input[type="password"]', process.env.ADMIN_PASSWORD ?? "123456");
+await page.click('button[type="submit"]');
+await page.waitForURL("**/admin**", { timeout: 10000 }).catch(() => null);
+await page.waitForTimeout(800);
+
+if (page.url().includes("/admin") && !page.url().includes("/login")) {
+  results.push(await auditPage(page, "mobile_admin_bookings"));
+
+  const firstBooking = page.locator(".luxury-card.w-full.p-6").first();
+  if (await firstBooking.count()) {
+    await firstBooking.click();
+    await page.waitForTimeout(400);
+    await page.screenshot({
+      path: path.join(OUT, "mobile_admin_booking_sheet.png"),
+    });
+    const sheet = page.locator('[role="dialog"][aria-label="Booking details"]');
+    if (!(await sheet.isVisible())) {
+      results.push({
+        name: "admin_booking_sheet",
+        issues: ["Booking detail sheet did not open on mobile"],
+        metrics: {},
+      });
+    }
+    await page.locator('[aria-label="Close"]').first().click().catch(() => {});
+  }
+
+  await page.getByRole("button", { name: "Notifications" }).click();
+  await page.waitForTimeout(500);
+  results.push(await auditPage(page, "mobile_admin_notifications"));
+
+  await page.getByRole("button", { name: "Menu" }).click();
+  await page.waitForTimeout(500);
+  results.push(await auditPage(page, "mobile_admin_menu"));
+  await page.screenshot({ path: path.join(OUT, "mobile_admin_menu.png") });
+} else {
+  results.push({
+    name: "admin_login",
+    issues: ["Could not log in to admin for mobile audit"],
+    metrics: {},
+  });
+}
+
 await browser.close();
 
 console.log(JSON.stringify(results, null, 2));
