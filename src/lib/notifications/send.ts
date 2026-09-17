@@ -1,8 +1,8 @@
 import { updateBooking } from "../db/store";
 import type { Booking } from "../types";
 import {
-  isUsingResendTestDomain,
-  resolveResendApiKey,
+  isEmailConfigured,
+  shouldSkipGuestEmail,
 } from "./config";
 import {
   sendCancellationEmail,
@@ -60,21 +60,22 @@ export async function resendBookingConfirmationEmail(
 ): Promise<ResendConfirmationResult> {
   const recipient = booking.customerEmail;
 
-  if (!resolveResendApiKey()) {
+  if (!isEmailConfigured()) {
     return {
       sent: false,
       recipient,
-      error: "Resend is not configured. Add RESEND_API_KEY in environment variables.",
+      error:
+        "Email is not configured. Set SMTP_HOST/SMTP_USER/SMTP_PASS or RESEND_API_KEY.",
     };
   }
 
-  if (isUsingResendTestDomain()) {
+  if (shouldSkipGuestEmail()) {
     return {
       sent: false,
       skipped: true,
       recipient,
       error:
-        "Guest emails are blocked until photarestaurants.com is verified on Resend. Staff test emails only reach the Resend account inbox.",
+        "Guest emails are blocked on Resend test domain. Use SMTP (e.g. Gmail) or verify photarestaurants.com on Resend.",
     };
   }
 

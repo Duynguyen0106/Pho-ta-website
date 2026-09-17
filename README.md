@@ -42,12 +42,30 @@ npm run check-setup
 4. Run **`supabase/setup-complete.sql`** in the SQL Editor (creates tables + RLS policies)
 5. Verify: `npm run test-db`
 
-### Step 2 — Email (Resend)
+### Step 2 — Email (Resend or SMTP)
+
+**Option A — SMTP (Gmail / Google Workspace)** — send from the restaurant inbox without Resend:
+
+1. Create a [Gmail App Password](https://myaccount.google.com/apppasswords) for the restaurant account
+2. In Vercel, set:
+   ```
+   EMAIL_PROVIDER=smtp
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=587
+   SMTP_SECURE=false
+   SMTP_USER=Phovagrill@gmail.com
+   SMTP_PASS=your-16-char-app-password
+   EMAIL_FROM="Pho Ta <Phovagrill@gmail.com>"
+   STAFF_NOTIFICATION_EMAIL=duydichdanh@gmail.com
+   ```
+
+**Option B — Resend** — better for high volume; requires domain DNS verification:
 
 1. Sign up at [resend.com](https://resend.com)
-2. Add and verify domain `photarestaurants.com` (or use Resend test domain for staging)
-3. Create API key → `RESEND_API_KEY`
-4. Set `EMAIL_FROM="Pho Ta <bookings@photarestaurants.com>"`
+2. Verify domain `photarestaurants.com`
+3. Set `RESEND_API_KEY` and `EMAIL_FROM="Pho Ta <bookings@photarestaurants.com>"`
+
+If both are configured, **SMTP is used by default** (unless `EMAIL_PROVIDER=resend`).
 
 ### Step 3 — SMS (Twilio)
 
@@ -118,8 +136,11 @@ Share the admin URL and password with managers only:
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase publishable key |
 | `SUPABASE_SERVICE_ROLE_KEY` | Optional — server admin access (bypasses RLS) |
-| `RESEND_API_KEY` | Transactional email |
-| `EMAIL_FROM` | Sender address |
+| `EMAIL_PROVIDER` | `smtp` or `resend` (auto-detected if omitted) |
+| `RESEND_API_KEY` | Resend API key |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | SMTP server (Gmail, etc.) |
+| `EMAIL_FROM` | Sender name and address |
+| `STAFF_NOTIFICATION_EMAIL` | Inbox for new-booking staff alerts |
 | `TWILIO_*` | SMS confirmations and reminders |
 | `ADMIN_PASSWORD` | Staff dashboard login |
 | `CRON_SECRET` | Secures `/api/cron/reminders` |
@@ -127,7 +148,7 @@ Share the admin URL and password with managers only:
 
 Without Supabase credentials, bookings are stored locally in `.data/` for development only.
 
-**Email confirmations:** Add `RESEND_API_KEY` in Vercel (from [resend.com](https://resend.com)). Until `photarestaurants.com` is verified on Resend, use `EMAIL_FROM=Pho Ta <onboarding@resend.dev>` — guest emails only work after domain verification; staff notifications go to the Resend account inbox.
+**Email confirmations:** Use **SMTP** (restaurant Gmail + app password) or **Resend** (verified domain). SMTP sends guest confirmations immediately from your restaurant address without Resend.
 
 **SMS:** Add Twilio credentials in Vercel to enable text confirmations.
 

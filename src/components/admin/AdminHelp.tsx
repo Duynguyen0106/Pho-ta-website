@@ -7,6 +7,7 @@ interface AdminStatus {
   services: {
     database: string;
     email: string;
+    emailProvider?: string;
     sms: string;
     warnings: string[];
   };
@@ -97,6 +98,9 @@ export function AdminHelp() {
               <p className="label-caps">System status</p>
               <p className="mt-3 text-lg text-foreground">
                 Storage: {status.storage} · Email: {status.services.email}
+                {status.services.emailProvider
+                  ? ` (${status.services.emailProvider})`
+                  : ""}
               </p>
               {status.services.warnings.length > 0 && (
                 <ul className="mt-4 space-y-2 text-base text-orange-300">

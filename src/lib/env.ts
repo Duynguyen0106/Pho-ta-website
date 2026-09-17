@@ -1,4 +1,9 @@
-import { resolveResendApiKey, isUsingResendTestDomain } from "./notifications/config";
+import {
+  isEmailConfigured,
+  isUsingResendTestDomain,
+  resolveEmailProvider,
+  resolveResendApiKey,
+} from "./notifications/config";
 import { isSupabaseConfigured } from "./supabase/client";
 import { isUsingDefaultSupabaseConfig } from "./supabase/config";
 
@@ -8,6 +13,7 @@ export interface EnvStatus {
   nodeEnv: string;
   database: ServiceStatus;
   email: ServiceStatus;
+  emailProvider: "resend" | "smtp" | "none";
   sms: ServiceStatus;
   admin: ServiceStatus;
   cron: ServiceStatus;
@@ -21,7 +27,8 @@ export function getEnvStatus(): EnvStatus {
   const hasSupabase = isSupabaseConfigured();
   const hasSupabaseEnv = !isUsingDefaultSupabaseConfig();
   const hasServiceRole = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
-  const hasEmail = Boolean(resolveResendApiKey());
+  const emailProvider = resolveEmailProvider();
+  const hasEmail = isEmailConfigured();
   const hasSms = Boolean(
     process.env.TWILIO_ACCOUNT_SID &&
       process.env.TWILIO_AUTH_TOKEN &&
@@ -41,11 +48,17 @@ export function getEnvStatus(): EnvStatus {
     );
   }
   if (isProd && !hasEmail) {
-    warnings.push("Resend is not configured — confirmation emails will not be sent.");
-  }
-  if (isProd && hasEmail && isUsingResendTestDomain()) {
     warnings.push(
-      "Resend test domain active — verify photarestaurants.com at resend.com/domains to email guests. Staff notifications go to the Resend account inbox.",
+      "Email is not configured — set SMTP or Resend env vars to send confirmations.",
+    );
+  }
+  if (
+    isProd &&
+    emailProvider === "resend" &&
+    isUsingResendTestDomain()
+  ) {
+    warnings.push(
+      "Resend test domain active — verify photarestaurants.com on Resend, or switch to SMTP for guest emails.",
     );
   }
   if (isProd && !hasSms) {
@@ -58,6 +71,7 @@ export function getEnvStatus(): EnvStatus {
     nodeEnv: process.env.NODE_ENV ?? "development",
     database: hasSupabase ? "configured" : "dev_fallback",
     email: hasEmail ? "configured" : "dev_fallback",
+    emailProvider,
     sms: hasSms ? "configured" : "dev_fallback",
     admin: "configured",
     cron: hasCronSecret ? "configured" : "missing",
