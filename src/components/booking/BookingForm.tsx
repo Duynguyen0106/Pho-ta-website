@@ -288,7 +288,7 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
                 Your details
               </h2>
               <p className="mt-2 text-lg text-muted">
-                Almost done — tell us how to reach you
+                Almost done — we will send your confirmation by email
               </p>
             </header>
 
@@ -325,7 +325,7 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
                 />
               </label>
               <label className="block">
-                <span className="label-caps">Mobile</span>
+                <span className="label-caps">Phone</span>
                 <input
                   type="tel"
                   value={phone}
@@ -335,6 +335,9 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
                   autoComplete="tel"
                   required
                 />
+                <span className="mt-2 block text-sm text-muted">
+                  In case we need to reach you about your booking
+                </span>
               </label>
               <label className="block sm:col-span-2">
                 <span className="label-caps">Special requests</span>
@@ -357,7 +360,7 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
                 required
               />
               <span>
-                I agree to receive confirmations and reminders by email and SMS.{" "}
+                I agree to receive booking confirmations and reminders by email.{" "}
                 <a href="/privacy" className="text-gold underline-offset-2 hover:underline">
                   Privacy policy
                 </a>

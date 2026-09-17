@@ -77,8 +77,8 @@ export function BookingSummary({
 
       {!compact && (
         <p className="mt-6 border-t border-gold/15 pt-5 text-sm leading-relaxed text-muted">
-          You will receive a booking reference on the next screen. The restaurant
-          is notified immediately; guest email and SMS follow once enabled.
+          After you confirm, we will email your reservation details and show a
+          reference on the next screen to save or print.
         </p>
       )}
     </aside>

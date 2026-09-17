@@ -187,7 +187,7 @@ export default function HomePage() {
           </h2>
           <p className="mt-5 text-xl leading-relaxed text-muted">
             Secure your table in moments. Select your preferred seating and
-            receive confirmation by email and SMS.
+            receive confirmation by email.
           </p>
           <Link href="/book" className="mt-10 inline-block">
             <Button size="lg">Book a Table</Button>
