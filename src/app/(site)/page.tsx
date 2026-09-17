@@ -26,7 +26,7 @@ export default function HomePage() {
           <p className="text-base font-medium uppercase tracking-[0.2em] text-gold-light">
             London · Kentish Town · Finchley Road
           </p>
-          <h1 className="mt-6 max-w-3xl font-serif text-6xl font-normal leading-[1.08] tracking-wide text-white sm:text-8xl">
+          <h1 className="mt-6 max-w-3xl font-display text-6xl font-normal leading-[1.08] tracking-wide text-white sm:text-8xl">
             The art of Vietnamese dining
           </h1>
           <p className="mt-8 max-w-xl text-xl leading-relaxed text-white/90">

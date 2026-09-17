@@ -40,7 +40,7 @@ export default async function ConfirmationPage({
       <p className="text-base uppercase tracking-[0.16em] text-gold">
         Confirmed
       </p>
-      <h1 className="mt-4 font-serif text-5xl font-normal text-foreground">
+      <h1 className="mt-4 font-display text-5xl font-normal text-foreground">
         We await your arrival
       </h1>
       <p className="mt-6 text-lg leading-relaxed text-muted">
