@@ -1,16 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { formatPricePence } from "@/lib/menu/format";
-import type { MenuCategory, MenuItem } from "@/lib/menu/types";
+import type {
+  BranchMenu,
+  MenuCategory,
+  MenuItem,
+  MenuLocationSlug,
+} from "@/lib/menu/types";
 
 type MenuTab = "daily" | "lunch";
 
+interface BranchOption {
+  slug: MenuLocationSlug;
+  label: string;
+}
+
 interface MenuTabsProps {
-  dailyCategories: MenuCategory[];
-  lunchCategories: MenuCategory[];
-  lunchNote: string;
+  branches: BranchOption[];
+  branchMenus: Record<MenuLocationSlug, BranchMenu>;
+  initialLocation?: MenuLocationSlug;
 }
 
 function VariantPrices({ item }: { item: MenuItem }) {
@@ -100,19 +110,52 @@ function MenuCategoryList({ categories }: { categories: MenuCategory[] }) {
 }
 
 export function MenuTabs({
-  dailyCategories,
-  lunchCategories,
-  lunchNote,
+  branches,
+  branchMenus,
+  initialLocation = "kentish-town",
 }: MenuTabsProps) {
+  const [location, setLocation] = useState<MenuLocationSlug>(initialLocation);
   const [tab, setTab] = useState<MenuTab>("daily");
+
+  const activeBranch = branchMenus[location];
+  const categories = useMemo(
+    () => (tab === "daily" ? activeBranch.daily : activeBranch.lunch),
+    [activeBranch, tab],
+  );
 
   return (
     <>
       <div className="mt-16 flex justify-center">
         <div
           role="tablist"
+          aria-label="Restaurant location"
+          className="fine-dining-panel inline-flex"
+        >
+          {branches.map(({ slug, label }) => (
+            <button
+              key={slug}
+              type="button"
+              role="tab"
+              aria-selected={location === slug}
+              onClick={() => setLocation(slug)}
+              className={cn(
+                "px-8 py-3.5 text-sm font-medium uppercase tracking-[0.12em] transition",
+                location === slug
+                  ? "bg-gold text-white"
+                  : "text-muted hover:text-foreground",
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-8 flex justify-center">
+        <div
+          role="tablist"
           aria-label="Menu type"
-          className="inline-flex border border-gold/30 bg-surface"
+          className="fine-dining-panel inline-flex"
         >
           {(
             [
@@ -140,15 +183,13 @@ export function MenuTabs({
       </div>
 
       {tab === "lunch" && (
-        <p className="mt-8 text-center text-base text-muted">{lunchNote}</p>
+        <p className="mt-8 text-center text-base text-muted">
+          {activeBranch.lunchNote}
+        </p>
       )}
 
       <div className="mt-16" role="tabpanel">
-        {tab === "daily" ? (
-          <MenuCategoryList categories={dailyCategories} />
-        ) : (
-          <MenuCategoryList categories={lunchCategories} />
-        )}
+        <MenuCategoryList categories={categories} />
       </div>
     </>
   );

@@ -8,6 +8,7 @@ import {
 } from "@/lib/data/legacy-menu";
 import { parsePriceToPence } from "@/lib/menu/format";
 import type {
+  BranchMenu,
   MenuCategory,
   MenuData,
   MenuItem,
@@ -139,7 +140,7 @@ function convertCategory(
   };
 }
 
-export function buildSeedMenu(): MenuData {
+function buildBranchMenu(): BranchMenu {
   return {
     daily: dailyMenuCategories.map((cat, i) =>
       convertCategory(cat, "daily", i),
@@ -148,5 +149,17 @@ export function buildSeedMenu(): MenuData {
       convertCategory(cat, "lunch", i),
     ),
     lunchNote: lunchMenuNote,
+  };
+}
+
+export function buildSeedMenu(): MenuData {
+  const kentishTown = buildBranchMenu();
+  const finchleyRoad = buildBranchMenu();
+
+  return {
+    branches: {
+      "kentish-town": kentishTown,
+      "finchley-road": finchleyRoad,
+    },
   };
 }

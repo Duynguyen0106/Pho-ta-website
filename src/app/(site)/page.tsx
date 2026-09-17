@@ -19,8 +19,8 @@ export default function HomePage() {
           className="object-cover brightness-[0.92] saturate-[1.05]"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1a1612]/85 via-[#1a1612]/40 to-[#1a1612]/15" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#1a1612]/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#2a2520]/80 via-[#2a2520]/35 to-[#2a2520]/10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#2a2520]/45 to-transparent" />
 
         <div className="relative mx-auto w-full max-w-6xl px-6 pb-24 pt-32">
           <p className="text-sm font-medium uppercase tracking-[0.25em] text-gold-light">
@@ -39,7 +39,11 @@ export default function HomePage() {
               <Button size="lg">Reserve a Table</Button>
             </Link>
             <Link href="/menu">
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:border-white hover:text-white">
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-white/50 text-white hover:border-white hover:bg-white/10 hover:text-white"
+              >
                 View Menu
               </Button>
             </Link>
@@ -109,13 +113,17 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div className="mt-16 text-center">
-            <Link
-              href="/menu"
-              className="inline-flex items-center gap-3 text-sm font-medium uppercase tracking-[0.15em] text-gold transition hover:text-gold-light"
-            >
-              Explore full menu <ArrowRight size={16} strokeWidth={1.5} />
-            </Link>
+          <div className="mt-16 flex flex-wrap justify-center gap-6">
+            {locations.map((location) => (
+              <Link
+                key={location.slug}
+                href={`/menu?location=${location.slug}`}
+                className="inline-flex items-center gap-3 text-sm font-medium uppercase tracking-[0.15em] text-gold transition hover:text-gold-light"
+              >
+                {location.shortName} menu{" "}
+                <ArrowRight size={16} strokeWidth={1.5} />
+              </Link>
+            ))}
           </div>
         </div>
       </section>

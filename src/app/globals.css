@@ -1,20 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #faf7f2;
-  --foreground: #2a2520;
-  --surface: #ffffff;
-  --surface-elevated: #fffdf9;
-  --surface-alt: #f3ece2;
-  --gold: #a8842f;
-  --gold-light: #c9a962;
-  --gold-muted: rgba(168, 132, 47, 0.35);
-  --muted: #5c534a;
-  --muted-light: #7a6f63;
-  --border: rgba(168, 132, 47, 0.22);
-  --border-subtle: rgba(42, 37, 32, 0.08);
-  /* Hero / image overlays keep readable white type */
-  --hero-overlay: #1a1612;
+  --background: #f6f1e8;
+  --foreground: #2e2a26;
+  --surface: #fffcf7;
+  --surface-elevated: #fff9f0;
+  --surface-alt: #ebe3d6;
+  --gold: #9a7b32;
+  --gold-light: #c4a24a;
+  --gold-muted: rgba(154, 123, 50, 0.32);
+  --muted: #635b52;
+  --muted-light: #857b70;
+  --border: rgba(154, 123, 50, 0.24);
+  --border-subtle: rgba(46, 42, 38, 0.08);
+  --hero-overlay: #2a2520;
 }
 
 @theme inline {
@@ -33,8 +32,8 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-size: 1rem;
-  line-height: 1.65;
+  font-size: 1.0625rem;
+  line-height: 1.7;
 }
 
 .font-serif,
@@ -48,7 +47,7 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 9999;
-  opacity: 0.02;
+  opacity: 0.025;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
@@ -77,16 +76,26 @@ body {
 .luxury-input:focus {
   outline: none;
   border-color: var(--gold);
-  box-shadow: 0 0 0 2px rgba(168, 132, 47, 0.12);
+  box-shadow: 0 0 0 2px rgba(154, 123, 50, 0.12);
 }
 
 .luxury-card {
   border: 1px solid var(--border);
   background: var(--surface);
-  box-shadow: 0 1px 3px rgba(42, 37, 32, 0.04);
+  box-shadow: 0 2px 8px rgba(46, 42, 38, 0.04);
 }
 
 .luxury-card:hover {
   border-color: var(--gold-muted);
-  box-shadow: 0 4px 16px rgba(42, 37, 32, 0.06);
+  box-shadow: 0 8px 24px rgba(46, 42, 38, 0.07);
+}
+
+.fine-dining-panel {
+  border: 1px solid var(--border);
+  background: linear-gradient(
+    180deg,
+    var(--surface-elevated) 0%,
+    var(--surface) 100%
+  );
+  box-shadow: 0 1px 2px rgba(46, 42, 38, 0.03);
 }
