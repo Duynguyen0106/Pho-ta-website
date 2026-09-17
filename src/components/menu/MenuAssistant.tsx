@@ -24,6 +24,7 @@ const SUGGESTIONS = [
   "Bun cha vs pho?",
   "Gluten-free options?",
   "Vegetarian dishes?",
+  "Allergies & hygiene info",
   "How do I book?",
 ];
 

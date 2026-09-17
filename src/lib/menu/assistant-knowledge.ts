@@ -4,6 +4,10 @@ import { featuredDishes } from "@/lib/data/legacy-menu";
 import { findDishByQuery } from "@/lib/menu/assistant-context";
 import { formatPricePence, priceRangeLabel } from "@/lib/menu/format";
 import { getBranchMenu } from "@/lib/menu/migrate";
+import {
+  buildFoodSafetyKnowledgeText,
+  findAllergenAnswer,
+} from "@/lib/menu/assistant-food-safety";
 import { VIETNAMESE_EXPERTISE } from "@/lib/menu/assistant-vietnamese-expertise";
 import type {
   BranchMenu,
@@ -283,28 +287,6 @@ const PREPARED_TOPICS: PreparedTopic[] = [
         allergenFooter()
       );
     },
-  },
-  {
-    id: "allergies",
-    phrases: [
-      "food allergy",
-      "food allergies",
-      "allergen info",
-      "allergy info",
-      "nut allergy",
-      "peanut allergy",
-      "dairy free",
-      "lactose",
-    ],
-    keywords: ["allerg", "allergy", "intoleran"],
-    minScore: 2,
-    answer: () =>
-      `We take allergies seriously. Many menu items show dietary tags (Gluten free, Vegetarian, Vegan, Mild) as a guide, but our kitchen handles multiple ingredients and we cannot guarantee an allergen-free environment.\n\n` +
-      `Please:\n` +
-      `• Read our Food hygiene & allergies page: /food-safety\n` +
-      `• Tell us about allergies when you book (special requests) and again when you arrive\n` +
-      `• Speak to a manager or your server before ordering\n\n` +
-      `For severe allergies, always confirm with our team in person.`,
   },
   {
     id: "hours",
@@ -628,6 +610,9 @@ export function findPreparedAnswer(
   const normalized = normalizeQuery(query);
   if (!normalized) return null;
 
+  const allergen = findAllergenAnswer(query, ctx);
+  if (allergen) return allergen;
+
   const hasMenuCode = /\b[smvk]\d{2}[a-z]?\b/i.test(normalized);
   const dishMatch = findDishByQuery(ctx.menu, ctx.locationSlug, normalized);
   if (dishMatch) {
@@ -714,7 +699,7 @@ export function buildAssistantKnowledgeText(ctx: AssistantContext): string {
     `- Hours: Mon–Sun 11:30am – 9:30pm`,
     `- Booking: online at /book (up to 30 days ahead); call ${location.phone} to change/cancel`,
     `- Parking: street parking nearby; good public transport links`,
-    `- Allergies: tags are guides only; direct guests to /food-safety and to speak to staff — never guarantee allergen-free`,
+    buildFoodSafetyKnowledgeText(),
     `- Takeaway: call ${location.phone} for availability`,
     `- Dress code: smart casual`,
     "",
