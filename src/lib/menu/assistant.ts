@@ -3,7 +3,13 @@ import {
   buildMenuContextText,
   searchMenuFallback,
 } from "./assistant-context";
+import {
+  buildAssistantKnowledgeText,
+  findPreparedAnswer,
+} from "./assistant-knowledge";
 import type { MenuLocationSlug, MenuType } from "./types";
+
+export type AssistantReplyMode = "ai" | "prepared" | "search";
 
 export interface AssistantMessage {
   role: "user" | "assistant";
@@ -13,9 +19,9 @@ export interface AssistantMessage {
 const SYSTEM_PROMPT = `You are the Pho Ta menu assistant — a warm, knowledgeable guide for guests browsing Vietnamese cuisine at Pho Ta Finchley Road in London.
 
 Rules:
-- Answer ONLY using the menu data provided below for the guest's selected location and menu type.
+- Use the RESTAURANT FACTS and MENU DATA below. For common topics (hours, booking, allergies, signatures, dietary tags), follow the prepared guidance.
 - Mention dish names, descriptions, prices, and tags (Gluten free, Mild, Vegetarian, Vegan) when relevant.
-- If asked about allergens or severe allergies: be helpful but ALWAYS say we cannot guarantee an allergen-free kitchen; guests must speak to a manager/server and read the food safety page. Never invent allergen-free guarantees.
+- If asked about allergens or severe allergies: be helpful but ALWAYS say we cannot guarantee an allergen-free kitchen; guests must speak to a manager/server and read /food-safety. Never invent allergen-free guarantees.
 - If a dish is not on the menu, say so politely and suggest similar options from the menu.
 - Keep answers concise (2–4 short paragraphs max). Use plain English.
 - Encourage booking at /book for reservations.
@@ -46,13 +52,24 @@ export async function askMenuAssistant(input: {
   locationSlug: MenuLocationSlug;
   menuType: MenuType;
   history?: AssistantMessage[];
-}): Promise<{ reply: string; mode: "ai" | "search" }> {
+}): Promise<{ reply: string; mode: AssistantReplyMode }> {
   const menu = await getMenu();
+  const ctx = {
+    menu,
+    locationSlug: input.locationSlug,
+    menuType: input.menuType,
+  };
   const menuContext = buildMenuContextText(
     menu,
     input.locationSlug,
     input.menuType,
   );
+  const knowledgeContext = buildAssistantKnowledgeText(ctx);
+
+  const prepared = findPreparedAnswer(input.message, ctx);
+  if (prepared) {
+    return { reply: prepared.reply, mode: "prepared" };
+  }
 
   const apiKey = resolveApiKey();
   if (!apiKey) {
@@ -94,7 +111,7 @@ export async function askMenuAssistant(input: {
         messages: [
           {
             role: "system",
-            content: `${SYSTEM_PROMPT}\n\n--- MENU DATA ---\n${menuContext}`,
+            content: `${SYSTEM_PROMPT}\n\n--- RESTAURANT & GUIDANCE ---\n${knowledgeContext}\n\n--- MENU DATA ---\n${menuContext}`,
           },
           ...history,
           { role: "user", content: input.message.slice(0, 1000) },

@@ -19,10 +19,12 @@ interface MenuAssistantProps {
 }
 
 const SUGGESTIONS = [
-  "What are your signature dishes?",
+  "Signature dishes?",
   "Gluten-free options?",
   "Tell me about the pho",
-  "Vegetarian dishes?",
+  "Opening hours?",
+  "How do I book?",
+  "Allergies & dietary info",
 ];
 
 export function MenuAssistant({ menuTab, branchLabel }: MenuAssistantProps) {
@@ -32,7 +34,7 @@ export function MenuAssistant({ menuTab, branchLabel }: MenuAssistantProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
-      content: `Hello! I can help you explore the ${menuTab === "daily" ? "daily" : "lunch"} menu at Pho Ta ${branchLabel}. Ask about dishes, prices, dietary tags, or recommendations.`,
+      content: `Hello! I can help with the ${menuTab === "daily" ? "daily" : "lunch"} menu at Pho Ta ${branchLabel} — dishes, dietary tags, signatures, hours, and booking. Tap a suggestion below or ask anything.`,
     },
   ]);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -50,7 +52,7 @@ export function MenuAssistant({ menuTab, branchLabel }: MenuAssistantProps) {
     setMessages([
       {
         role: "assistant",
-        content: `Showing the ${menuTab === "daily" ? "daily" : "lunch"} menu for ${branchLabel}. What would you like to know?`,
+        content: `Showing the ${menuTab === "daily" ? "daily" : "lunch"} menu for ${branchLabel}. Try "Signature dishes?" or ask about any dish.`,
       },
     ]);
   }, [menuTab, branchLabel]);
