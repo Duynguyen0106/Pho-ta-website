@@ -128,6 +128,12 @@ export default function FoodSafetyPage() {
           >
             Book with dietary notes →
           </Link>
+          <Link
+            href="/privacy"
+            className="text-base font-medium uppercase tracking-[0.1em] text-muted hover:text-gold"
+          >
+            Privacy policy
+          </Link>
         </div>
       </div>
     </>

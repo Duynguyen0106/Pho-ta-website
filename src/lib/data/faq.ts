@@ -25,7 +25,7 @@ export const faqCategories: { title: string; items: FaqItem[] }[] = [
       {
         question: "Will I receive a confirmation?",
         answer:
-          "Yes. After booking online you will see a confirmation on screen with your reference number. We also send a confirmation email once our email domain is active — save or print your reference in the meantime.",
+          "Yes. After booking you will see a confirmation on screen with your reference number — please save or print it. We also send a confirmation email to the address you provide. Check your inbox (and spam folder) if it does not arrive within a few minutes.",
       },
     ],
   },

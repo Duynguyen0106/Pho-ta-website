@@ -72,4 +72,5 @@ export const allergyAdvice: string[] = [
   "We cannot guarantee a completely allergen-free environment because ingredients are prepared in shared kitchens.",
   "If you have a severe allergy, please speak to us before ordering. We will guide you to suitable dishes where possible.",
   "Always declare allergies when booking online in special requests, and remind your server when you arrive.",
+  "Allergy information you provide is handled confidentially — see our Privacy policy for how we protect your data.",
 ];

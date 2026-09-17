@@ -63,6 +63,16 @@ export function Footer() {
                 Privacy policy
               </Link>
             </li>
+            <li>
+              <Link href="/terms" className="text-muted transition hover:text-gold">
+                Terms of use
+              </Link>
+            </li>
+            <li>
+              <Link href="/cookies" className="text-muted transition hover:text-gold">
+                Cookie policy
+              </Link>
+            </li>
           </ul>
           <Link
             href="/book"
@@ -76,8 +86,23 @@ export function Footer() {
         </div>
       </div>
       <div className="gold-line mx-auto max-w-6xl" />
-      <div className="py-6 text-center text-base uppercase tracking-[0.1em] text-muted">
-        © {new Date().getFullYear()} Pho Ta Restaurant
+      <div className="px-6 py-6 text-center text-base text-muted">
+        <p className="uppercase tracking-[0.1em]">
+          © {new Date().getFullYear()} Pho Ta Restaurant
+        </p>
+        <p className="mt-3 text-sm leading-relaxed">
+          <Link href="/privacy" className="hover:text-gold">
+            Privacy
+          </Link>
+          {" · "}
+          <Link href="/terms" className="hover:text-gold">
+            Terms
+          </Link>
+          {" · "}
+          <Link href="/cookies" className="hover:text-gold">
+            Cookies
+          </Link>
+        </p>
       </div>
     </footer>
   );

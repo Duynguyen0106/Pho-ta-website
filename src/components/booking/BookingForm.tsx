@@ -360,10 +360,16 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
                 required
               />
               <span>
-                I agree to receive booking confirmations and reminders by email.{" "}
+                I agree to receive booking confirmations and reminders by email,
+                and I accept the{" "}
+                <a href="/terms" className="text-gold underline-offset-2 hover:underline">
+                  Terms of use
+                </a>{" "}
+                and{" "}
                 <a href="/privacy" className="text-gold underline-offset-2 hover:underline">
                   Privacy policy
                 </a>
+                .
               </span>
             </label>
 
