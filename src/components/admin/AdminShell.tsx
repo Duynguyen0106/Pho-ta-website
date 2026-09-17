@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Logo } from "@/components/layout/Logo";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 
@@ -37,13 +37,8 @@ export function AdminShell({
       <header className="sticky top-0 z-40 border-b border-gold/15 bg-background/95 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-6">
           <div>
-            <Link
-              href="/"
-              className="font-display text-3xl font-normal tracking-wide text-foreground hover:text-gold-light"
-            >
-              Pho Ta
-            </Link>
-            <p className="mt-1 text-base uppercase tracking-[0.2em] text-gold">
+            <Logo href="/" />
+            <p className="mt-2 text-base uppercase tracking-[0.2em] text-gold">
               Staff admin
             </p>
           </div>

@@ -40,7 +40,7 @@ export default function PrivacyPage() {
           <h2 className="font-serif text-2xl font-normal text-foreground">How we use your data</h2>
           <ul className="mt-3 list-disc space-y-1 pl-5">
             <li>Confirm and manage your reservation</li>
-            <li>Send confirmations and reminders by email and SMS</li>
+            <li>Send confirmations and reminders by email</li>
             <li>Contact you regarding changes to your booking</li>
           </ul>
         </section>
