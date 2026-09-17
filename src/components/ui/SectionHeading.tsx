@@ -22,16 +22,16 @@ export function SectionHeading({
         className,
       )}
     >
-      <p className="text-sm font-medium uppercase tracking-[0.2em] text-gold">
+      <p className="text-base font-medium uppercase tracking-[0.18em] text-gold">
         {eyebrow}
       </p>
-      <h2 className="mt-4 font-serif text-4xl font-normal tracking-wide text-foreground sm:text-5xl">
+      <h2 className="mt-4 font-serif text-5xl font-normal tracking-wide text-foreground sm:text-6xl">
         {title}
       </h2>
       {description && (
         <p
           className={cn(
-            "mt-5 max-w-xl text-lg leading-relaxed text-muted",
+            "mt-6 max-w-xl text-xl leading-relaxed text-muted",
             align === "center" && "mx-auto",
           )}
         >

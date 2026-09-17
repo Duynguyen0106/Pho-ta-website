@@ -19,17 +19,17 @@ export default function HomePage() {
           className="object-cover brightness-[0.92] saturate-[1.05]"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#2a2520]/80 via-[#2a2520]/35 to-[#2a2520]/10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#2a2520]/45 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0f0d0b]/88 via-[#0f0d0b]/45 to-[#0f0d0b]/15" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0f0d0b]/55 to-transparent" />
 
         <div className="relative mx-auto w-full max-w-6xl px-6 pb-24 pt-32">
-          <p className="text-sm font-medium uppercase tracking-[0.25em] text-gold-light">
+          <p className="text-base font-medium uppercase tracking-[0.2em] text-gold-light">
             London · Kentish Town · Finchley Road
           </p>
-          <h1 className="mt-6 max-w-3xl font-serif text-5xl font-normal leading-[1.1] tracking-wide text-white sm:text-7xl">
+          <h1 className="mt-6 max-w-3xl font-serif text-6xl font-normal leading-[1.08] tracking-wide text-white sm:text-8xl">
             The art of Vietnamese dining
           </h1>
-          <p className="mt-8 max-w-lg text-lg leading-relaxed text-white/85">
+          <p className="mt-8 max-w-xl text-xl leading-relaxed text-white/90">
             An elevated journey through Vietnam&apos;s most cherished flavours —
             from fragrant pho to the refined traditions of Hanoi. Where
             authenticity meets elegance.
@@ -61,7 +61,7 @@ export default function HomePage() {
               title="A taste of distinction"
               description="Pho Ta curates the finest Vietnamese traditions for the discerning London palate — fresh ingredients, meticulous preparation, and an atmosphere of quiet luxury."
             />
-            <p className="mt-8 text-base leading-relaxed text-muted">
+            <p className="mt-8 text-lg leading-relaxed text-muted">
               Whether an intimate dinner or a celebratory gathering, our kitchens
               honour the depth and nuance of Vietnamese cuisine with grace and
               precision.
@@ -102,10 +102,10 @@ export default function HomePage() {
                   />
                 </div>
                 <div className="border-t border-gold/15 p-8">
-                  <h3 className="font-serif text-2xl font-normal text-foreground">
+                  <h3 className="font-serif text-3xl font-normal text-foreground">
                     {dish.name}
                   </h3>
-                  <p className="mt-3 text-base leading-relaxed text-muted">
+                  <p className="mt-3 text-lg leading-relaxed text-muted">
                     {dish.description}
                   </p>
                 </div>
@@ -118,7 +118,7 @@ export default function HomePage() {
               <Link
                 key={location.slug}
                 href={`/menu?location=${location.slug}`}
-                className="inline-flex items-center gap-3 text-sm font-medium uppercase tracking-[0.15em] text-gold transition hover:text-gold-light"
+                className="inline-flex items-center gap-3 text-base font-medium uppercase tracking-[0.1em] text-gold transition hover:text-gold-light"
               >
                 {location.shortName} menu{" "}
                 <ArrowRight size={16} strokeWidth={1.5} />
@@ -143,11 +143,11 @@ export default function HomePage() {
                 key={location.slug}
                 className="luxury-card p-10 transition duration-500"
               >
-                <h3 className="font-serif text-3xl font-normal text-foreground">
+                <h3 className="font-serif text-4xl font-normal text-foreground">
                   {location.shortName}
                 </h3>
                 <div className="gold-line my-6 w-12" />
-                <div className="space-y-3 text-base text-muted">
+                <div className="space-y-3 text-lg text-muted">
                   <p className="flex items-start gap-3">
                     <MapPin size={18} className="mt-0.5 shrink-0 text-gold" strokeWidth={1.5} />
                     {location.address}, {location.postcode}
@@ -165,7 +165,7 @@ export default function HomePage() {
                 </div>
                 <Link
                   href={`/book?location=${location.slug}`}
-                  className="mt-8 inline-flex items-center gap-2 text-sm font-medium uppercase tracking-[0.12em] text-gold transition hover:text-gold-light"
+                  className="mt-8 inline-flex items-center gap-2 text-base font-medium uppercase tracking-[0.1em] text-gold transition hover:text-gold-light"
                 >
                   Reserve at {location.shortName}{" "}
                   <ArrowRight size={14} strokeWidth={1.5} />
@@ -179,13 +179,13 @@ export default function HomePage() {
       {/* CTA */}
       <section className="border-t border-gold/10 bg-surface-alt py-24">
         <div className="mx-auto max-w-2xl px-6 text-center">
-          <p className="text-sm uppercase tracking-[0.2em] text-gold">
+          <p className="text-base uppercase tracking-[0.16em] text-gold">
             Reservations
           </p>
-          <h2 className="mt-4 font-serif text-4xl font-normal text-foreground">
+          <h2 className="mt-4 font-serif text-5xl font-normal text-foreground">
             We look forward to welcoming you
           </h2>
-          <p className="mt-5 text-lg leading-relaxed text-muted">
+          <p className="mt-5 text-xl leading-relaxed text-muted">
             Secure your table in moments. Select your preferred seating and
             receive confirmation by email and SMS.
           </p>

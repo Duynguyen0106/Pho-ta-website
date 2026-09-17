@@ -51,7 +51,7 @@ export default async function MenuPage({ searchParams }: MenuPageProps) {
         initialLocation={initialLocation}
       />
 
-      <p className="mt-16 text-center text-sm uppercase tracking-[0.12em] text-muted">
+      <p className="mt-16 text-center text-base uppercase tracking-[0.1em] text-muted">
         Gluten free · Mild · Vegetarian · Vegan options marked · Please enquire
         with your server
       </p>

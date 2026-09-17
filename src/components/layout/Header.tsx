@@ -40,7 +40,7 @@ export function Header() {
         <Link href="/" className="group text-center">
           <span
             className={cn(
-              "font-serif text-3xl font-normal tracking-[0.12em]",
+              "font-serif text-4xl font-normal tracking-[0.12em]",
               onHero ? "text-white" : "text-foreground",
             )}
           >
@@ -48,7 +48,7 @@ export function Header() {
           </span>
           <span
             className={cn(
-              "mt-1 block text-xs uppercase tracking-[0.3em] text-gold-light",
+              "mt-1 block text-sm uppercase tracking-[0.28em] text-gold-light",
             )}
           >
             Fine Vietnamese
@@ -61,11 +61,11 @@ export function Header() {
               key={link.href}
               href={link.href}
               className={cn(
-                "text-sm font-medium uppercase tracking-[0.15em] transition-colors duration-300",
+                "text-base font-medium uppercase tracking-[0.12em] transition-colors duration-300",
                 pathname === link.href
                   ? "text-gold"
                   : onHero
-                    ? "text-white/90 hover:text-white"
+                    ? "text-white hover:text-white"
                     : "text-muted hover:text-foreground",
               )}
             >
@@ -77,7 +77,7 @@ export function Header() {
         <Link
           href="/book"
           className={cn(
-            "hidden border px-6 py-2.5 text-sm font-medium uppercase tracking-[0.12em] transition md:inline-block",
+            "hidden border px-7 py-3 text-base font-medium uppercase tracking-[0.1em] transition md:inline-block",
             onHero
               ? "border-white text-white hover:bg-white hover:text-foreground"
               : "border-gold text-gold hover:bg-gold hover:text-white",
@@ -92,7 +92,7 @@ export function Header() {
           onClick={() => setOpen(!open)}
           aria-label="Toggle menu"
         >
-          {open ? <X size={24} strokeWidth={1.5} /> : <Menu size={24} strokeWidth={1.5} />}
+          {open ? <X size={28} strokeWidth={1.5} /> : <Menu size={28} strokeWidth={1.5} />}
         </button>
       </div>
 
@@ -105,7 +105,7 @@ export function Header() {
                 href={link.href}
                 onClick={() => setOpen(false)}
                 className={cn(
-                  "text-base font-medium uppercase tracking-[0.12em]",
+                  "text-lg font-medium uppercase tracking-[0.1em]",
                   pathname === link.href ? "text-gold" : "text-muted",
                 )}
               >

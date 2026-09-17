@@ -22,7 +22,7 @@ export default async function ConfirmationPage({
   if (!booking) {
     return (
       <div className="mx-auto max-w-lg px-6 py-28 text-center">
-        <h1 className="font-serif text-3xl font-normal text-foreground">
+        <h1 className="font-serif text-4xl font-normal text-foreground">
           Reservation not found
         </h1>
         <Link href="/book" className="mt-10 inline-block">
@@ -37,20 +37,20 @@ export default async function ConfirmationPage({
   return (
     <div className="mx-auto max-w-lg px-6 py-28 text-center">
       <div className="gold-line mx-auto mb-10 w-16" />
-      <p className="text-sm uppercase tracking-[0.2em] text-gold">
+      <p className="text-base uppercase tracking-[0.16em] text-gold">
         Confirmed
       </p>
-      <h1 className="mt-4 font-serif text-4xl font-normal text-foreground">
+      <h1 className="mt-4 font-serif text-5xl font-normal text-foreground">
         We await your arrival
       </h1>
-      <p className="mt-6 text-base leading-relaxed text-muted">
+      <p className="mt-6 text-lg leading-relaxed text-muted">
         Thank you, {booking.customerName}. A confirmation has been sent to your
         email and phone. We shall remind you before your visit.
       </p>
 
-      <div className="mt-10 luxury-card p-8 text-left text-base">
+      <div className="mt-10 luxury-card p-8 text-left text-lg">
         <p className={labelStyle}>Reference</p>
-        <p className="mt-1 font-serif text-xl text-gold">{booking.referenceCode}</p>
+        <p className="mt-1 font-serif text-2xl text-gold">{booking.referenceCode}</p>
         <dl className="mt-6 space-y-3 text-muted">
           <Row label="Venue" value={location.shortName} />
           <Row label="Date" value={booking.date} />
@@ -67,7 +67,7 @@ export default async function ConfirmationPage({
   );
 }
 
-const labelStyle = "text-sm uppercase tracking-[0.12em] text-gold";
+const labelStyle = "text-base uppercase tracking-[0.1em] text-gold";
 
 function Row({ label, value }: { label: string; value: string }) {
   return (

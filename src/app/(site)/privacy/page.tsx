@@ -17,9 +17,9 @@ export default function PrivacyPage() {
         description="Last updated September 2026"
       />
 
-      <div className="mt-16 space-y-10 text-base leading-relaxed text-muted">
+      <div className="mt-16 space-y-10 text-lg leading-relaxed text-muted">
         <section>
-          <h2 className="font-serif text-xl font-normal text-foreground">Who we are</h2>
+          <h2 className="font-serif text-2xl font-normal text-foreground">Who we are</h2>
           <p className="mt-3">
             Pho Ta Restaurant operates fine Vietnamese dining at Kentish Town and
             Finchley Road, London. When you reserve a table, we collect information
@@ -28,7 +28,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="font-serif text-xl font-normal text-foreground">What we collect</h2>
+          <h2 className="font-serif text-2xl font-normal text-foreground">What we collect</h2>
           <ul className="mt-3 list-disc space-y-1 pl-5">
             <li>Name, email address, and telephone number</li>
             <li>Reservation details and seating preferences</li>
@@ -37,7 +37,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="font-serif text-xl font-normal text-foreground">How we use your data</h2>
+          <h2 className="font-serif text-2xl font-normal text-foreground">How we use your data</h2>
           <ul className="mt-3 list-disc space-y-1 pl-5">
             <li>Confirm and manage your reservation</li>
             <li>Send confirmations and reminders by email and SMS</li>
@@ -46,7 +46,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="font-serif text-xl font-normal text-foreground">Your rights</h2>
+          <h2 className="font-serif text-2xl font-normal text-foreground">Your rights</h2>
           <p className="mt-3">
             You may request access, correction, or deletion of your data by
             contacting{" "}
@@ -58,7 +58,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="font-serif text-xl font-normal text-foreground">Third parties</h2>
+          <h2 className="font-serif text-2xl font-normal text-foreground">Third parties</h2>
           <p className="mt-3">
             We use Supabase, Resend, and Twilio to operate our reservation system.
             These providers process data on our behalf under their respective
@@ -69,7 +69,7 @@ export default function PrivacyPage() {
 
       <Link
         href="/book"
-        className="mt-12 inline-block text-sm font-medium uppercase tracking-[0.12em] text-gold hover:text-gold-light"
+        className="mt-12 inline-block text-base font-medium uppercase tracking-[0.1em] text-gold hover:text-gold-light"
       >
         ← Return to reservations
       </Link>

@@ -13,9 +13,9 @@ interface BookingFormProps {
   defaultLocation?: LocationSlug;
 }
 
-const labelClass = "text-sm font-medium uppercase tracking-[0.12em] text-gold";
-const stepTitleClass = "font-serif text-2xl font-normal text-foreground";
-const stepDescClass = "mt-2 text-base text-muted";
+const labelClass = "text-base font-medium uppercase tracking-[0.1em] text-gold";
+const stepTitleClass = "font-serif text-3xl font-normal text-foreground";
+const stepDescClass = "mt-2 text-lg text-muted";
 
 export function BookingForm({ defaultLocation }: BookingFormProps) {
   const router = useRouter();
@@ -127,7 +127,7 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
       </div>
 
       {error && (
-        <div className="border border-red-900/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">
+        <div className="border border-red-900/50 bg-red-950/30 px-4 py-3 text-base text-red-300">
           {error}
         </div>
       )}
@@ -147,8 +147,8 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
                 onClick={() => setLocationSlug(loc.slug)}
                 className={selectCard(locationSlug === loc.slug)}
               >
-                <span className="font-serif text-lg text-foreground">{loc.shortName}</span>
-                <p className="mt-1 text-sm text-muted">{loc.address}</p>
+                <span className="font-serif text-2xl text-foreground">{loc.shortName}</span>
+                <p className="mt-1 text-lg text-muted">{loc.address}</p>
               </button>
             ))}
           </div>
@@ -199,7 +199,7 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
           </div>
 
           {slotsLoading ? (
-            <p className="text-sm text-muted">Loading availability…</p>
+            <p className="text-lg text-muted">Loading availability…</p>
           ) : (
             <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
               {slots.map((slot) => (
@@ -209,7 +209,7 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
                   disabled={!slot.available}
                   onClick={() => setTime(slot.time)}
                   className={cn(
-                    "border px-2 py-3 text-sm tracking-wider transition",
+                    "border px-3 py-3.5 text-base tracking-wider transition",
                     !slot.available && "cursor-not-allowed opacity-30",
                     time === slot.time
                       ? "border-gold bg-gold text-white"
@@ -250,8 +250,8 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
                 onClick={() => setSeatingPreference(pref.value)}
                 className={selectCard(seatingPreference === pref.value)}
               >
-                <span className="text-sm text-foreground">{pref.label}</span>
-                <p className="mt-1 text-sm text-muted">{pref.description}</p>
+                <span className="text-lg text-foreground">{pref.label}</span>
+                <p className="mt-1 text-lg text-muted">{pref.description}</p>
               </button>
             ))}
           </div>
@@ -274,9 +274,9 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
             <p className={stepDescClass}>Confirmation will be sent by email and SMS</p>
           </div>
 
-          <div className="border border-gold/20 bg-surface-alt p-5 text-sm">
+          <div className="border border-gold/20 bg-surface-alt p-5 text-lg">
             <p className={labelClass}>Summary</p>
-            <p className="mt-3 text-muted">
+            <p className="mt-3 text-lg text-muted">
               {location.shortName} · {partySize} guests · {date} at {time}
               <br />
               {SEATING_PREFERENCES.find((p) => p.value === seatingPreference)?.label}
@@ -327,7 +327,7 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
             </label>
           </div>
 
-          <label className="flex items-start gap-3 text-sm text-muted">
+          <label className="flex items-start gap-3 text-lg text-muted">
             <input
               type="checkbox"
               checked={consent}

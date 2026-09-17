@@ -28,7 +28,7 @@ function VariantPrices({ item }: { item: MenuItem }) {
     const variant = item.variants[0];
     if (!variant) return null;
     return (
-      <span className="shrink-0 font-serif text-xl text-gold">
+      <span className="shrink-0 font-serif text-2xl text-gold">
         {formatPricePence(variant.pricePence)}
       </span>
     );
@@ -39,12 +39,12 @@ function VariantPrices({ item }: { item: MenuItem }) {
       {item.variants.map((variant) => (
         <li
           key={variant.id}
-          className="flex items-baseline justify-end gap-3 text-base"
+          className="flex items-baseline justify-end gap-3 text-lg"
         >
           {variant.protein && (
             <span className="text-muted">{variant.protein}</span>
           )}
-          <span className="font-serif text-lg text-gold">
+          <span className="font-serif text-xl text-gold">
             {formatPricePence(variant.pricePence)}
           </span>
         </li>
@@ -59,11 +59,11 @@ function MenuCategoryList({ categories }: { categories: MenuCategory[] }) {
       {categories.map((category) => (
         <section key={category.id}>
           <div className="flex items-end justify-between border-b border-gold/20 pb-4">
-            <h2 className="font-serif text-3xl font-normal text-foreground">
+            <h2 className="font-serif text-4xl font-normal text-foreground">
               {category.name}
             </h2>
             {category.note && (
-              <p className="text-sm uppercase tracking-[0.12em] text-muted">
+              <p className="text-base uppercase tracking-[0.1em] text-muted">
                 {category.note}
               </p>
             )}
@@ -76,25 +76,25 @@ function MenuCategoryList({ categories }: { categories: MenuCategory[] }) {
               >
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-baseline gap-3">
-                    <h3 className="font-serif text-xl font-normal text-foreground">
+                    <h3 className="font-serif text-2xl font-normal text-foreground">
                       {item.name}
                     </h3>
                     {item.featured && (
-                      <span className="text-xs uppercase tracking-[0.12em] text-gold">
+                      <span className="text-sm uppercase tracking-[0.1em] text-gold">
                         Signature
                       </span>
                     )}
                     {item.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="text-xs uppercase tracking-[0.12em] text-muted"
+                        className="text-sm uppercase tracking-[0.1em] text-muted"
                       >
                         {tag}
                       </span>
                     ))}
                   </div>
                   {item.description && (
-                    <p className="mt-2 max-w-lg text-base leading-relaxed text-muted">
+                    <p className="mt-2 max-w-lg text-lg leading-relaxed text-muted">
                       {item.description}
                     </p>
                   )}
@@ -139,7 +139,7 @@ export function MenuTabs({
               aria-selected={location === slug}
               onClick={() => setLocation(slug)}
               className={cn(
-                "px-8 py-3.5 text-sm font-medium uppercase tracking-[0.12em] transition",
+                "px-8 py-4 text-base font-medium uppercase tracking-[0.1em] transition",
                 location === slug
                   ? "bg-gold text-white"
                   : "text-muted hover:text-foreground",
@@ -170,7 +170,7 @@ export function MenuTabs({
               aria-selected={tab === id}
               onClick={() => setTab(id)}
               className={cn(
-                "px-8 py-3.5 text-sm font-medium uppercase tracking-[0.12em] transition",
+                "px-8 py-4 text-base font-medium uppercase tracking-[0.1em] transition",
                 tab === id
                   ? "bg-gold text-white"
                   : "text-muted hover:text-foreground",
@@ -183,7 +183,7 @@ export function MenuTabs({
       </div>
 
       {tab === "lunch" && (
-        <p className="mt-8 text-center text-base text-muted">
+        <p className="mt-8 text-center text-lg text-muted">
           {activeBranch.lunchNote}
         </p>
       )}

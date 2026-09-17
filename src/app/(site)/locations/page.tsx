@@ -32,11 +32,11 @@ export default function LocationsPage() {
               />
             </div>
             <div className="p-10">
-              <h2 className="font-serif text-3xl font-normal text-foreground">
+              <h2 className="font-serif text-4xl font-normal text-foreground">
                 {location.name}
               </h2>
               <div className="gold-line my-6 w-12" />
-              <ul className="space-y-4 text-base text-muted">
+              <ul className="space-y-4 text-lg text-muted">
                 <li className="flex items-start gap-3">
                   <MapPin size={18} className="mt-0.5 shrink-0 text-gold" strokeWidth={1.5} />
                   {location.address}, {location.postcode}
