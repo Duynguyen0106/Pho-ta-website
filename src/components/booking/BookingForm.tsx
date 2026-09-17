@@ -365,7 +365,11 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
             />
             <span>
               I agree to receive booking confirmations and reminders by email
-              and SMS. See our privacy policy for how we handle your data.
+              and SMS. See our{" "}
+              <a href="/privacy" className="text-[#1a3c34] underline">
+                privacy policy
+              </a>{" "}
+              for how we handle your data.
             </span>
           </label>
 

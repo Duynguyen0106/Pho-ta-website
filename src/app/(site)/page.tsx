@@ -4,6 +4,7 @@ import { ArrowRight, MapPin, Clock } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { featuredDishes } from "@/lib/data/menu";
 import { locations } from "@/lib/data/locations";
+import { siteImages } from "@/lib/data/images";
 
 export default function HomePage() {
   return (
@@ -11,7 +12,7 @@ export default function HomePage() {
       {/* Hero */}
       <section className="relative min-h-[85vh] flex items-center">
         <Image
-          src="https://images.unsplash.com/photo-1591814468924-caf87d6592d3?w=1920&q=80"
+          src={siteImages.hero}
           alt="Pho Ta Vietnamese cuisine"
           fill
           className="object-cover"
@@ -70,7 +71,7 @@ export default function HomePage() {
           </div>
           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
             <Image
-              src="https://images.unsplash.com/photo-1555126634-323283e090fa?w=800&q=80"
+              src={siteImages.about}
               alt="Vietnamese bun cha dish"
               fill
               className="object-cover"

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  getBookingsNeedingReminder,
-} from "@/lib/db/store";
+import { getReminderMode } from "@/lib/bookings/reminders";
+import { getBookingsNeedingReminder } from "@/lib/db/store";
 import { sendBookingReminder } from "@/lib/notifications/send";
 
 export async function GET(request: NextRequest) {
@@ -21,6 +20,7 @@ export async function GET(request: NextRequest) {
   }
 
   return NextResponse.json({
+    mode: getReminderMode(),
     processed: results.length,
     references: results,
   });

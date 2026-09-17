@@ -1,4 +1,5 @@
 import { format, parse } from "date-fns";
+import { isDailyReminderMode } from "../bookings/reminders";
 import { SEATING_LABELS } from "../constants";
 import { getLocation } from "../data/locations";
 import type { Booking } from "../types";
@@ -77,11 +78,16 @@ export function buildReminderEmail(booking: Booking): {
   const seating = SEATING_LABELS[booking.seatingPreference];
   const dateTime = formatBookingDateTime(booking);
 
+  const daily = isDailyReminderMode();
+  const leadLine = daily
+    ? "Reminder: your table at Pho Ta is today."
+    : "Reminder: your table at Pho Ta is in about 2 hours.";
+
   const subject = `Reminder: Your Pho Ta booking today`;
 
   const text = `Hi ${booking.customerName},
 
-Reminder: Your table at Pho Ta ${location.shortName} is in 2 hours.
+${leadLine}
 
 Guests: ${booking.partySize}
 Time: ${dateTime}
@@ -100,7 +106,7 @@ See you soon!`;
       </div>
       <div style="padding: 32px 24px; background: #faf7f2;">
         <p>Hi ${booking.customerName},</p>
-        <p>Your table at <strong>Pho Ta ${location.shortName}</strong> is in about 2 hours.</p>
+        <p>${leadLine.replace("Pho Ta", `<strong>Pho Ta ${location.shortName}</strong>`)}</p>
         <p><strong>${booking.partySize} guests</strong> · ${dateTime}<br/>Seating: ${seating}<br/>Ref: ${booking.referenceCode}</p>
         <p style="color: #666;">${location.address}, ${location.postcode}</p>
         <p>See you soon!</p>

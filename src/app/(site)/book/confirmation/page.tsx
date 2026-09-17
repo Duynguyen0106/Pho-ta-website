@@ -41,7 +41,7 @@ export default async function ConfirmationPage({
       </h1>
       <p className="mt-4 text-[#5c534a]">
         Thank you, {booking.customerName}. A confirmation has been sent to your
-        email and phone. We&apos;ll remind you 2 hours before your reservation.
+        email and phone. We&apos;ll send a reminder before your visit.
       </p>
 
       <div className="mt-8 rounded-xl border border-[#e8e0d4] bg-white p-6 text-left text-sm">
