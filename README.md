@@ -5,6 +5,7 @@ Modern website and booking system for [Pho Ta](https://www.photarestaurants.com/
 ## Features
 
 - **Public website** — Home, menu, locations, elegant Vietnamese branding
+- **Menu AI helper** — Floating chat on the menu page to answer dish, dietary, and recommendation questions
 - **Online booking** — Party size + seating preference (side, centre, near window, quiet)
 - **Confirmations** — Email and SMS on booking (via Resend + Twilio)
 - **Reminders** — Automated email + SMS (daily on Vercel Hobby, or 2h before with Pro/external cron)
@@ -145,8 +146,12 @@ Share the admin URL and password with managers only:
 | `ADMIN_PASSWORD` | Staff dashboard login |
 | `CRON_SECRET` | Secures `/api/cron/reminders` |
 | `REMINDER_MODE` | `daily` (Hobby default) or `two_hours` (Pro / cron-job.org) |
+| `OPENAI_API_KEY` | Optional — enables GPT answers in the menu helper (keyword fallback without it) |
+| `OPENAI_MODEL` | Optional — defaults to `gpt-4o-mini` |
 
 Without Supabase credentials, bookings are stored locally in `.data/` for development only.
+
+**Menu helper:** Set `OPENAI_API_KEY` in Vercel for natural-language answers from live menu data. Without it, the helper still works using keyword search over the menu.
 
 **Email confirmations:** Use **SMTP** (restaurant Gmail + app password) or **Resend** (verified domain). SMTP sends guest confirmations immediately from your restaurant address without Resend.
 

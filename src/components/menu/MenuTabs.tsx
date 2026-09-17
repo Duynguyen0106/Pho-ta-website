@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ArrowRight } from "lucide-react";
+import { MenuAssistant } from "@/components/menu/MenuAssistant";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { formatPricePence, priceRangeLabel } from "@/lib/menu/format";
@@ -379,6 +380,12 @@ export function MenuTabs({
           </Link>
         </div>
       </div>
+
+      <MenuAssistant
+        locationSlug={location}
+        menuTab={tab}
+        branchLabel={branchLabel}
+      />
     </>
   );
 }
