@@ -3,10 +3,15 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, Search, X } from "lucide-react";
 import { MenuAssistant } from "@/components/menu/MenuAssistant";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
+import {
+  countMenuItems,
+  filterMenuCategories,
+  type DietaryFilter,
+} from "@/lib/menu/filter-menu";
 import { formatPricePence, priceRangeLabel } from "@/lib/menu/format";
 import type { BranchMenu, MenuCategory, MenuItem } from "@/lib/menu/types";
 
@@ -15,14 +20,20 @@ type MenuTab = "daily" | "lunch";
 interface MenuTabsProps {
   branchMenu: BranchMenu;
   initialTab?: MenuTab;
+  menuAssistantEnabled?: boolean;
 }
 
-const DIETARY_LEGEND = [
-  { label: "Gluten free", short: "GF" },
-  { label: "Mild", short: "Mild" },
-  { label: "Vegetarian", short: "V" },
-  { label: "Vegan", short: "Vg" },
-] as const;
+const DIETARY_FILTERS: {
+  id: DietaryFilter;
+  label: string;
+  tag: string;
+}[] = [
+  { id: "signature", label: "Signature", tag: "Signature" },
+  { id: "gluten-free", label: "Gluten free", tag: "Gluten free" },
+  { id: "mild", label: "Mild", tag: "Mild" },
+  { id: "vegetarian", label: "Vegetarian", tag: "Vegetarian" },
+  { id: "vegan", label: "Vegan", tag: "Vegan" },
+];
 
 function tagShortLabel(tag: string): string {
   const lower = tag.toLowerCase();
@@ -311,10 +322,13 @@ function MenuCategorySection({ category }: { category: MenuCategory }) {
 export function MenuTabs({
   branchMenu,
   initialTab = "daily",
+  menuAssistantEnabled = true,
 }: MenuTabsProps) {
   const router = useRouter();
   const [tab, setTab] = useState<MenuTab>(initialTab);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dietaryFilter, setDietaryFilter] = useState<DietaryFilter>("all");
 
   const activeBranch = branchMenu;
   const categories = useMemo(
@@ -322,10 +336,23 @@ export function MenuTabs({
     [activeBranch, tab],
   );
 
+  const filteredCategories = useMemo(
+    () => filterMenuCategories(categories, searchQuery, dietaryFilter),
+    [categories, searchQuery, dietaryFilter],
+  );
+
   const itemCount = useMemo(
-    () => categories.reduce((sum, cat) => sum + cat.items.length, 0),
+    () => countMenuItems(categories),
     [categories],
   );
+
+  const filteredItemCount = useMemo(
+    () => countMenuItems(filteredCategories),
+    [filteredCategories],
+  );
+
+  const isFiltering =
+    searchQuery.trim().length > 0 || dietaryFilter !== "all";
 
   const syncUrl = useCallback(
     (menuTab: MenuTab) => {
@@ -342,11 +369,11 @@ export function MenuTabs({
   }, [tab, syncUrl]);
 
   useEffect(() => {
-    setActiveCategory(categories[0]?.id ?? null);
-  }, [categories]);
+    setActiveCategory(filteredCategories[0]?.id ?? null);
+  }, [filteredCategories, tab]);
 
   useEffect(() => {
-    const ids = categories.map((c) => c.id);
+    const ids = filteredCategories.map((c) => c.id);
     const elements = ids
       .map((id) => document.getElementById(`menu-${id}`))
       .filter(Boolean) as HTMLElement[];
@@ -367,7 +394,7 @@ export function MenuTabs({
 
     for (const el of elements) observer.observe(el);
     return () => observer.disconnect();
-  }, [categories]);
+  }, [filteredCategories]);
 
   function scrollToCategory(categoryId: string) {
     document
@@ -412,30 +439,103 @@ export function MenuTabs({
               ))}
             </div>
             <p className="text-sm text-muted">
-              <span className="text-gold">{itemCount}</span> dishes
+              {isFiltering ? (
+                <>
+                  <span className="text-gold">{filteredItemCount}</span> of{" "}
+                  {itemCount} dishes
+                </>
+              ) : (
+                <>
+                  <span className="text-gold">{itemCount}</span> dishes
+                </>
+              )}
             </p>
           </div>
 
-          <CategoryScrollBar
-            categories={categories}
-            activeCategory={activeCategory}
-            onSelect={scrollToCategory}
-          />
+          <div className="relative">
+            <Search
+              size={18}
+              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gold/70"
+              strokeWidth={1.5}
+            />
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search dishes…"
+              aria-label="Search menu"
+              className="luxury-input w-full py-3 pl-11 pr-11"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-muted hover:text-foreground"
+                aria-label="Clear search"
+              >
+                <X size={18} strokeWidth={1.5} />
+              </button>
+            )}
+          </div>
+
+          {!isFiltering && (
+            <CategoryScrollBar
+              categories={filteredCategories}
+              activeCategory={activeCategory}
+              onSelect={scrollToCategory}
+            />
+          )}
         </div>
       </div>
 
       <div className="mx-auto mt-8 max-w-5xl">
-        <div className="flex flex-col gap-3 rounded border border-gold/15 bg-surface-alt/30 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-lg text-muted">
-            <span className="text-foreground">Pho Ta {branchLabel}</span>
-            {" · "}
-            {tab === "daily" ? "Daily menu" : "Lunch menu"}
-          </p>
+        <div className="space-y-4 rounded border border-gold/15 bg-surface-alt/30 px-5 py-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-lg text-muted">
+              <span className="text-foreground">Pho Ta {branchLabel}</span>
+              {" · "}
+              {tab === "daily" ? "Daily menu" : "Lunch menu"}
+            </p>
+            {isFiltering && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery("");
+                  setDietaryFilter("all");
+                }}
+                className="text-sm uppercase tracking-[0.1em] text-gold hover:text-gold-light"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
           <div className="menu-category-rail flex min-w-0 gap-2 overflow-x-auto pb-0.5">
-            {DIETARY_LEGEND.map(({ label }) => (
-              <span key={label} className="shrink-0">
-                <MenuTagBadge tag={label} />
-              </span>
+            <button
+              type="button"
+              onClick={() => setDietaryFilter("all")}
+              className={cn(
+                "shrink-0 rounded-full border px-3 py-1 transition",
+                dietaryFilter === "all"
+                  ? "border-gold bg-gold/15 text-gold"
+                  : "border-gold/20 text-muted hover:border-gold/40",
+              )}
+            >
+              All
+            </button>
+            {DIETARY_FILTERS.map(({ id, label, tag }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() =>
+                  setDietaryFilter((current) => (current === id ? "all" : id))
+                }
+                className={cn(
+                  "shrink-0 rounded-full transition",
+                  dietaryFilter === id && "ring-1 ring-gold/50",
+                )}
+              >
+                <MenuTagBadge tag={tag} />
+              </button>
             ))}
           </div>
         </div>
@@ -447,12 +547,14 @@ export function MenuTabs({
         )}
 
         <div className="mt-10 space-y-8" role="tabpanel">
-          {categories.length === 0 ? (
+          {filteredCategories.length === 0 ? (
             <div className="luxury-card px-8 py-16 text-center text-xl text-muted">
-              No dishes listed for this menu yet.
+              {categories.length === 0
+                ? "No dishes listed for this menu yet."
+                : "No dishes match your search. Try another term or clear the filters."}
             </div>
           ) : (
-            categories.map((category) => (
+            filteredCategories.map((category) => (
               <MenuCategorySection key={category.id} category={category} />
             ))
           )}
@@ -472,7 +574,9 @@ export function MenuTabs({
         </div>
       </div>
 
-      <MenuAssistant menuTab={tab} branchLabel={branchLabel} />
+      {menuAssistantEnabled && (
+        <MenuAssistant menuTab={tab} branchLabel={branchLabel} />
+      )}
     </>
   );
 }

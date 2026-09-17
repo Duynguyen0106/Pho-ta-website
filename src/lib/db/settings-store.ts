@@ -16,8 +16,17 @@ export interface LocationSettings {
   maxPartySize: number;
 }
 
+export interface SiteFeatures {
+  menuAssistantEnabled: boolean;
+}
+
 export interface SiteSettings {
   locations: Record<LocationSlug, LocationSettings>;
+  features: SiteFeatures;
+}
+
+function defaultFeatures(): SiteFeatures {
+  return { menuAssistantEnabled: true };
 }
 
 function settingsFile(): string {
@@ -28,6 +37,7 @@ let cache: SiteSettings | null = null;
 
 function defaultsFromCode(): SiteSettings {
   return {
+    features: defaultFeatures(),
     locations: Object.fromEntries(
       locations.map((loc) => [
         loc.slug,
@@ -112,6 +122,10 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   }
 
   cache = {
+    features: {
+      ...base.features,
+      ...(stored.features ?? {}),
+    },
     locations: {
       "finchley-road": {
         ...base.locations["finchley-road"],
@@ -122,16 +136,29 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   return cache;
 }
 
-export async function saveSiteSettings(
-  updates: Partial<Record<LocationSlug, Partial<LocationSettings>>>,
-): Promise<SiteSettings> {
+export async function isMenuAssistantEnabled(): Promise<boolean> {
+  const settings = await getSiteSettings();
+  return settings.features.menuAssistantEnabled;
+}
+
+export async function saveSiteSettings(input: {
+  locations?: Partial<Record<LocationSlug, Partial<LocationSettings>>>;
+  features?: Partial<SiteFeatures>;
+}): Promise<SiteSettings> {
   const current = await getSiteSettings();
-  for (const slug of ["finchley-road"] as const) {
-    if (updates[slug]) {
-      current.locations[slug] = {
-        ...current.locations[slug],
-        ...updates[slug],
-      };
+
+  if (input.features) {
+    current.features = { ...current.features, ...input.features };
+  }
+
+  if (input.locations) {
+    for (const slug of ["finchley-road"] as const) {
+      if (input.locations[slug]) {
+        current.locations[slug] = {
+          ...current.locations[slug],
+          ...input.locations[slug],
+        };
+      }
     }
   }
 

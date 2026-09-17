@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { MenuTabs } from "@/components/menu/MenuTabs";
 import { getMenu } from "@/lib/db/menu-store";
+import { getSiteSettings } from "@/lib/db/settings-store";
 
 export const metadata: Metadata = {
   title: "Menu",
@@ -16,7 +17,7 @@ export default async function MenuPage({ searchParams }: MenuPageProps) {
   const params = await searchParams;
   const initialTab = params.type === "lunch" ? "lunch" : "daily";
 
-  const menu = await getMenu();
+  const [menu, settings] = await Promise.all([getMenu(), getSiteSettings()]);
   const branchMenu = menu.branches["finchley-road"];
 
   return (
@@ -36,7 +37,11 @@ export default async function MenuPage({ searchParams }: MenuPageProps) {
       </section>
 
       <div className="mx-auto min-w-0 max-w-6xl overflow-x-hidden px-6 py-12 sm:py-16">
-        <MenuTabs branchMenu={branchMenu} initialTab={initialTab} />
+        <MenuTabs
+          branchMenu={branchMenu}
+          initialTab={initialTab}
+          menuAssistantEnabled={settings.features.menuAssistantEnabled}
+        />
       </div>
     </>
   );

@@ -26,15 +26,18 @@ export async function PATCH(request: NextRequest) {
     const locations = body.locations as
       | Partial<Record<LocationSlug, Partial<LocationSettings>>>
       | undefined;
+    const features = body.features as
+      | Partial<{ menuAssistantEnabled: boolean }>
+      | undefined;
 
-    if (!locations) {
+    if (!locations && !features) {
       return NextResponse.json(
-        { error: "locations is required" },
+        { error: "locations or features is required" },
         { status: 400 },
       );
     }
 
-    const settings = await saveSiteSettings(locations);
+    const settings = await saveSiteSettings({ locations, features });
     return NextResponse.json({ settings });
   } catch (error) {
     console.error("[admin/settings:PATCH]", error);

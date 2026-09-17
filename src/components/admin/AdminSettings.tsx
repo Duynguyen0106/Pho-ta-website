@@ -13,10 +13,17 @@ interface LocationSettings {
   maxPartySize: number;
 }
 
+interface SiteFeatures {
+  menuAssistantEnabled: boolean;
+}
+
 type SettingsMap = Record<LocationSlug, LocationSettings>;
 
 export function AdminSettings() {
   const [settings, setSettings] = useState<SettingsMap | null>(null);
+  const [features, setFeatures] = useState<SiteFeatures>({
+    menuAssistantEnabled: true,
+  });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -26,7 +33,12 @@ export function AdminSettings() {
     setLoading(true);
     const res = await fetch("/api/admin/settings");
     const data = await res.json();
-    if (res.ok) setSettings(data.settings.locations);
+    if (res.ok) {
+      setSettings(data.settings.locations);
+      setFeatures(
+        data.settings.features ?? { menuAssistantEnabled: true },
+      );
+    }
     setLoading(false);
   }, []);
 
@@ -56,11 +68,12 @@ export function AdminSettings() {
       const res = await fetch("/api/admin/settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ locations: settings }),
+        body: JSON.stringify({ locations: settings, features }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Save failed");
       setSettings(data.settings.locations);
+      setFeatures(data.settings.features ?? features);
       setSaved(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Save failed");
@@ -80,11 +93,41 @@ export function AdminSettings() {
           Venue settings
         </h2>
         <p className="mt-2 text-xl text-muted">
-          Opening hours, slot intervals, and booking capacity
+          Opening hours, booking capacity, and website features
         </p>
       </div>
 
       <form onSubmit={handleSave} className="space-y-8">
+        <section className="fine-dining-panel p-6">
+          <h3 className="font-display text-2xl text-foreground">Website</h3>
+          <p className="mt-1 text-base text-muted">
+            Control guest-facing features on the public menu page
+          </p>
+          <label className="mt-6 flex cursor-pointer items-start gap-4">
+            <input
+              type="checkbox"
+              checked={features.menuAssistantEnabled}
+              onChange={(e) => {
+                setFeatures({
+                  ...features,
+                  menuAssistantEnabled: e.target.checked,
+                });
+                setSaved(false);
+              }}
+              className="mt-1 h-5 w-5 accent-gold"
+            />
+            <span>
+              <span className="block text-lg text-foreground">
+                Menu AI helper
+              </span>
+              <span className="mt-1 block text-base text-muted">
+                Show the floating chat on /menu. Prepared answers still work
+                without an API key; disable to hide the helper entirely.
+              </span>
+            </span>
+          </label>
+        </section>
+
         {locations.map((loc) => {
           const s = settings[loc.slug as LocationSlug];
           return (

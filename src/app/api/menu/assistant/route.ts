@@ -1,11 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isMenuAssistantEnabled } from "@/lib/db/settings-store";
 import { askMenuAssistant } from "@/lib/menu/assistant";
 import type { MenuLocationSlug, MenuType } from "@/lib/menu/types";
+import { checkRateLimit, clientIpFromRequest } from "@/lib/rate-limit";
 
 const VALID_LOCATIONS = new Set<MenuLocationSlug>(["finchley-road"]);
+const RATE_LIMIT = 30;
+const RATE_WINDOW_MS = 15 * 60 * 1000;
 
 export async function POST(request: NextRequest) {
   try {
+    if (!(await isMenuAssistantEnabled())) {
+      return NextResponse.json(
+        { error: "Menu helper is temporarily unavailable." },
+        { status: 503 },
+      );
+    }
+
+    const ip = clientIpFromRequest(request);
+    const rate = checkRateLimit(`menu-assistant:${ip}`, RATE_LIMIT, RATE_WINDOW_MS);
+    if (!rate.allowed) {
+      return NextResponse.json(
+        {
+          error: `Too many questions. Please wait ${rate.retryAfterSec ?? 60} seconds and try again.`,
+        },
+        { status: 429 },
+      );
+    }
+
     const body = await request.json();
     const message = String(body.message ?? "").trim();
 
