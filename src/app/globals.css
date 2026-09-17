@@ -147,6 +147,26 @@ body {
   color: var(--gold);
 }
 
+.menu-category-rail {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 169, 98, 0.45) transparent;
+}
+
+.menu-category-rail::-webkit-scrollbar {
+  height: 4px;
+}
+
+.menu-category-rail::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.menu-category-rail::-webkit-scrollbar-thumb {
+  background: rgba(201, 169, 98, 0.45);
+  border-radius: 9999px;
+}
+
 @media print {
   body {
     background: #fff;
