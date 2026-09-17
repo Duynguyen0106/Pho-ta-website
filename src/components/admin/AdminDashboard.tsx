@@ -10,6 +10,7 @@ import { Search } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AdminBlackouts } from "@/components/admin/AdminBlackouts";
 import { AdminBookingEdit } from "@/components/admin/AdminBookingEdit";
+import { AdminConfirmationEmailModal } from "@/components/admin/AdminConfirmationEmailModal";
 import { AdminCalendar } from "@/components/admin/AdminCalendar";
 import { AdminCustomers } from "@/components/admin/AdminCustomers";
 import { AdminNotifications } from "@/components/admin/AdminNotifications";
@@ -52,7 +53,7 @@ export function AdminDashboard() {
   const [tableNumber, setTableNumber] = useState("");
   const [savingTable, setSavingTable] = useState(false);
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
-  const [resending, setResending] = useState(false);
+  const [emailBooking, setEmailBooking] = useState<Booking | null>(null);
   const [bookingsLayout, setBookingsLayout] = useState<
     "list" | "day" | "week"
   >("list");
@@ -143,19 +144,6 @@ export function AdminDashboard() {
     window.location.href = "/admin/login";
   }
 
-  async function resendConfirmation(booking: Booking) {
-    setResending(true);
-    try {
-      await fetch("/api/admin/bookings/resend", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: booking.id }),
-      });
-      fetchBookings();
-    } finally {
-      setResending(false);
-    }
-  }
 
   function exportCsv() {
     const params = new URLSearchParams({ date });
@@ -409,10 +397,9 @@ export function AdminDashboard() {
                       type="button"
                       variant="outline"
                       size="sm"
-                      disabled={resending}
-                      onClick={() => resendConfirmation(selected)}
+                      onClick={() => setEmailBooking(selected)}
                     >
-                      {resending ? "Sending…" : "Resend email"}
+                      Resend email
                     </Button>
                   </div>
 
@@ -549,6 +536,19 @@ export function AdminDashboard() {
           onSaved={(booking) => {
             setSelected(booking);
             fetchBookings();
+          }}
+        />
+      )}
+
+      {emailBooking && (
+        <AdminConfirmationEmailModal
+          booking={emailBooking}
+          onClose={() => setEmailBooking(null)}
+          onSent={(updated) => {
+            fetchBookings();
+            if (updated && selected?.id === updated.id) {
+              setSelected(updated);
+            }
           }}
         />
       )}

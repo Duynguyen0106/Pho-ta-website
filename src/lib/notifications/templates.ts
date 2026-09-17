@@ -3,6 +3,7 @@ import { isDailyReminderMode } from "../bookings/reminders";
 import { SEATING_LABELS } from "../constants";
 import { getLocation } from "../data/locations";
 import type { Booking } from "../types";
+import { buildConfirmationEmailFromBooking } from "./confirmation-template";
 
 function formatBookingDateTime(booking: Booking): string {
   const date = parse(booking.date, "yyyy-MM-dd", new Date());
@@ -19,53 +20,7 @@ export function buildConfirmationEmail(booking: Booking): {
   html: string;
   text: string;
 } {
-  const location = getLocation(booking.locationSlug)!;
-  const seating = SEATING_LABELS[booking.seatingPreference];
-  const dateTime = formatBookingDateTime(booking);
-
-  const subject = `Reservation confirmed — Pho Ta ${location.shortName}`;
-
-  const text = `Dear ${booking.customerName},
-
-Your reservation at Pho Ta ${location.shortName} is confirmed.
-
-Reference: ${booking.referenceCode}
-Guests: ${booking.partySize}
-Date & time: ${dateTime}
-Seating preference: ${seating}
-${booking.specialRequests ? `Special requests: ${booking.specialRequests}\n` : ""}
-Address: ${location.address}, ${location.postcode}
-Phone: ${location.phone}
-
-We look forward to welcoming you.
-
-Pho Ta Restaurant`;
-
-  const html = `
-    <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; background: #0a0908; color: #f5f0e6;">
-      <div style="padding: 40px 32px; text-align: center; border-bottom: 1px solid #c9a96240;">
-        <p style="margin: 0; font-size: 11px; letter-spacing: 0.35em; text-transform: uppercase; color: #c9a962;">Pho Ta</p>
-        <h1 style="margin: 16px 0 0; font-size: 28px; font-weight: 300; letter-spacing: 0.05em;">Reservation Confirmed</h1>
-      </div>
-      <div style="padding: 40px 32px;">
-        <p style="color: #9a9085;">Dear ${booking.customerName},</p>
-        <p>We are honoured to confirm your table at <strong style="color: #c9a962;">Pho Ta ${location.shortName}</strong>.</p>
-        <table style="width: 100%; border-collapse: collapse; margin: 32px 0; font-size: 14px;">
-          <tr><td style="padding: 10px 0; color: #c9a962; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;">Reference</td><td style="padding: 10px 0; text-align: right;">${booking.referenceCode}</td></tr>
-          <tr style="border-top: 1px solid #c9a96220;"><td style="padding: 10px 0; color: #c9a962; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;">Guests</td><td style="padding: 10px 0; text-align: right;">${booking.partySize}</td></tr>
-          <tr style="border-top: 1px solid #c9a96220;"><td style="padding: 10px 0; color: #c9a962; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;">Date & time</td><td style="padding: 10px 0; text-align: right;">${dateTime}</td></tr>
-          <tr style="border-top: 1px solid #c9a96220;"><td style="padding: 10px 0; color: #c9a962; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;">Seating</td><td style="padding: 10px 0; text-align: right;">${seating}</td></tr>
-          ${booking.specialRequests ? `<tr style="border-top: 1px solid #c9a96220;"><td style="padding: 10px 0; color: #c9a962; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;">Requests</td><td style="padding: 10px 0; text-align: right;">${booking.specialRequests}</td></tr>` : ""}
-        </table>
-        <p style="color: #9a9085; font-size: 13px;">
-          ${location.address}, ${location.postcode}<br/>
-          ${location.phone}
-        </p>
-        <p style="margin-top: 24px; color: #f5f0e6;">We look forward to welcoming you.</p>
-      </div>
-    </div>
-  `;
-
+  const { subject, html, text } = buildConfirmationEmailFromBooking(booking);
   return { subject, html, text };
 }
 

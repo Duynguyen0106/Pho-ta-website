@@ -1,12 +1,48 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/auth/admin";
-import {
-  getBookingById,
-  getBookingByReference,
-  updateBooking,
-} from "@/lib/db/store";
-import { sendBookingConfirmation } from "@/lib/notifications/send";
+import { getBookingById, getBookingByReference } from "@/lib/db/store";
+import { buildConfirmationEmailFromBooking } from "@/lib/notifications/confirmation-template";
+import { resendBookingConfirmationEmail } from "@/lib/notifications/send";
 
+async function loadBooking(id?: string, referenceCode?: string) {
+  if (referenceCode) {
+    const byRef = await getBookingByReference(referenceCode);
+    if (byRef) return byRef;
+  }
+  if (id) {
+    return getBookingById(id);
+  }
+  return null;
+}
+
+/** Preview filled confirmation template for admin review. */
+export async function GET(request: NextRequest) {
+  if (!(await isAdminAuthenticated())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { searchParams } = request.nextUrl;
+  const id = searchParams.get("id") ?? undefined;
+  const referenceCode = searchParams.get("referenceCode") ?? undefined;
+
+  const booking = await loadBooking(id, referenceCode);
+  if (!booking) {
+    return NextResponse.json({ error: "Booking not found" }, { status: 404 });
+  }
+
+  const preview = buildConfirmationEmailFromBooking(booking);
+  return NextResponse.json({
+    preview: {
+      subject: preview.subject,
+      html: preview.html,
+      text: preview.text,
+      recipient: preview.recipient,
+      context: preview.context,
+    },
+  });
+}
+
+/** Send filled confirmation template to the guest email. */
 export async function POST(request: NextRequest) {
   if (!(await isAdminAuthenticated())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -14,26 +50,34 @@ export async function POST(request: NextRequest) {
 
   try {
     const { id, referenceCode } = await request.json();
-
-    let booking = null;
-    if (referenceCode) {
-      booking = await getBookingByReference(referenceCode);
-    }
-
-    if (!booking && id) {
-      booking = await getBookingById(id);
-    }
+    const booking = await loadBooking(id, referenceCode);
 
     if (!booking) {
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
     }
 
-    await sendBookingConfirmation(booking);
-    const updated = await updateBooking(booking.id, {
-      confirmationSentAt: new Date().toISOString(),
-    });
+    const result = await resendBookingConfirmationEmail(booking);
 
-    return NextResponse.json({ booking: updated ?? booking, ok: true });
+    if (!result.sent) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: result.error,
+          recipient: result.recipient,
+          skipped: result.skipped,
+        },
+        { status: 502 },
+      );
+    }
+
+    const updated = await getBookingById(booking.id);
+
+    return NextResponse.json({
+      ok: true,
+      recipient: result.recipient,
+      booking: updated ?? booking,
+      message: `Confirmation email sent to ${result.recipient}`,
+    });
   } catch (error) {
     console.error("[admin/bookings/resend:POST]", error);
     return NextResponse.json(
