@@ -1,3 +1,4 @@
+import { resolveResendApiKey, isUsingResendTestDomain } from "./notifications/config";
 import { isSupabaseConfigured } from "./supabase/client";
 import { isUsingDefaultSupabaseConfig } from "./supabase/config";
 
@@ -20,13 +21,12 @@ export function getEnvStatus(): EnvStatus {
   const hasSupabase = isSupabaseConfigured();
   const hasSupabaseEnv = !isUsingDefaultSupabaseConfig();
   const hasServiceRole = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
-  const hasEmail = Boolean(process.env.RESEND_API_KEY);
+  const hasEmail = Boolean(resolveResendApiKey());
   const hasSms = Boolean(
     process.env.TWILIO_ACCOUNT_SID &&
       process.env.TWILIO_AUTH_TOKEN &&
       process.env.TWILIO_PHONE_NUMBER,
   );
-  const hasAdminPassword = true;
   const hasCronSecret = Boolean(process.env.CRON_SECRET);
   const isProd = process.env.NODE_ENV === "production";
 
@@ -42,6 +42,11 @@ export function getEnvStatus(): EnvStatus {
   }
   if (isProd && !hasEmail) {
     warnings.push("Resend is not configured — confirmation emails will not be sent.");
+  }
+  if (isProd && hasEmail && isUsingResendTestDomain()) {
+    warnings.push(
+      "Resend test domain active — verify photarestaurants.com at resend.com/domains to email guests. Staff notifications go to the Resend account inbox.",
+    );
   }
   if (isProd && !hasSms) {
     warnings.push("Twilio is not configured — SMS confirmations and reminders will not be sent.");

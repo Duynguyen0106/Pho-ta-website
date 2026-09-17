@@ -1,17 +1,22 @@
 import { updateBooking } from "../db/store";
 import type { Booking } from "../types";
-import { sendConfirmationEmail, sendReminderEmail } from "./email";
+import {
+  sendConfirmationEmail,
+  sendReminderEmail,
+  sendRestaurantNotificationEmail,
+} from "./email";
 import { sendConfirmationSms, sendReminderSms } from "./sms";
 
 export async function sendBookingConfirmation(
   booking: Booking,
 ): Promise<void> {
-  const [emailOk, smsOk] = await Promise.all([
+  const [emailOk, smsOk, restaurantOk] = await Promise.all([
     sendConfirmationEmail(booking),
     sendConfirmationSms(booking),
+    sendRestaurantNotificationEmail(booking),
   ]);
 
-  if (emailOk || smsOk) {
+  if (emailOk || smsOk || restaurantOk) {
     try {
       await updateBooking(booking.id, {
         confirmationSentAt: new Date().toISOString(),
@@ -19,6 +24,15 @@ export async function sendBookingConfirmation(
     } catch (error) {
       console.error("[notify:confirmation:update]", error);
     }
+  }
+
+  if (!emailOk && !smsOk) {
+    console.warn("[notify:confirmation] Customer notification not sent", {
+      reference: booking.referenceCode,
+      email: booking.customerEmail,
+      phone: booking.customerPhone,
+      restaurantNotified: restaurantOk,
+    });
   }
 }
 

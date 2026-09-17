@@ -44,8 +44,12 @@ export default async function ConfirmationPage({
         We await your arrival
       </h1>
       <p className="mt-6 text-lg leading-relaxed text-muted">
-        Thank you, {booking.customerName}. A confirmation has been sent to your
-        email and phone. We shall remind you before your visit.
+        Thank you, {booking.customerName}. Your table is reserved — please save
+        your reference below. The restaurant has been notified of your booking.
+      </p>
+      <p className="mt-4 text-base text-muted">
+        Guest confirmation emails and SMS will be sent once our messaging
+        services are fully connected to your address.
       </p>
 
       <div className="mt-10 luxury-card p-8 text-left text-lg">

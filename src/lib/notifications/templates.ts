@@ -69,6 +69,49 @@ Pho Ta Restaurant`;
   return { subject, html, text };
 }
 
+export function buildRestaurantNotificationEmail(booking: Booking): {
+  subject: string;
+  html: string;
+  text: string;
+} {
+  const location = getLocation(booking.locationSlug)!;
+  const seating = SEATING_LABELS[booking.seatingPreference];
+  const dateTime = formatBookingDateTime(booking);
+
+  const subject = `New booking — ${location.shortName} · ${booking.referenceCode}`;
+
+  const text = `New online reservation
+
+Reference: ${booking.referenceCode}
+Guest: ${booking.customerName}
+Email: ${booking.customerEmail}
+Phone: ${booking.customerPhone}
+Venue: ${location.shortName}
+Guests: ${booking.partySize}
+Date & time: ${dateTime}
+Seating: ${seating}
+${booking.specialRequests ? `Special requests: ${booking.specialRequests}` : ""}`;
+
+  const html = `
+    <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto;">
+      <h1 style="font-size: 22px; font-weight: 400;">New online reservation</h1>
+      <p><strong>${booking.referenceCode}</strong></p>
+      <ul style="line-height: 1.8;">
+        <li><strong>Guest:</strong> ${booking.customerName}</li>
+        <li><strong>Email:</strong> ${booking.customerEmail}</li>
+        <li><strong>Phone:</strong> ${booking.customerPhone}</li>
+        <li><strong>Venue:</strong> ${location.shortName}</li>
+        <li><strong>Party:</strong> ${booking.partySize}</li>
+        <li><strong>When:</strong> ${dateTime}</li>
+        <li><strong>Seating:</strong> ${seating}</li>
+        ${booking.specialRequests ? `<li><strong>Requests:</strong> ${booking.specialRequests}</li>` : ""}
+      </ul>
+    </div>
+  `;
+
+  return { subject, html, text };
+}
+
 export function buildReminderEmail(booking: Booking): {
   subject: string;
   html: string;

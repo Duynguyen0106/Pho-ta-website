@@ -26,8 +26,10 @@ export async function sendConfirmationSms(booking: Booking): Promise<boolean> {
   const from = process.env.TWILIO_PHONE_NUMBER;
 
   if (!client || !from) {
-    console.log("[sms:confirmation]", { to: booking.customerPhone, message });
-    return true;
+    console.warn("[sms:confirmation] Twilio not configured", {
+      to: booking.customerPhone,
+    });
+    return false;
   }
 
   try {
@@ -49,8 +51,8 @@ export async function sendReminderSms(booking: Booking): Promise<boolean> {
   const from = process.env.TWILIO_PHONE_NUMBER;
 
   if (!client || !from) {
-    console.log("[sms:reminder]", { to: booking.customerPhone, message });
-    return true;
+    console.warn("[sms:reminder] Twilio not configured");
+    return false;
   }
 
   try {
