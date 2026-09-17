@@ -2,11 +2,17 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/Button";
-import { menuCategories } from "@/lib/data/menu";
+import { MenuTabs } from "@/components/menu/MenuTabs";
+import {
+  dailyMenuCategories,
+  lunchMenuCategories,
+  lunchMenuNote,
+} from "@/lib/data/menu";
 
 export const metadata: Metadata = {
   title: "Menu",
-  description: "Explore Pho Ta's refined Vietnamese menu — pho, bun cha, and seasonal selections.",
+  description:
+    "Explore Pho Ta's full Vietnamese menu — daily selections, lunch specials, pho, wok & grill, and more.",
 };
 
 export default function MenuPage() {
@@ -18,52 +24,15 @@ export default function MenuPage() {
         description="Each dish is prepared with premium ingredients and the reverence of Vietnamese culinary tradition."
       />
 
-      <div className="mt-24 space-y-20">
-        {menuCategories.map((category) => (
-          <section key={category.id}>
-            <div className="flex items-end justify-between border-b border-[#c9a962]/20 pb-4">
-              <h2 className="font-serif text-3xl font-light text-[#f5f0e6]">
-                {category.name}
-              </h2>
-            </div>
-            <ul className="mt-8 space-y-0">
-              {category.items.map((item) => (
-                <li
-                  key={item.name}
-                  className="flex flex-col gap-3 border-b border-[#c9a962]/8 py-8 sm:flex-row sm:items-start sm:justify-between"
-                >
-                  <div>
-                    <div className="flex flex-wrap items-baseline gap-3">
-                      <h3 className="font-serif text-xl font-light text-[#f5f0e6]">
-                        {item.name}
-                      </h3>
-                      {item.tags?.map((tag) => (
-                        <span
-                          key={tag}
-                          className="text-[9px] uppercase tracking-[0.2em] text-[#c9a962]"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                    <p className="mt-2 max-w-lg text-sm leading-relaxed text-[#9a9085]">
-                      {item.description}
-                    </p>
-                  </div>
-                  {item.price && (
-                    <span className="shrink-0 font-serif text-lg text-[#c9a962]">
-                      {item.price}
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))}
-      </div>
+      <MenuTabs
+        dailyCategories={dailyMenuCategories}
+        lunchCategories={lunchMenuCategories}
+        lunchNote={lunchMenuNote}
+      />
 
       <p className="mt-16 text-center text-[11px] uppercase tracking-[0.2em] text-[#6b635a]">
-        Seasonal availability · Please enquire with your server
+        Gluten free · Mild · Vegetarian · Vegan options marked · Please enquire
+        with your server
       </p>
 
       <div className="mt-12 text-center">
