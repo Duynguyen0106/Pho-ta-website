@@ -28,7 +28,7 @@ export default async function MenuPage() {
         lunchNote={menu.lunchNote}
       />
 
-      <p className="mt-16 text-center text-[11px] uppercase tracking-[0.2em] text-[#6b635a]">
+      <p className="mt-16 text-center text-sm uppercase tracking-[0.12em] text-muted">
         Gluten free · Mild · Vegetarian · Vegan options marked · Please enquire
         with your server
       </p>
