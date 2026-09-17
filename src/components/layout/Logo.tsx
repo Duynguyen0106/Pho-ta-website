@@ -19,7 +19,7 @@ export function Logo({
 }: LogoProps) {
   const image = (
     <Image
-      src="/images/logo.jpg"
+      src="/images/logo.png"
       alt="Pho Ta — Vietnamese restaurant"
       width={160}
       height={64}
