@@ -1,19 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #12100e;
-  --foreground: #f5f0e8;
+  --background: #100e0c;
+  --foreground: #f7f2ea;
   --surface: #1a1714;
-  --surface-elevated: #221f1b;
-  --surface-alt: #161412;
+  --surface-elevated: #242019;
+  --surface-alt: #141210;
   --gold: #c9a962;
-  --gold-light: #dfc488;
-  --gold-muted: rgba(201, 169, 98, 0.42);
-  --muted: #c8bfb3;
-  --muted-light: #ddd6cc;
-  --border: rgba(201, 169, 98, 0.28);
-  --border-subtle: rgba(245, 240, 232, 0.1);
-  --hero-overlay: #0f0d0b;
+  --gold-light: #e0c88a;
+  --gold-muted: rgba(201, 169, 98, 0.4);
+  --muted: #c9bfb2;
+  --muted-light: #ddd4c8;
+  --border: rgba(201, 169, 98, 0.26);
+  --border-subtle: rgba(247, 242, 234, 0.08);
+  --hero-overlay: #0c0a09;
 }
 
 @theme inline {
@@ -24,22 +24,26 @@
   --color-surface: var(--surface);
   --color-surface-alt: var(--surface-alt);
   --color-muted: var(--muted);
-  --font-sans: var(--font-dm-sans);
+  --font-sans: var(--font-josefin);
   --font-serif: var(--font-cormorant);
-  --font-display: var(--font-cormorant);
+  --font-display: var(--font-playfair);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-size: 1.1875rem;
-  font-weight: 400;
+  font-size: 1.125rem;
+  font-weight: 300;
   line-height: 1.75;
+  letter-spacing: 0.01em;
 }
 
-.font-serif,
-.font-display {
+.font-serif {
   font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+}
+
+.font-display {
+  font-family: var(--font-playfair), "Playfair Display", Georgia, serif;
 }
 
 .luxury-grain::before {
@@ -48,7 +52,7 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 9999;
-  opacity: 0.03;
+  opacity: 0.035;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
@@ -67,28 +71,40 @@ body {
 .luxury-input {
   width: 100%;
   border: 1px solid var(--border);
-  background: var(--surface);
+  background: var(--surface-elevated);
   color: var(--foreground);
   padding: 1rem 1.125rem;
-  font-size: 1.125rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: var(--font-josefin), sans-serif;
+  font-size: 1.0625rem;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+}
+
+.luxury-input:hover {
+  border-color: rgba(201, 169, 98, 0.45);
 }
 
 .luxury-input:focus {
   outline: none;
   border-color: var(--gold);
-  box-shadow: 0 0 0 2px rgba(201, 169, 98, 0.18);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px rgba(201, 169, 98, 0.14);
 }
 
 .luxury-card {
   border: 1px solid var(--border);
-  background: var(--surface);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(
+    165deg,
+    var(--surface-elevated) 0%,
+    var(--surface) 55%,
+    var(--surface-alt) 100%
+  );
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
 }
 
 .luxury-card:hover {
   border-color: var(--gold-muted);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
 }
 
 .fine-dining-panel {
@@ -98,5 +114,35 @@ body {
     var(--surface-elevated) 0%,
     var(--surface) 100%
   );
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+}
+
+.booking-select-card {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+}
+
+.booking-select-card:hover {
+  border-color: rgba(201, 169, 98, 0.55);
+  transform: translateY(-1px);
+}
+
+.booking-select-card[data-selected="true"] {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold), 0 8px 32px rgba(201, 169, 98, 0.12);
+  background: linear-gradient(
+    145deg,
+    rgba(201, 169, 98, 0.08) 0%,
+    var(--surface) 100%
+  );
+}
+
+.label-caps {
+  font-family: var(--font-josefin), sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
 }

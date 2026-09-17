@@ -1,17 +1,28 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, DM_Sans } from "next/font/google";
+import {
+  Cormorant_Garamond,
+  Josefin_Sans,
+  Playfair_Display,
+} from "next/font/google";
 import "./globals.css";
 
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
+const josefin = Josefin_Sans({
+  variable: "--font-josefin",
   subsets: ["latin"],
-  weight: ["300", "400", "500"],
+  weight: ["300", "400", "500", "600"],
 });
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600"],
+  style: ["normal", "italic"],
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
   style: ["normal", "italic"],
 });
 
@@ -40,9 +51,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${dmSans.variable} ${cormorant.variable} h-full antialiased`}
+      className={`${josefin.variable} ${cormorant.variable} ${playfair.variable} h-full antialiased`}
     >
-      <body className="luxury-grain min-h-full flex flex-col bg-background font-sans text-lg font-normal text-foreground">
+      <body className="luxury-grain min-h-full flex flex-col bg-background font-sans text-lg font-light text-foreground">
         {children}
       </body>
     </html>

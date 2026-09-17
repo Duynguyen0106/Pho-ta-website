@@ -40,17 +40,13 @@ export function Header() {
         <Link href="/" className="group text-center">
           <span
             className={cn(
-              "font-serif text-4xl font-normal tracking-[0.12em]",
+              "font-display text-4xl font-normal tracking-[0.08em]",
               onHero ? "text-white" : "text-foreground",
             )}
           >
             Pho Ta
           </span>
-          <span
-            className={cn(
-              "mt-1 block text-sm uppercase tracking-[0.28em] text-gold-light",
-            )}
-          >
+          <span className="mt-1 block text-xs uppercase tracking-[0.32em] text-gold-light">
             Fine Vietnamese
           </span>
         </Link>
