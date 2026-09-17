@@ -146,3 +146,25 @@ body {
   text-transform: uppercase;
   color: var(--gold);
 }
+
+@media print {
+  body {
+    background: #fff;
+    color: #111;
+    font-size: 12pt;
+  }
+
+  .luxury-grain::before,
+  header,
+  footer,
+  nav {
+    display: none !important;
+  }
+
+  .confirmation-print {
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    break-inside: avoid;
+  }
+}
