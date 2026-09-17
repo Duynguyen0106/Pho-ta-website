@@ -1,6 +1,6 @@
 import { siteImages } from "./images";
 
-/** Homepage featured dishes — menu content is loaded from menu-store */
+/** Homepage featured dishes — full menu is loaded from menu-store */
 export const featuredDishes = [
   {
     name: "Special Pho Ta Mixed Beef",
