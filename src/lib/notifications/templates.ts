@@ -23,11 +23,11 @@ export function buildConfirmationEmail(booking: Booking): {
   const seating = SEATING_LABELS[booking.seatingPreference];
   const dateTime = formatBookingDateTime(booking);
 
-  const subject = `Booking confirmed — Pho Ta ${location.shortName}`;
+  const subject = `Reservation confirmed — Pho Ta ${location.shortName}`;
 
   const text = `Dear ${booking.customerName},
 
-Your table at Pho Ta ${location.shortName} is confirmed.
+Your reservation at Pho Ta ${location.shortName} is confirmed.
 
 Reference: ${booking.referenceCode}
 Guests: ${booking.partySize}
@@ -42,26 +42,26 @@ We look forward to welcoming you.
 Pho Ta Restaurant`;
 
   const html = `
-    <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; color: #2d2d2d;">
-      <div style="background: #1a3c34; color: #faf7f2; padding: 24px; text-align: center;">
-        <h1 style="margin: 0; font-size: 24px; font-weight: normal;">Pho Ta</h1>
-        <p style="margin: 8px 0 0; opacity: 0.9;">Booking Confirmed</p>
+    <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; background: #0a0908; color: #f5f0e6;">
+      <div style="padding: 40px 32px; text-align: center; border-bottom: 1px solid #c9a96240;">
+        <p style="margin: 0; font-size: 11px; letter-spacing: 0.35em; text-transform: uppercase; color: #c9a962;">Pho Ta</p>
+        <h1 style="margin: 16px 0 0; font-size: 28px; font-weight: 300; letter-spacing: 0.05em;">Reservation Confirmed</h1>
       </div>
-      <div style="padding: 32px 24px; background: #faf7f2;">
-        <p>Dear ${booking.customerName},</p>
-        <p>Your table at <strong>Pho Ta ${location.shortName}</strong> is confirmed.</p>
-        <table style="width: 100%; border-collapse: collapse; margin: 24px 0;">
-          <tr><td style="padding: 8px 0; color: #666;">Reference</td><td style="padding: 8px 0;"><strong>${booking.referenceCode}</strong></td></tr>
-          <tr><td style="padding: 8px 0; color: #666;">Guests</td><td style="padding: 8px 0;">${booking.partySize}</td></tr>
-          <tr><td style="padding: 8px 0; color: #666;">Date & time</td><td style="padding: 8px 0;">${dateTime}</td></tr>
-          <tr><td style="padding: 8px 0; color: #666;">Seating</td><td style="padding: 8px 0;">${seating}</td></tr>
-          ${booking.specialRequests ? `<tr><td style="padding: 8px 0; color: #666;">Requests</td><td style="padding: 8px 0;">${booking.specialRequests}</td></tr>` : ""}
+      <div style="padding: 40px 32px;">
+        <p style="color: #9a9085;">Dear ${booking.customerName},</p>
+        <p>We are honoured to confirm your table at <strong style="color: #c9a962;">Pho Ta ${location.shortName}</strong>.</p>
+        <table style="width: 100%; border-collapse: collapse; margin: 32px 0; font-size: 14px;">
+          <tr><td style="padding: 10px 0; color: #c9a962; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;">Reference</td><td style="padding: 10px 0; text-align: right;">${booking.referenceCode}</td></tr>
+          <tr style="border-top: 1px solid #c9a96220;"><td style="padding: 10px 0; color: #c9a962; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;">Guests</td><td style="padding: 10px 0; text-align: right;">${booking.partySize}</td></tr>
+          <tr style="border-top: 1px solid #c9a96220;"><td style="padding: 10px 0; color: #c9a962; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;">Date & time</td><td style="padding: 10px 0; text-align: right;">${dateTime}</td></tr>
+          <tr style="border-top: 1px solid #c9a96220;"><td style="padding: 10px 0; color: #c9a962; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;">Seating</td><td style="padding: 10px 0; text-align: right;">${seating}</td></tr>
+          ${booking.specialRequests ? `<tr style="border-top: 1px solid #c9a96220;"><td style="padding: 10px 0; color: #c9a962; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;">Requests</td><td style="padding: 10px 0; text-align: right;">${booking.specialRequests}</td></tr>` : ""}
         </table>
-        <p style="color: #666; font-size: 14px;">
+        <p style="color: #9a9085; font-size: 13px;">
           ${location.address}, ${location.postcode}<br/>
           ${location.phone}
         </p>
-        <p>We look forward to welcoming you.</p>
+        <p style="margin-top: 24px; color: #f5f0e6;">We look forward to welcoming you.</p>
       </div>
     </div>
   `;
@@ -100,16 +100,16 @@ ${location.phone}
 See you soon!`;
 
   const html = `
-    <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; color: #2d2d2d;">
-      <div style="background: #1a3c34; color: #faf7f2; padding: 24px; text-align: center;">
-        <h1 style="margin: 0; font-size: 24px;">Booking Reminder</h1>
+    <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; background: #0a0908; color: #f5f0e6;">
+      <div style="padding: 40px 32px; text-align: center; border-bottom: 1px solid #c9a96240;">
+        <p style="margin: 0; font-size: 11px; letter-spacing: 0.35em; text-transform: uppercase; color: #c9a962;">Reminder</p>
+        <h1 style="margin: 16px 0 0; font-size: 24px; font-weight: 300;">We await your arrival</h1>
       </div>
-      <div style="padding: 32px 24px; background: #faf7f2;">
-        <p>Hi ${booking.customerName},</p>
-        <p>${leadLine.replace("Pho Ta", `<strong>Pho Ta ${location.shortName}</strong>`)}</p>
-        <p><strong>${booking.partySize} guests</strong> · ${dateTime}<br/>Seating: ${seating}<br/>Ref: ${booking.referenceCode}</p>
-        <p style="color: #666;">${location.address}, ${location.postcode}</p>
-        <p>See you soon!</p>
+      <div style="padding: 40px 32px;">
+        <p style="color: #9a9085;">Dear ${booking.customerName},</p>
+        <p>${leadLine.replace("Pho Ta", `<strong style="color: #c9a962;">Pho Ta ${location.shortName}</strong>`)}</p>
+        <p style="margin-top: 24px;"><strong>${booking.partySize} guests</strong> · ${dateTime}<br/>Seating: ${seating}<br/>Ref: ${booking.referenceCode}</p>
+        <p style="color: #9a9085; margin-top: 16px;">${location.address}, ${location.postcode}</p>
       </div>
     </div>
   `;

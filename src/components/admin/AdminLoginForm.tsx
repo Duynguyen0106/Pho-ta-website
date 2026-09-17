@@ -31,19 +31,21 @@ export function AdminLoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <p className="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">
+        <p className="border border-red-900/50 bg-red-950/30 px-4 py-2 text-sm text-red-300">
           {error}
         </p>
       )}
       <label className="block">
-        <span className="text-sm font-medium text-[#1a3c34]">Password</span>
+        <span className="text-[10px] uppercase tracking-[0.25em] text-[#c9a962]">
+          Password
+        </span>
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-[#e8e0d4] px-4 py-3 focus:border-[#1a3c34] focus:outline-none"
+          className="luxury-input mt-2"
           required
         />
       </label>

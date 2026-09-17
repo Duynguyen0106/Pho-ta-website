@@ -1,91 +1,77 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "How Pho Ta Restaurant handles your personal data for bookings.",
+  description: "How Pho Ta Restaurant handles your personal data.",
 };
 
 export default function PrivacyPage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
-      <h1 className="font-serif text-4xl text-[#1a3c34]">Privacy Policy</h1>
-      <p className="mt-4 text-sm text-[#8a7f72]">Last updated: September 2026</p>
+    <div className="mx-auto max-w-3xl px-6 py-24">
+      <SectionHeading
+        align="left"
+        eyebrow="Legal"
+        title="Privacy Policy"
+        description="Last updated September 2026"
+      />
 
-      <div className="prose prose-neutral mt-10 max-w-none space-y-6 text-[#5c534a]">
+      <div className="mt-16 space-y-10 text-sm leading-relaxed text-[#9a9085]">
         <section>
-          <h2 className="font-serif text-xl text-[#1a3c34]">Who we are</h2>
-          <p className="mt-2 leading-relaxed">
-            Pho Ta Restaurant operates Vietnamese restaurants at Kentish Town and
-            Finchley Road, London. When you book a table online, we collect the
-            information needed to manage your reservation.
+          <h2 className="font-serif text-xl font-light text-[#f5f0e6]">Who we are</h2>
+          <p className="mt-3">
+            Pho Ta Restaurant operates fine Vietnamese dining at Kentish Town and
+            Finchley Road, London. When you reserve a table, we collect information
+            necessary to honour your booking.
           </p>
         </section>
 
         <section>
-          <h2 className="font-serif text-xl text-[#1a3c34]">What we collect</h2>
-          <ul className="mt-2 list-disc space-y-1 pl-5">
-            <li>Name, email address, and phone number</li>
-            <li>Booking details (date, time, party size, seating preference)</li>
-            <li>Special requests you choose to provide</li>
+          <h2 className="font-serif text-xl font-light text-[#f5f0e6]">What we collect</h2>
+          <ul className="mt-3 list-disc space-y-1 pl-5">
+            <li>Name, email address, and telephone number</li>
+            <li>Reservation details and seating preferences</li>
+            <li>Special requests you provide voluntarily</li>
           </ul>
         </section>
 
         <section>
-          <h2 className="font-serif text-xl text-[#1a3c34]">How we use your data</h2>
-          <ul className="mt-2 list-disc space-y-1 pl-5">
-            <li>Confirm and manage your table reservation</li>
-            <li>Send booking confirmations and reminders by email and SMS</li>
-            <li>Contact you if we need to change or cancel your booking</li>
-            <li>Maintain a record of visits to improve service</li>
+          <h2 className="font-serif text-xl font-light text-[#f5f0e6]">How we use your data</h2>
+          <ul className="mt-3 list-disc space-y-1 pl-5">
+            <li>Confirm and manage your reservation</li>
+            <li>Send confirmations and reminders by email and SMS</li>
+            <li>Contact you regarding changes to your booking</li>
           </ul>
         </section>
 
         <section>
-          <h2 className="font-serif text-xl text-[#1a3c34]">Legal basis</h2>
-          <p className="mt-2 leading-relaxed">
-            We process your data to fulfil your booking request (contract) and,
-            where you agree, to send transactional messages about your
-            reservation. We do not use your details for unrelated marketing
-            without separate consent.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="font-serif text-xl text-[#1a3c34]">How long we keep data</h2>
-          <p className="mt-2 leading-relaxed">
-            Booking and contact records are kept for up to 2 years for operational
-            and legal purposes, then deleted or anonymised.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="font-serif text-xl text-[#1a3c34]">Your rights</h2>
-          <p className="mt-2 leading-relaxed">
-            You may request access, correction, or deletion of your personal data
-            by emailing{" "}
-            <a href="mailto:Phovagrill@gmail.com" className="text-[#1a3c34] underline">
+          <h2 className="font-serif text-xl font-light text-[#f5f0e6]">Your rights</h2>
+          <p className="mt-3">
+            You may request access, correction, or deletion of your data by
+            contacting{" "}
+            <a href="mailto:Phovagrill@gmail.com" className="text-[#c9a962] hover:underline">
               Phovagrill@gmail.com
             </a>
-            . You may also complain to the ICO (ico.org.uk).
+            .
           </p>
         </section>
 
         <section>
-          <h2 className="font-serif text-xl text-[#1a3c34]">Third parties</h2>
-          <p className="mt-2 leading-relaxed">
-            We use Supabase (database), Resend (email), and Twilio (SMS) to
-            operate our booking system. These providers process data on our
-            behalf under their own privacy terms.
+          <h2 className="font-serif text-xl font-light text-[#f5f0e6]">Third parties</h2>
+          <p className="mt-3">
+            We use Supabase, Resend, and Twilio to operate our reservation system.
+            These providers process data on our behalf under their respective
+            privacy terms.
           </p>
         </section>
       </div>
 
       <Link
         href="/book"
-        className="mt-10 inline-block text-sm font-medium text-[#1a3c34] hover:text-[#c9a962]"
+        className="mt-12 inline-block text-[11px] uppercase tracking-[0.25em] text-[#c9a962] hover:text-[#dfc488]"
       >
-        ← Back to booking
+        ← Return to reservations
       </Link>
     </div>
   );

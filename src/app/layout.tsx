@@ -1,32 +1,34 @@
 import type { Metadata } from "next";
-import { DM_Sans, Playfair_Display } from "next/font/google";
+import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import "./globals.css";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
   subsets: ["latin"],
+  weight: ["300", "400", "500"],
 });
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
   title: {
-    default: "Pho Ta | Authentic Vietnamese Restaurant in London",
-    template: "%s | Pho Ta Restaurant",
+    default: "Pho Ta | Fine Vietnamese Dining in London",
+    template: "%s | Pho Ta",
   },
   description:
-    "Pho Ta serves authentic Vietnamese cuisine at Kentish Town and Finchley Road, London. Book a table online for pho, bun cha, and fresh flavours.",
+    "An elevated Vietnamese dining experience at Kentish Town and Finchley Road, London. Reserve your table for refined flavours and warm hospitality.",
   keywords: [
     "Pho Ta",
     "Vietnamese restaurant",
+    "fine dining",
     "London",
     "Finchley Road",
     "Kentish Town",
-    "Pho",
-    "Bun Cha",
   ],
 };
 
@@ -38,9 +40,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${dmSans.variable} ${playfair.variable} h-full antialiased`}
+      className={`${dmSans.variable} ${cormorant.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="luxury-grain min-h-full flex flex-col bg-[#0a0908] font-sans font-light text-[#f5f0e6]">
+        {children}
+      </body>
     </html>
   );
 }

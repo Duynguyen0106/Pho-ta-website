@@ -13,6 +13,10 @@ interface BookingFormProps {
   defaultLocation?: LocationSlug;
 }
 
+const labelClass = "text-[10px] font-medium uppercase tracking-[0.25em] text-[#c9a962]";
+const stepTitleClass = "font-serif text-2xl font-light text-[#f5f0e6]";
+const stepDescClass = "mt-2 text-sm text-[#9a9085]";
+
 export function BookingForm({ defaultLocation }: BookingFormProps) {
   const router = useRouter();
   const [step, setStep] = useState(1);
@@ -100,114 +104,102 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
 
   const location = locations.find((l) => l.slug === locationSlug)!;
 
+  const selectCard = (selected: boolean) =>
+    cn(
+      "border p-5 text-left transition duration-300",
+      selected
+        ? "border-[#c9a962] bg-[#c9a962]/5"
+        : "border-[#c9a962]/20 hover:border-[#c9a962]/50",
+    );
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
-      {/* Step indicator */}
-      <div className="flex items-center justify-center gap-2">
+    <form onSubmit={handleSubmit} className="space-y-10">
+      <div className="flex items-center justify-center gap-3">
         {[1, 2, 3, 4].map((s) => (
           <div
             key={s}
             className={cn(
-              "h-2 w-12 rounded-full transition-colors",
-              step >= s ? "bg-[#1a3c34]" : "bg-[#e8e0d4]",
+              "h-px w-10 transition-all duration-500",
+              step >= s ? "bg-[#c9a962]" : "bg-[#c9a962]/20",
             )}
           />
         ))}
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="border border-red-900/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">
           {error}
         </div>
       )}
 
       {step === 1 && (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div>
-            <h2 className="font-serif text-2xl text-[#1a3c34]">
-              Choose your restaurant
-            </h2>
-            <p className="mt-1 text-sm text-[#5c534a]">
-              Select location, date, and party size
-            </p>
+            <h2 className={stepTitleClass}>Select your venue</h2>
+            <p className={stepDescClass}>Location, date, and party size</p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             {locations.map((loc) => (
               <button
                 key={loc.slug}
                 type="button"
                 onClick={() => setLocationSlug(loc.slug)}
-                className={cn(
-                  "rounded-xl border p-4 text-left transition",
-                  locationSlug === loc.slug
-                    ? "border-[#1a3c34] bg-[#1a3c34]/5 ring-2 ring-[#1a3c34]"
-                    : "border-[#e8e0d4] hover:border-[#1a3c34]/40",
-                )}
+                className={selectCard(locationSlug === loc.slug)}
               >
-                <span className="font-medium text-[#1a3c34]">{loc.shortName}</span>
-                <p className="mt-1 text-xs text-[#5c534a]">{loc.address}</p>
+                <span className="font-serif text-lg text-[#f5f0e6]">{loc.shortName}</span>
+                <p className="mt-1 text-xs text-[#9a9085]">{loc.address}</p>
               </button>
             ))}
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-6 sm:grid-cols-2">
             <label className="block">
-              <span className="text-sm font-medium text-[#1a3c34]">Date</span>
+              <span className={labelClass}>Date</span>
               <input
                 type="date"
                 value={date}
                 min={format(new Date(), "yyyy-MM-dd")}
                 max={maxDate}
                 onChange={(e) => setDate(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-[#e8e0d4] bg-white px-4 py-3 text-[#2d2d2d] focus:border-[#1a3c34] focus:outline-none focus:ring-1 focus:ring-[#1a3c34]"
+                className="luxury-input mt-2"
                 required
               />
             </label>
             <label className="block">
-              <span className="text-sm font-medium text-[#1a3c34]">
-                Number of guests
-              </span>
+              <span className={labelClass}>Guests</span>
               <select
                 value={partySize}
                 onChange={(e) => setPartySize(Number(e.target.value))}
-                className="mt-1 w-full rounded-lg border border-[#e8e0d4] bg-white px-4 py-3 text-[#2d2d2d] focus:border-[#1a3c34] focus:outline-none focus:ring-1 focus:ring-[#1a3c34]"
+                className="luxury-input mt-2"
               >
-                {Array.from({ length: MAX_PARTY_SIZE }, (_, i) => i + 1).map(
-                  (n) => (
-                    <option key={n} value={n}>
-                      {n} {n === 1 ? "guest" : "guests"}
-                    </option>
-                  ),
-                )}
+                {Array.from({ length: MAX_PARTY_SIZE }, (_, i) => i + 1).map((n) => (
+                  <option key={n} value={n} className="bg-[#12100e]">
+                    {n} {n === 1 ? "guest" : "guests"}
+                  </option>
+                ))}
               </select>
-              {partySize > 8 && (
-                <p className="mt-1 text-xs text-[#8a7f72]">
-                  For groups over 8, please mention any special requirements in
-                  the next step.
-                </p>
-              )}
             </label>
           </div>
 
-          <Button type="button" onClick={() => setStep(2)} className="w-full sm:w-auto">
-            Choose time →
+          <Button type="button" onClick={() => setStep(2)}>
+            Continue
           </Button>
         </div>
       )}
 
       {step === 2 && (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div>
-            <h2 className="font-serif text-2xl text-[#1a3c34]">Pick a time</h2>
-            <p className="mt-1 text-sm text-[#5c534a]">
+            <h2 className={stepTitleClass}>Select a time</h2>
+            <p className={stepDescClass}>
               {location.shortName} · {partySize} guests ·{" "}
               {format(new Date(date), "EEE d MMM yyyy")}
             </p>
           </div>
 
           {slotsLoading ? (
-            <p className="text-sm text-[#5c534a]">Loading available times…</p>
+            <p className="text-sm text-[#9a9085]">Loading availability…</p>
           ) : (
             <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
               {slots.map((slot) => (
@@ -217,13 +209,13 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
                   disabled={!slot.available}
                   onClick={() => setTime(slot.time)}
                   className={cn(
-                    "rounded-lg border px-3 py-2.5 text-sm transition",
-                    !slot.available && "cursor-not-allowed opacity-40",
+                    "border px-2 py-3 text-xs tracking-wider transition",
+                    !slot.available && "cursor-not-allowed opacity-30",
                     time === slot.time
-                      ? "border-[#1a3c34] bg-[#1a3c34] text-[#faf7f2]"
+                      ? "border-[#c9a962] bg-[#c9a962] text-[#0a0908]"
                       : slot.available
-                        ? "border-[#e8e0d4] hover:border-[#1a3c34]"
-                        : "border-[#e8e0d4]",
+                        ? "border-[#c9a962]/25 text-[#f5f0e6] hover:border-[#c9a962]"
+                        : "border-[#c9a962]/10 text-[#6b635a]",
                   )}
                 >
                   {slot.time}
@@ -232,153 +224,131 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
             </div>
           )}
 
-          <div className="flex gap-3">
+          <div className="flex gap-4">
             <Button type="button" variant="outline" onClick={() => setStep(1)}>
-              ← Back
+              Back
             </Button>
-            <Button
-              type="button"
-              disabled={!time}
-              onClick={() => setStep(3)}
-            >
-              Seating preference →
+            <Button type="button" disabled={!time} onClick={() => setStep(3)}>
+              Continue
             </Button>
           </div>
         </div>
       )}
 
       {step === 3 && (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div>
-            <h2 className="font-serif text-2xl text-[#1a3c34]">
-              Where would you like to sit?
-            </h2>
-            <p className="mt-1 text-sm text-[#5c534a]">
-              We&apos;ll do our best to honour your preference
-            </p>
+            <h2 className={stepTitleClass}>Seating preference</h2>
+            <p className={stepDescClass}>We shall endeavour to honour your request</p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             {SEATING_PREFERENCES.map((pref) => (
               <button
                 key={pref.value}
                 type="button"
                 onClick={() => setSeatingPreference(pref.value)}
-                className={cn(
-                  "rounded-xl border p-4 text-left transition",
-                  seatingPreference === pref.value
-                    ? "border-[#1a3c34] bg-[#1a3c34]/5 ring-2 ring-[#1a3c34]"
-                    : "border-[#e8e0d4] hover:border-[#1a3c34]/40",
-                )}
+                className={selectCard(seatingPreference === pref.value)}
               >
-                <span className="font-medium text-[#1a3c34]">{pref.label}</span>
-                <p className="mt-1 text-xs text-[#5c534a]">{pref.description}</p>
+                <span className="text-sm text-[#f5f0e6]">{pref.label}</span>
+                <p className="mt-1 text-xs text-[#9a9085]">{pref.description}</p>
               </button>
             ))}
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-4">
             <Button type="button" variant="outline" onClick={() => setStep(2)}>
-              ← Back
+              Back
             </Button>
             <Button type="button" onClick={() => setStep(4)}>
-              Your details →
+              Continue
             </Button>
           </div>
         </div>
       )}
 
       {step === 4 && (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div>
-            <h2 className="font-serif text-2xl text-[#1a3c34]">
-              Your details
-            </h2>
-            <p className="mt-1 text-sm text-[#5c534a]">
-              We&apos;ll send confirmation to your email and phone
-            </p>
+            <h2 className={stepTitleClass}>Your details</h2>
+            <p className={stepDescClass}>Confirmation will be sent by email and SMS</p>
           </div>
 
-          <div className="rounded-xl border border-[#e8e0d4] bg-white/50 p-4 text-sm">
-            <p className="font-medium text-[#1a3c34]">Booking summary</p>
-            <p className="mt-2 text-[#5c534a]">
+          <div className="border border-[#c9a962]/20 bg-[#12100e] p-5 text-sm">
+            <p className={labelClass}>Summary</p>
+            <p className="mt-3 text-[#9a9085]">
               {location.shortName} · {partySize} guests · {date} at {time}
               <br />
-              Seating:{" "}
               {SEATING_PREFERENCES.find((p) => p.value === seatingPreference)?.label}
             </p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-6 sm:grid-cols-2">
             <label className="block sm:col-span-2">
-              <span className="text-sm font-medium text-[#1a3c34]">Full name</span>
+              <span className={labelClass}>Full name</span>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-[#e8e0d4] bg-white px-4 py-3 focus:border-[#1a3c34] focus:outline-none focus:ring-1 focus:ring-[#1a3c34]"
+                className="luxury-input mt-2"
                 required
               />
             </label>
             <label className="block">
-              <span className="text-sm font-medium text-[#1a3c34]">Email</span>
+              <span className={labelClass}>Email</span>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-[#e8e0d4] bg-white px-4 py-3 focus:border-[#1a3c34] focus:outline-none focus:ring-1 focus:ring-[#1a3c34]"
+                className="luxury-input mt-2"
                 required
               />
             </label>
             <label className="block">
-              <span className="text-sm font-medium text-[#1a3c34]">Mobile phone</span>
+              <span className={labelClass}>Mobile</span>
               <input
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="07xxx xxxxxx"
-                className="mt-1 w-full rounded-lg border border-[#e8e0d4] bg-white px-4 py-3 focus:border-[#1a3c34] focus:outline-none focus:ring-1 focus:ring-[#1a3c34]"
+                className="luxury-input mt-2"
                 required
               />
             </label>
             <label className="block sm:col-span-2">
-              <span className="text-sm font-medium text-[#1a3c34]">
-                Special requests (optional)
-              </span>
+              <span className={labelClass}>Special requests</span>
               <textarea
                 value={specialRequests}
                 onChange={(e) => setSpecialRequests(e.target.value)}
                 rows={3}
-                placeholder="Allergies, high chair, birthday, etc."
-                className="mt-1 w-full rounded-lg border border-[#e8e0d4] bg-white px-4 py-3 focus:border-[#1a3c34] focus:outline-none focus:ring-1 focus:ring-[#1a3c34]"
+                placeholder="Dietary requirements, celebrations, accessibility…"
+                className="luxury-input mt-2 resize-none"
               />
             </label>
           </div>
 
-          <label className="flex items-start gap-3 text-sm text-[#5c534a]">
+          <label className="flex items-start gap-3 text-sm text-[#9a9085]">
             <input
               type="checkbox"
               checked={consent}
               onChange={(e) => setConsent(e.target.checked)}
-              className="mt-1"
+              className="mt-1 accent-[#c9a962]"
               required
             />
             <span>
-              I agree to receive booking confirmations and reminders by email
-              and SMS. See our{" "}
-              <a href="/privacy" className="text-[#1a3c34] underline">
-                privacy policy
-              </a>{" "}
-              for how we handle your data.
+              I agree to receive confirmations and reminders by email and SMS.{" "}
+              <a href="/privacy" className="text-[#c9a962] underline-offset-2 hover:underline">
+                Privacy policy
+              </a>
             </span>
           </label>
 
-          <div className="flex gap-3">
+          <div className="flex gap-4">
             <Button type="button" variant="outline" onClick={() => setStep(3)}>
-              ← Back
+              Back
             </Button>
             <Button type="submit" disabled={loading || !consent}>
-              {loading ? "Confirming…" : "Confirm booking"}
+              {loading ? "Confirming…" : "Confirm Reservation"}
             </Button>
           </div>
         </div>

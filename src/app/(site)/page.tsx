@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, MapPin, Clock } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { featuredDishes } from "@/lib/data/menu";
 import { locations } from "@/lib/data/locations";
 import { siteImages } from "@/lib/data/images";
@@ -10,39 +11,35 @@ export default function HomePage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative min-h-[85vh] flex items-center">
+      <section className="relative flex min-h-[92vh] items-end">
         <Image
           src={siteImages.hero}
-          alt="Pho Ta Vietnamese cuisine"
+          alt="Pho Ta fine Vietnamese dining"
           fill
-          className="object-cover"
+          className="object-cover brightness-[0.55] saturate-[0.85]"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#1a3c34]/90 via-[#1a3c34]/70 to-transparent" />
-        <div className="relative mx-auto max-w-6xl px-4 py-24 sm:px-6">
-          <p className="text-sm uppercase tracking-[0.3em] text-[#c9a962]">
-            The Soul of Vietnamese
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0908] via-[#0a0908]/60 to-[#0a0908]/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0908]/80 to-transparent" />
+
+        <div className="relative mx-auto w-full max-w-6xl px-6 pb-24 pt-32">
+          <p className="text-[11px] font-medium uppercase tracking-[0.45em] text-[#c9a962]">
+            London · Kentish Town · Finchley Road
           </p>
-          <h1 className="mt-4 max-w-2xl font-serif text-5xl leading-tight text-[#faf7f2] sm:text-6xl">
-            Fresh flavours, warm hospitality
+          <h1 className="mt-6 max-w-3xl font-serif text-5xl font-light leading-[1.1] tracking-wide text-[#f5f0e6] sm:text-7xl">
+            The art of Vietnamese dining
           </h1>
-          <p className="mt-6 max-w-lg text-lg text-[#c9d5d0]">
-            Pho Ta brings authentic Vietnamese cuisine to London — from rich,
-            fragrant pho to Hanoi-style bun cha. Dine in or take away at
-            Kentish Town and Finchley Road.
+          <p className="mt-8 max-w-lg text-base leading-relaxed text-[#9a9085]">
+            An elevated journey through Vietnam&apos;s most cherished flavours —
+            from fragrant pho to the refined traditions of Hanoi. Where
+            authenticity meets elegance.
           </p>
-          <div className="mt-10 flex flex-wrap gap-4">
+          <div className="mt-12 flex flex-wrap gap-5">
             <Link href="/book">
-              <Button size="lg" variant="secondary">
-                Book a Table
-              </Button>
+              <Button size="lg">Reserve a Table</Button>
             </Link>
             <Link href="/menu">
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-[#faf7f2] text-[#faf7f2] hover:bg-[#faf7f2] hover:text-[#1a3c34]"
-              >
+              <Button size="lg" variant="outline">
                 View Menu
               </Button>
             </Link>
@@ -51,137 +48,141 @@ export default function HomePage() {
       </section>
 
       {/* About */}
-      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
-        <div className="grid items-center gap-12 md:grid-cols-2">
+      <section className="border-t border-[#c9a962]/10 bg-[#0a0908] py-28">
+        <div className="mx-auto grid max-w-6xl items-center gap-16 px-6 md:grid-cols-2">
           <div>
-            <h2 className="font-serif text-3xl text-[#1a3c34] sm:text-4xl">
-              About Pho Ta
-            </h2>
-            <p className="mt-6 leading-relaxed text-[#5c534a]">
-              Pho Ta is known for discovering unique flavours from Vietnam and
-              sharing them with the London area. We take pride in fresh
-              ingredients, healthy options, and catering to all dietary
-              requirements — vegetarian, vegan, and gluten-free choices
-              available.
-            </p>
-            <p className="mt-4 leading-relaxed text-[#5c534a]">
-              Whether you&apos;re craving a warming bowl of pho or our
-              signature bun cha, join us for an authentic taste of Vietnam.
+            <SectionHeading
+              align="left"
+              eyebrow="Our Story"
+              title="A taste of distinction"
+              description="Pho Ta curates the finest Vietnamese traditions for the discerning London palate — fresh ingredients, meticulous preparation, and an atmosphere of quiet luxury."
+            />
+            <p className="mt-8 text-sm leading-relaxed text-[#9a9085]">
+              Whether an intimate dinner or a celebratory gathering, our kitchens
+              honour the depth and nuance of Vietnamese cuisine with grace and
+              precision.
             </p>
           </div>
-          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
-            <Image
-              src={siteImages.about}
-              alt="Vietnamese bun cha dish"
-              fill
-              className="object-cover"
-            />
+          <div className="relative">
+            <div className="absolute -inset-3 border border-[#c9a962]/25" />
+            <div className="relative aspect-[4/5] overflow-hidden">
+              <Image
+                src={siteImages.about}
+                alt="Signature Vietnamese dish"
+                fill
+                className="object-cover brightness-90"
+              />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Featured dishes */}
-      <section className="bg-[#1a3c34] py-20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="text-center">
-            <p className="text-sm uppercase tracking-[0.2em] text-[#c9a962]">
-              Featured Dishes
-            </p>
-            <h2 className="mt-2 font-serif text-3xl text-[#faf7f2] sm:text-4xl">
-              Customer favourites
-            </h2>
-          </div>
-          <div className="mt-12 grid gap-8 md:grid-cols-3">
+      {/* Signature dishes */}
+      <section className="border-t border-[#c9a962]/10 bg-[#080706] py-28">
+        <div className="mx-auto max-w-6xl px-6">
+          <SectionHeading
+            eyebrow="The Menu"
+            title="Signature selections"
+            description="Handcrafted dishes that define the Pho Ta experience."
+          />
+
+          <div className="mt-20 grid gap-10 md:grid-cols-3">
             {featuredDishes.map((dish) => (
-              <article
-                key={dish.name}
-                className="group overflow-hidden rounded-2xl bg-[#245046]"
-              >
-                <div className="relative aspect-[4/3] overflow-hidden">
+              <article key={dish.name} className="group luxury-card">
+                <div className="relative aspect-[3/4] overflow-hidden">
                   <Image
                     src={dish.image}
                     alt={dish.name}
                     fill
-                    className="object-cover transition duration-500 group-hover:scale-105"
+                    className="object-cover brightness-75 transition duration-700 group-hover:scale-105 group-hover:brightness-90"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0908] via-transparent to-transparent" />
                 </div>
-                <div className="p-6">
-                  <h3 className="font-serif text-xl text-[#faf7f2]">
+                <div className="border-t border-[#c9a962]/15 p-8">
+                  <h3 className="font-serif text-2xl font-light text-[#f5f0e6]">
                     {dish.name}
                   </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-[#c9d5d0]">
+                  <p className="mt-3 text-sm leading-relaxed text-[#9a9085]">
                     {dish.description}
                   </p>
                 </div>
               </article>
             ))}
           </div>
-          <div className="mt-10 text-center">
+
+          <div className="mt-16 text-center">
             <Link
               href="/menu"
-              className="inline-flex items-center gap-2 text-[#c9a962] transition hover:text-[#faf7f2]"
+              className="inline-flex items-center gap-3 text-[11px] uppercase tracking-[0.3em] text-[#c9a962] transition hover:text-[#dfc488]"
             >
-              See full menu <ArrowRight size={16} />
+              Explore full menu <ArrowRight size={14} strokeWidth={1} />
             </Link>
           </div>
         </div>
       </section>
 
       {/* Locations */}
-      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
-        <h2 className="text-center font-serif text-3xl text-[#1a3c34] sm:text-4xl">
-          Our Locations
-        </h2>
-        <p className="mx-auto mt-4 max-w-xl text-center text-[#5c534a]">
-          Two branches across North London. Book online or walk in.
-        </p>
-        <div className="mt-12 grid gap-8 md:grid-cols-2">
-          {locations.map((location) => (
-            <article
-              key={location.slug}
-              className="rounded-2xl border border-[#e8e0d4] bg-white p-8 shadow-sm"
-            >
-              <h3 className="font-serif text-2xl text-[#1a3c34]">
-                {location.name}
-              </h3>
-              <div className="mt-4 space-y-2 text-sm text-[#5c534a]">
-                <p className="flex items-start gap-2">
-                  <MapPin size={16} className="mt-0.5 shrink-0 text-[#c9a962]" />
-                  {location.address}, {location.postcode}
-                </p>
-                <p className="flex items-center gap-2">
-                  <Clock size={16} className="text-[#c9a962]" />
-                  Mon – Sun, 11:30am – 9:30pm
-                </p>
-                <a
-                  href={`tel:${location.phone.replace(/\s/g, "")}`}
-                  className="block hover:text-[#1a3c34]"
-                >
-                  {location.phone}
-                </a>
-              </div>
-              <Link
-                href={`/book?location=${location.slug}`}
-                className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-[#1a3c34] hover:text-[#c9a962]"
+      <section className="border-t border-[#c9a962]/10 py-28">
+        <div className="mx-auto max-w-6xl px-6">
+          <SectionHeading
+            eyebrow="Visit Us"
+            title="Two London addresses"
+            description="Each location offers the same commitment to excellence."
+          />
+
+          <div className="mt-20 grid gap-8 md:grid-cols-2">
+            {locations.map((location) => (
+              <article
+                key={location.slug}
+                className="luxury-card p-10 transition duration-500"
               >
-                Book at {location.shortName} <ArrowRight size={14} />
-              </Link>
-            </article>
-          ))}
+                <h3 className="font-serif text-3xl font-light text-[#f5f0e6]">
+                  {location.shortName}
+                </h3>
+                <div className="gold-line my-6 w-12" />
+                <div className="space-y-3 text-sm text-[#9a9085]">
+                  <p className="flex items-start gap-3">
+                    <MapPin size={15} className="mt-0.5 shrink-0 text-[#c9a962]" strokeWidth={1} />
+                    {location.address}, {location.postcode}
+                  </p>
+                  <p className="flex items-center gap-3">
+                    <Clock size={15} className="shrink-0 text-[#c9a962]" strokeWidth={1} />
+                    Mon – Sun · 11:30am – 9:30pm
+                  </p>
+                  <a
+                    href={`tel:${location.phone.replace(/\s/g, "")}`}
+                    className="block text-[#f5f0e6] transition hover:text-[#c9a962]"
+                  >
+                    {location.phone}
+                  </a>
+                </div>
+                <Link
+                  href={`/book?location=${location.slug}`}
+                  className="mt-8 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-[#c9a962] transition hover:text-[#dfc488]"
+                >
+                  Reserve at {location.shortName}{" "}
+                  <ArrowRight size={12} strokeWidth={1} />
+                </Link>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="border-t border-[#e8e0d4] bg-[#faf7f2] py-16">
-        <div className="mx-auto max-w-2xl px-4 text-center sm:px-6">
-          <h2 className="font-serif text-3xl text-[#1a3c34]">
-            Ready to dine with us?
-          </h2>
-          <p className="mt-4 text-[#5c534a]">
-            Reserve your table in under a minute. Choose your seating preference
-            and we&apos;ll confirm by email and SMS.
+      <section className="border-t border-[#c9a962]/10 bg-[#080706] py-24">
+        <div className="mx-auto max-w-2xl px-6 text-center">
+          <p className="text-[11px] uppercase tracking-[0.4em] text-[#c9a962]">
+            Reservations
           </p>
-          <Link href="/book" className="mt-8 inline-block">
+          <h2 className="mt-4 font-serif text-4xl font-light text-[#f5f0e6]">
+            We look forward to welcoming you
+          </h2>
+          <p className="mt-5 text-sm leading-relaxed text-[#9a9085]">
+            Secure your table in moments. Select your preferred seating and
+            receive confirmation by email and SMS.
+          </p>
+          <Link href="/book" className="mt-10 inline-block">
             <Button size="lg">Book a Table</Button>
           </Link>
         </div>

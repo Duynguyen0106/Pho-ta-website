@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { BookingForm } from "@/components/booking/BookingForm";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import type { LocationSlug } from "@/lib/types";
 
 export const metadata: Metadata = {
-  title: "Book a Table",
-  description: "Reserve a table at Pho Ta Kentish Town or Finchley Road online.",
+  title: "Reservations",
+  description: "Reserve your table at Pho Ta Kentish Town or Finchley Road.",
 };
 
 export default async function BookPage({
@@ -19,19 +20,14 @@ export default async function BookPage({
       : undefined;
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
-      <div className="text-center">
-        <p className="text-sm uppercase tracking-[0.2em] text-[#c9a962]">
-          Reservations
-        </p>
-        <h1 className="mt-2 font-serif text-4xl text-[#1a3c34]">Book a Table</h1>
-        <p className="mt-4 text-[#5c534a]">
-          Choose your location, time, and seating preference. We&apos;ll confirm
-          by email and SMS, and send a reminder before your visit.
-        </p>
-      </div>
+    <div className="mx-auto max-w-2xl px-6 py-24">
+      <SectionHeading
+        eyebrow="Reservations"
+        title="Book a Table"
+        description="Select your preferred date, time, and seating. Confirmation will be sent by email and SMS."
+      />
 
-      <div className="mt-12 rounded-2xl border border-[#e8e0d4] bg-white p-6 shadow-sm sm:p-8">
+      <div className="mt-16 luxury-card p-8 sm:p-10">
         <BookingForm defaultLocation={defaultLocation} />
       </div>
     </div>
