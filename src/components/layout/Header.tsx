@@ -17,6 +17,8 @@ export function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const isHome = pathname === "/";
+  const onHero = isHome && !scrolled;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -29,17 +31,26 @@ export function Header() {
     <header
       className={cn(
         "sticky top-0 z-50 border-b transition duration-500",
-        scrolled
-          ? "border-[#c9a962]/20 bg-[#0a0908]/95 backdrop-blur-xl"
-          : "border-transparent bg-transparent",
+        onHero
+          ? "border-transparent bg-transparent"
+          : "border-gold/15 bg-background/95 backdrop-blur-xl shadow-sm",
       )}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
         <Link href="/" className="group text-center">
-          <span className="font-serif text-3xl font-light tracking-[0.15em] text-[#f5f0e6]">
+          <span
+            className={cn(
+              "font-serif text-3xl font-normal tracking-[0.12em]",
+              onHero ? "text-white" : "text-foreground",
+            )}
+          >
             Pho Ta
           </span>
-          <span className="mt-1 block text-[9px] uppercase tracking-[0.45em] text-[#c9a962]">
+          <span
+            className={cn(
+              "mt-1 block text-xs uppercase tracking-[0.3em] text-gold-light",
+            )}
+          >
             Fine Vietnamese
           </span>
         </Link>
@@ -50,10 +61,12 @@ export function Header() {
               key={link.href}
               href={link.href}
               className={cn(
-                "text-[11px] uppercase tracking-[0.25em] transition-colors duration-300",
+                "text-sm font-medium uppercase tracking-[0.15em] transition-colors duration-300",
                 pathname === link.href
-                  ? "text-[#c9a962]"
-                  : "text-[#9a9085] hover:text-[#f5f0e6]",
+                  ? "text-gold"
+                  : onHero
+                    ? "text-white/90 hover:text-white"
+                    : "text-muted hover:text-foreground",
               )}
             >
               {link.label}
@@ -63,23 +76,28 @@ export function Header() {
 
         <Link
           href="/book"
-          className="hidden border border-[#c9a962] px-6 py-2.5 text-[10px] uppercase tracking-[0.25em] text-[#c9a962] transition hover:bg-[#c9a962] hover:text-[#0a0908] md:inline-block"
+          className={cn(
+            "hidden border px-6 py-2.5 text-sm font-medium uppercase tracking-[0.12em] transition md:inline-block",
+            onHero
+              ? "border-white text-white hover:bg-white hover:text-foreground"
+              : "border-gold text-gold hover:bg-gold hover:text-white",
+          )}
         >
           Reserve
         </Link>
 
         <button
           type="button"
-          className="text-[#c9a962] md:hidden"
+          className={cn(onHero ? "text-white" : "text-gold")}
           onClick={() => setOpen(!open)}
           aria-label="Toggle menu"
         >
-          {open ? <X size={22} strokeWidth={1} /> : <Menu size={22} strokeWidth={1} />}
+          {open ? <X size={24} strokeWidth={1.5} /> : <Menu size={24} strokeWidth={1.5} />}
         </button>
       </div>
 
       {open && (
-        <nav className="border-t border-[#c9a962]/15 bg-[#0a0908] px-6 py-6 md:hidden">
+        <nav className="border-t border-gold/15 bg-background px-6 py-6 md:hidden">
           <div className="flex flex-col gap-5">
             {navLinks.map((link) => (
               <Link
@@ -87,10 +105,8 @@ export function Header() {
                 href={link.href}
                 onClick={() => setOpen(false)}
                 className={cn(
-                  "text-[11px] uppercase tracking-[0.25em]",
-                  pathname === link.href
-                    ? "text-[#c9a962]"
-                    : "text-[#9a9085]",
+                  "text-base font-medium uppercase tracking-[0.12em]",
+                  pathname === link.href ? "text-gold" : "text-muted",
                 )}
               >
                 {link.label}

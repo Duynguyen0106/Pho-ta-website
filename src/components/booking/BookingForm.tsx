@@ -13,9 +13,9 @@ interface BookingFormProps {
   defaultLocation?: LocationSlug;
 }
 
-const labelClass = "text-[10px] font-medium uppercase tracking-[0.25em] text-[#c9a962]";
-const stepTitleClass = "font-serif text-2xl font-light text-[#f5f0e6]";
-const stepDescClass = "mt-2 text-sm text-[#9a9085]";
+const labelClass = "text-sm font-medium uppercase tracking-[0.12em] text-gold";
+const stepTitleClass = "font-serif text-2xl font-normal text-foreground";
+const stepDescClass = "mt-2 text-base text-muted";
 
 export function BookingForm({ defaultLocation }: BookingFormProps) {
   const router = useRouter();
@@ -108,8 +108,8 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
     cn(
       "border p-5 text-left transition duration-300",
       selected
-        ? "border-[#c9a962] bg-[#c9a962]/5"
-        : "border-[#c9a962]/20 hover:border-[#c9a962]/50",
+        ? "border-gold bg-gold/5"
+        : "border-gold/20 hover:border-gold/50",
     );
 
   return (
@@ -120,7 +120,7 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
             key={s}
             className={cn(
               "h-px w-10 transition-all duration-500",
-              step >= s ? "bg-[#c9a962]" : "bg-[#c9a962]/20",
+              step >= s ? "bg-gold" : "bg-gold/20",
             )}
           />
         ))}
@@ -147,8 +147,8 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
                 onClick={() => setLocationSlug(loc.slug)}
                 className={selectCard(locationSlug === loc.slug)}
               >
-                <span className="font-serif text-lg text-[#f5f0e6]">{loc.shortName}</span>
-                <p className="mt-1 text-xs text-[#9a9085]">{loc.address}</p>
+                <span className="font-serif text-lg text-foreground">{loc.shortName}</span>
+                <p className="mt-1 text-sm text-muted">{loc.address}</p>
               </button>
             ))}
           </div>
@@ -174,7 +174,7 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
                 className="luxury-input mt-2"
               >
                 {Array.from({ length: MAX_PARTY_SIZE }, (_, i) => i + 1).map((n) => (
-                  <option key={n} value={n} className="bg-[#12100e]">
+                  <option key={n} value={n} className="bg-surface-alt">
                     {n} {n === 1 ? "guest" : "guests"}
                   </option>
                 ))}
@@ -199,7 +199,7 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
           </div>
 
           {slotsLoading ? (
-            <p className="text-sm text-[#9a9085]">Loading availability…</p>
+            <p className="text-sm text-muted">Loading availability…</p>
           ) : (
             <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
               {slots.map((slot) => (
@@ -209,13 +209,13 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
                   disabled={!slot.available}
                   onClick={() => setTime(slot.time)}
                   className={cn(
-                    "border px-2 py-3 text-xs tracking-wider transition",
+                    "border px-2 py-3 text-sm tracking-wider transition",
                     !slot.available && "cursor-not-allowed opacity-30",
                     time === slot.time
-                      ? "border-[#c9a962] bg-[#c9a962] text-[#0a0908]"
+                      ? "border-gold bg-gold text-white"
                       : slot.available
-                        ? "border-[#c9a962]/25 text-[#f5f0e6] hover:border-[#c9a962]"
-                        : "border-[#c9a962]/10 text-[#6b635a]",
+                        ? "border-gold/25 text-foreground hover:border-gold"
+                        : "border-gold/10 text-muted",
                   )}
                 >
                   {slot.time}
@@ -250,8 +250,8 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
                 onClick={() => setSeatingPreference(pref.value)}
                 className={selectCard(seatingPreference === pref.value)}
               >
-                <span className="text-sm text-[#f5f0e6]">{pref.label}</span>
-                <p className="mt-1 text-xs text-[#9a9085]">{pref.description}</p>
+                <span className="text-sm text-foreground">{pref.label}</span>
+                <p className="mt-1 text-sm text-muted">{pref.description}</p>
               </button>
             ))}
           </div>
@@ -274,9 +274,9 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
             <p className={stepDescClass}>Confirmation will be sent by email and SMS</p>
           </div>
 
-          <div className="border border-[#c9a962]/20 bg-[#12100e] p-5 text-sm">
+          <div className="border border-gold/20 bg-surface-alt p-5 text-sm">
             <p className={labelClass}>Summary</p>
-            <p className="mt-3 text-[#9a9085]">
+            <p className="mt-3 text-muted">
               {location.shortName} · {partySize} guests · {date} at {time}
               <br />
               {SEATING_PREFERENCES.find((p) => p.value === seatingPreference)?.label}
@@ -327,17 +327,17 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
             </label>
           </div>
 
-          <label className="flex items-start gap-3 text-sm text-[#9a9085]">
+          <label className="flex items-start gap-3 text-sm text-muted">
             <input
               type="checkbox"
               checked={consent}
               onChange={(e) => setConsent(e.target.checked)}
-              className="mt-1 accent-[#c9a962]"
+              className="mt-1 accent-gold"
               required
             />
             <span>
               I agree to receive confirmations and reminders by email and SMS.{" "}
-              <a href="/privacy" className="text-[#c9a962] underline-offset-2 hover:underline">
+              <a href="/privacy" className="text-gold underline-offset-2 hover:underline">
                 Privacy policy
               </a>
             </span>

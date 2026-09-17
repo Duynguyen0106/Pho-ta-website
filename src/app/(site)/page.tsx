@@ -16,20 +16,20 @@ export default function HomePage() {
           src={siteImages.hero}
           alt="Pho Ta Finchley Road restaurant interior"
           fill
-          className="object-cover brightness-[0.55] saturate-[0.85]"
+          className="object-cover brightness-[0.92] saturate-[1.05]"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0908] via-[#0a0908]/60 to-[#0a0908]/30" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0908]/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1a1612]/85 via-[#1a1612]/40 to-[#1a1612]/15" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#1a1612]/50 to-transparent" />
 
         <div className="relative mx-auto w-full max-w-6xl px-6 pb-24 pt-32">
-          <p className="text-[11px] font-medium uppercase tracking-[0.45em] text-[#c9a962]">
+          <p className="text-sm font-medium uppercase tracking-[0.25em] text-gold-light">
             London · Kentish Town · Finchley Road
           </p>
-          <h1 className="mt-6 max-w-3xl font-serif text-5xl font-light leading-[1.1] tracking-wide text-[#f5f0e6] sm:text-7xl">
+          <h1 className="mt-6 max-w-3xl font-serif text-5xl font-normal leading-[1.1] tracking-wide text-white sm:text-7xl">
             The art of Vietnamese dining
           </h1>
-          <p className="mt-8 max-w-lg text-base leading-relaxed text-[#9a9085]">
+          <p className="mt-8 max-w-lg text-lg leading-relaxed text-white/85">
             An elevated journey through Vietnam&apos;s most cherished flavours —
             from fragrant pho to the refined traditions of Hanoi. Where
             authenticity meets elegance.
@@ -39,7 +39,7 @@ export default function HomePage() {
               <Button size="lg">Reserve a Table</Button>
             </Link>
             <Link href="/menu">
-              <Button size="lg" variant="outline">
+              <Button size="lg" variant="outline" className="border-white/40 text-white hover:border-white hover:text-white">
                 View Menu
               </Button>
             </Link>
@@ -48,7 +48,7 @@ export default function HomePage() {
       </section>
 
       {/* About */}
-      <section className="border-t border-[#c9a962]/10 bg-[#0a0908] py-28">
+      <section className="border-t border-gold/10 bg-background py-28">
         <div className="mx-auto grid max-w-6xl items-center gap-16 px-6 md:grid-cols-2">
           <div>
             <SectionHeading
@@ -57,20 +57,20 @@ export default function HomePage() {
               title="A taste of distinction"
               description="Pho Ta curates the finest Vietnamese traditions for the discerning London palate — fresh ingredients, meticulous preparation, and an atmosphere of quiet luxury."
             />
-            <p className="mt-8 text-sm leading-relaxed text-[#9a9085]">
+            <p className="mt-8 text-base leading-relaxed text-muted">
               Whether an intimate dinner or a celebratory gathering, our kitchens
               honour the depth and nuance of Vietnamese cuisine with grace and
               precision.
             </p>
           </div>
           <div className="relative">
-            <div className="absolute -inset-3 border border-[#c9a962]/25" />
+            <div className="absolute -inset-3 border border-gold/25" />
             <div className="relative aspect-[4/5] overflow-hidden">
               <Image
                 src={siteImages.about}
                 alt="Pho Ta Finchley Road cherry blossom interior"
                 fill
-                className="object-cover brightness-90"
+                className="object-cover"
               />
             </div>
           </div>
@@ -78,7 +78,7 @@ export default function HomePage() {
       </section>
 
       {/* Signature dishes */}
-      <section className="border-t border-[#c9a962]/10 bg-[#080706] py-28">
+      <section className="border-t border-gold/10 bg-surface-alt py-28">
         <div className="mx-auto max-w-6xl px-6">
           <SectionHeading
             eyebrow="The Menu"
@@ -88,21 +88,20 @@ export default function HomePage() {
 
           <div className="mt-20 grid gap-10 md:grid-cols-3">
             {featuredDishes.map((dish) => (
-              <article key={dish.name} className="group luxury-card">
+              <article key={dish.name} className="group luxury-card overflow-hidden">
                 <div className="relative aspect-[3/4] overflow-hidden">
                   <Image
                     src={dish.image}
                     alt={dish.name}
                     fill
-                    className="object-cover brightness-75 transition duration-700 group-hover:scale-105 group-hover:brightness-90"
+                    className="object-cover transition duration-700 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0908] via-transparent to-transparent" />
                 </div>
-                <div className="border-t border-[#c9a962]/15 p-8">
-                  <h3 className="font-serif text-2xl font-light text-[#f5f0e6]">
+                <div className="border-t border-gold/15 p-8">
+                  <h3 className="font-serif text-2xl font-normal text-foreground">
                     {dish.name}
                   </h3>
-                  <p className="mt-3 text-sm leading-relaxed text-[#9a9085]">
+                  <p className="mt-3 text-base leading-relaxed text-muted">
                     {dish.description}
                   </p>
                 </div>
@@ -113,16 +112,16 @@ export default function HomePage() {
           <div className="mt-16 text-center">
             <Link
               href="/menu"
-              className="inline-flex items-center gap-3 text-[11px] uppercase tracking-[0.3em] text-[#c9a962] transition hover:text-[#dfc488]"
+              className="inline-flex items-center gap-3 text-sm font-medium uppercase tracking-[0.15em] text-gold transition hover:text-gold-light"
             >
-              Explore full menu <ArrowRight size={14} strokeWidth={1} />
+              Explore full menu <ArrowRight size={16} strokeWidth={1.5} />
             </Link>
           </div>
         </div>
       </section>
 
       {/* Locations */}
-      <section className="border-t border-[#c9a962]/10 py-28">
+      <section className="border-t border-gold/10 bg-background py-28">
         <div className="mx-auto max-w-6xl px-6">
           <SectionHeading
             eyebrow="Visit Us"
@@ -136,32 +135,32 @@ export default function HomePage() {
                 key={location.slug}
                 className="luxury-card p-10 transition duration-500"
               >
-                <h3 className="font-serif text-3xl font-light text-[#f5f0e6]">
+                <h3 className="font-serif text-3xl font-normal text-foreground">
                   {location.shortName}
                 </h3>
                 <div className="gold-line my-6 w-12" />
-                <div className="space-y-3 text-sm text-[#9a9085]">
+                <div className="space-y-3 text-base text-muted">
                   <p className="flex items-start gap-3">
-                    <MapPin size={15} className="mt-0.5 shrink-0 text-[#c9a962]" strokeWidth={1} />
+                    <MapPin size={18} className="mt-0.5 shrink-0 text-gold" strokeWidth={1.5} />
                     {location.address}, {location.postcode}
                   </p>
                   <p className="flex items-center gap-3">
-                    <Clock size={15} className="shrink-0 text-[#c9a962]" strokeWidth={1} />
+                    <Clock size={18} className="shrink-0 text-gold" strokeWidth={1.5} />
                     Mon – Sun · 11:30am – 9:30pm
                   </p>
                   <a
                     href={`tel:${location.phone.replace(/\s/g, "")}`}
-                    className="block text-[#f5f0e6] transition hover:text-[#c9a962]"
+                    className="block text-foreground transition hover:text-gold"
                   >
                     {location.phone}
                   </a>
                 </div>
                 <Link
                   href={`/book?location=${location.slug}`}
-                  className="mt-8 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-[#c9a962] transition hover:text-[#dfc488]"
+                  className="mt-8 inline-flex items-center gap-2 text-sm font-medium uppercase tracking-[0.12em] text-gold transition hover:text-gold-light"
                 >
                   Reserve at {location.shortName}{" "}
-                  <ArrowRight size={12} strokeWidth={1} />
+                  <ArrowRight size={14} strokeWidth={1.5} />
                 </Link>
               </article>
             ))}
@@ -170,15 +169,15 @@ export default function HomePage() {
       </section>
 
       {/* CTA */}
-      <section className="border-t border-[#c9a962]/10 bg-[#080706] py-24">
+      <section className="border-t border-gold/10 bg-surface-alt py-24">
         <div className="mx-auto max-w-2xl px-6 text-center">
-          <p className="text-[11px] uppercase tracking-[0.4em] text-[#c9a962]">
+          <p className="text-sm uppercase tracking-[0.2em] text-gold">
             Reservations
           </p>
-          <h2 className="mt-4 font-serif text-4xl font-light text-[#f5f0e6]">
+          <h2 className="mt-4 font-serif text-4xl font-normal text-foreground">
             We look forward to welcoming you
           </h2>
-          <p className="mt-5 text-sm leading-relaxed text-[#9a9085]">
+          <p className="mt-5 text-lg leading-relaxed text-muted">
             Secure your table in moments. Select your preferred seating and
             receive confirmation by email and SMS.
           </p>

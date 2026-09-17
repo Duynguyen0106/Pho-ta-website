@@ -42,7 +42,7 @@ export default function RootLayout({
       lang="en"
       className={`${dmSans.variable} ${cormorant.variable} h-full antialiased`}
     >
-      <body className="luxury-grain min-h-full flex flex-col bg-[#0a0908] font-sans font-light text-[#f5f0e6]">
+      <body className="luxury-grain min-h-full flex flex-col bg-background font-sans text-base font-normal text-foreground">
         {children}
       </body>
     </html>
