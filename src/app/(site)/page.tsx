@@ -4,7 +4,7 @@ import { ArrowRight, MapPin, Clock, HelpCircle, ShieldCheck } from "lucide-react
 import { Button } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { featuredDishes } from "@/lib/data/menu";
-import { locations } from "@/lib/data/locations";
+import { location } from "@/lib/data/locations";
 import { siteImages } from "@/lib/data/images";
 import { faqCategories } from "@/lib/data/faq";
 
@@ -25,7 +25,7 @@ export default function HomePage() {
 
         <div className="relative mx-auto w-full max-w-6xl px-6 pb-24 pt-32">
           <p className="text-base font-medium uppercase tracking-[0.2em] text-gold-light">
-            London · Kentish Town · Finchley Road
+            London · Finchley Road
           </p>
           <h1 className="mt-6 max-w-3xl font-display text-6xl font-normal leading-[1.08] tracking-wide text-white sm:text-8xl">
             The art of Vietnamese dining
@@ -114,17 +114,13 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div className="mt-16 flex flex-wrap justify-center gap-6">
-            {locations.map((location) => (
-              <Link
-                key={location.slug}
-                href={`/menu?location=${location.slug}`}
-                className="inline-flex items-center gap-3 text-base font-medium uppercase tracking-[0.1em] text-gold transition hover:text-gold-light"
-              >
-                {location.shortName} menu{" "}
-                <ArrowRight size={16} strokeWidth={1.5} />
-              </Link>
-            ))}
+          <div className="mt-16 flex justify-center">
+            <Link
+              href="/menu"
+              className="inline-flex items-center gap-3 text-base font-medium uppercase tracking-[0.1em] text-gold transition hover:text-gold-light"
+            >
+              View full menu <ArrowRight size={16} strokeWidth={1.5} />
+            </Link>
           </div>
         </div>
       </section>
@@ -134,46 +130,38 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl px-6">
           <SectionHeading
             eyebrow="Visit Us"
-            title="Two London addresses"
-            description="Each location offers the same commitment to excellence."
+            title="Pho Ta Finchley Road"
+            description="South Hampstead — the full Pho Ta experience in one welcoming dining room."
           />
 
-          <div className="mt-20 grid gap-8 md:grid-cols-2">
-            {locations.map((location) => (
-              <article
-                key={location.slug}
-                className="luxury-card p-10 transition duration-500"
+          <article className="mx-auto mt-20 max-w-2xl luxury-card p-10 transition duration-500">
+            <h3 className="font-serif text-4xl font-normal text-foreground">
+              {location.shortName}
+            </h3>
+            <div className="gold-line my-6 w-12" />
+            <div className="space-y-3 text-lg text-muted">
+              <p className="flex items-start gap-3">
+                <MapPin size={18} className="mt-0.5 shrink-0 text-gold" strokeWidth={1.5} />
+                {location.address}, {location.postcode}
+              </p>
+              <p className="flex items-center gap-3">
+                <Clock size={18} className="shrink-0 text-gold" strokeWidth={1.5} />
+                Mon – Sun · 11:30am – 9:30pm
+              </p>
+              <a
+                href={`tel:${location.phone.replace(/\s/g, "")}`}
+                className="block text-foreground transition hover:text-gold"
               >
-                <h3 className="font-serif text-4xl font-normal text-foreground">
-                  {location.shortName}
-                </h3>
-                <div className="gold-line my-6 w-12" />
-                <div className="space-y-3 text-lg text-muted">
-                  <p className="flex items-start gap-3">
-                    <MapPin size={18} className="mt-0.5 shrink-0 text-gold" strokeWidth={1.5} />
-                    {location.address}, {location.postcode}
-                  </p>
-                  <p className="flex items-center gap-3">
-                    <Clock size={18} className="shrink-0 text-gold" strokeWidth={1.5} />
-                    Mon – Sun · 11:30am – 9:30pm
-                  </p>
-                  <a
-                    href={`tel:${location.phone.replace(/\s/g, "")}`}
-                    className="block text-foreground transition hover:text-gold"
-                  >
-                    {location.phone}
-                  </a>
-                </div>
-                <Link
-                  href={`/book?location=${location.slug}`}
-                  className="mt-8 inline-flex items-center gap-2 text-base font-medium uppercase tracking-[0.1em] text-gold transition hover:text-gold-light"
-                >
-                  Reserve at {location.shortName}{" "}
-                  <ArrowRight size={14} strokeWidth={1.5} />
-                </Link>
-              </article>
-            ))}
-          </div>
+                {location.phone}
+              </a>
+            </div>
+            <Link
+              href="/book"
+              className="mt-8 inline-flex items-center gap-2 text-base font-medium uppercase tracking-[0.1em] text-gold transition hover:text-gold-light"
+            >
+              Reserve a table <ArrowRight size={14} strokeWidth={1.5} />
+            </Link>
+          </article>
         </div>
       </section>
 

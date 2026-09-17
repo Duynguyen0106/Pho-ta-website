@@ -8,7 +8,6 @@ import {
 } from "date-fns";
 import { AdminStatusBadge } from "@/components/admin/AdminStatusBadge";
 import { SEATING_LABELS } from "@/lib/constants";
-import { locations } from "@/lib/data/locations";
 import type { Booking } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -174,8 +173,6 @@ function CalendarBookingCard({
   selected: boolean;
   onSelect: () => void;
 }) {
-  const loc = locations.find((l) => l.slug === booking.locationSlug);
-
   return (
     <button
       type="button"
@@ -193,7 +190,6 @@ function CalendarBookingCard({
           </p>
           <p className="mt-1 text-base text-muted">
             {booking.partySize} guests · {SEATING_LABELS[booking.seatingPreference]}
-            {loc ? ` · ${loc.shortName}` : ""}
             {booking.seatedAtTable ? ` · Table ${booking.seatedAtTable}` : ""}
           </p>
           <p className="mt-1 font-serif text-base text-gold/80">

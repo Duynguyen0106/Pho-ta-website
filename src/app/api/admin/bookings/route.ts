@@ -13,14 +13,13 @@ export async function GET(request: NextRequest) {
   }
 
   const { searchParams } = request.nextUrl;
-  const locationSlug = searchParams.get("location") ?? undefined;
   const date = searchParams.get("date") ?? undefined;
   const from = searchParams.get("from") ?? undefined;
   const to = searchParams.get("to") ?? undefined;
   const status = searchParams.get("status") as BookingStatus | undefined;
 
   const bookings = await listBookings({
-    locationSlug,
+    locationSlug: "finchley-road",
     date,
     from,
     to,

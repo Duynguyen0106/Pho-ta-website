@@ -3,9 +3,12 @@
 import { format } from "date-fns";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
-import { SEATING_PREFERENCES, MAX_PARTY_SIZE } from "@/lib/constants";
-import { locations } from "@/lib/data/locations";
-import type { LocationSlug, SeatingPreference } from "@/lib/types";
+import {
+  LOCATION_SLUG,
+  MAX_PARTY_SIZE,
+  SEATING_PREFERENCES,
+} from "@/lib/constants";
+import type { SeatingPreference } from "@/lib/types";
 
 interface ManualBookingFormProps {
   onCreated: () => void;
@@ -16,7 +19,6 @@ export function ManualBookingForm({ onCreated }: ManualBookingFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [locationSlug, setLocationSlug] = useState<LocationSlug>("finchley-road");
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [time, setTime] = useState("19:00");
   const [partySize, setPartySize] = useState(2);
@@ -37,7 +39,7 @@ export function ManualBookingForm({ onCreated }: ManualBookingFormProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          locationSlug,
+          locationSlug: LOCATION_SLUG,
           date,
           time,
           partySize,
@@ -109,20 +111,6 @@ export function ManualBookingForm({ onCreated }: ManualBookingFormProps) {
       )}
 
       <div className="grid gap-6 sm:grid-cols-2">
-        <label className="block">
-          <span className="label-caps">Location</span>
-          <select
-            value={locationSlug}
-            onChange={(e) => setLocationSlug(e.target.value as LocationSlug)}
-            className="luxury-input mt-3"
-          >
-            {locations.map((loc) => (
-              <option key={loc.slug} value={loc.slug} className="bg-surface">
-                {loc.shortName}
-              </option>
-            ))}
-          </select>
-        </label>
         <label className="block">
           <span className="label-caps">Date</span>
           <input

@@ -3,7 +3,6 @@
 import { format, addDays } from "date-fns";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
-import { locations } from "@/lib/data/locations";
 import type { BlackoutDate } from "@/lib/types";
 
 export function AdminBlackouts() {
@@ -12,7 +11,6 @@ export function AdminBlackouts() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [date, setDate] = useState(format(addDays(new Date(), 1), "yyyy-MM-dd"));
-  const [locationSlug, setLocationSlug] = useState<string>("");
   const [reason, setReason] = useState("");
 
   const fetchBlackouts = useCallback(async () => {
@@ -38,7 +36,6 @@ export function AdminBlackouts() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           date,
-          locationSlug: locationSlug || undefined,
           reason: reason || undefined,
         }),
       });
@@ -100,23 +97,6 @@ export function AdminBlackouts() {
               required
             />
           </label>
-          <label className="block">
-            <span className="label-caps">Location</span>
-            <select
-              value={locationSlug}
-              onChange={(e) => setLocationSlug(e.target.value)}
-              className="luxury-input mt-3"
-            >
-              <option value="" className="bg-surface">
-                Both branches
-              </option>
-              {locations.map((loc) => (
-                <option key={loc.slug} value={loc.slug} className="bg-surface">
-                  {loc.shortName} only
-                </option>
-              ))}
-            </select>
-          </label>
           <label className="block sm:col-span-2">
             <span className="label-caps">Reason (optional)</span>
             <input
@@ -154,13 +134,9 @@ export function AdminBlackouts() {
                       "EEE d MMM yyyy",
                     )}
                   </p>
-                  <p className="mt-2 text-lg text-muted">
-                    {blackout.locationSlug
-                      ? locations.find((l) => l.slug === blackout.locationSlug)
-                          ?.shortName
-                      : "Both branches"}
-                    {blackout.reason ? ` · ${blackout.reason}` : ""}
-                  </p>
+                  {blackout.reason && (
+                    <p className="mt-2 text-lg text-muted">{blackout.reason}</p>
+                  )}
                 </div>
                 <Button
                   type="button"

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/layout/Logo";
-import { locations } from "@/lib/data/locations";
+import { location } from "@/lib/data/locations";
 
 export function Footer() {
   return (
@@ -9,36 +9,33 @@ export function Footer() {
         <div className="lg:col-span-1">
           <Logo href="/" />
           <p className="mt-6 text-lg leading-relaxed text-muted">
-            Refined Vietnamese cuisine in the heart of London. Fresh ingredients,
-            authentic flavours, and warm hospitality at Kentish Town and
-            Finchley Road.
+            Refined Vietnamese cuisine at Pho Ta Finchley Road. Fresh ingredients,
+            authentic flavours, and warm hospitality in South Hampstead.
           </p>
         </div>
 
-        {locations.map((location) => (
-          <div key={location.slug}>
-            <h4 className="text-base font-medium uppercase tracking-[0.16em] text-gold">
-              {location.shortName}
-            </h4>
-            <p className="mt-4 text-lg leading-relaxed text-muted">
-              {location.address}
-              <br />
-              {location.postcode}
-            </p>
-            <a
-              href={`tel:${location.phone.replace(/\s/g, "")}`}
-              className="mt-3 block text-lg text-foreground transition hover:text-gold"
-            >
-              {location.phone}
-            </a>
-            <a
-              href={`mailto:${location.email}`}
-              className="mt-1 block text-lg text-muted transition hover:text-gold"
-            >
-              {location.email}
-            </a>
-          </div>
-        ))}
+        <div>
+          <h4 className="text-base font-medium uppercase tracking-[0.16em] text-gold">
+            Visit us
+          </h4>
+          <p className="mt-4 text-lg leading-relaxed text-muted">
+            {location.address}
+            <br />
+            {location.postcode}
+          </p>
+          <a
+            href={`tel:${location.phone.replace(/\s/g, "")}`}
+            className="mt-3 block text-lg text-foreground transition hover:text-gold"
+          >
+            {location.phone}
+          </a>
+          <a
+            href={`mailto:${location.email}`}
+            className="mt-1 block text-lg text-muted transition hover:text-gold"
+          >
+            {location.email}
+          </a>
+        </div>
 
         <div>
           <h4 className="text-base font-medium uppercase tracking-[0.16em] text-gold">

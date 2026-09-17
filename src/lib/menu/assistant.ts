@@ -10,7 +10,7 @@ export interface AssistantMessage {
   content: string;
 }
 
-const SYSTEM_PROMPT = `You are the Pho Ta menu assistant — a warm, knowledgeable guide for guests browsing Vietnamese cuisine at Pho Ta restaurants in London (Kentish Town and Finchley Road).
+const SYSTEM_PROMPT = `You are the Pho Ta menu assistant — a warm, knowledgeable guide for guests browsing Vietnamese cuisine at Pho Ta Finchley Road in London.
 
 Rules:
 - Answer ONLY using the menu data provided below for the guest's selected location and menu type.

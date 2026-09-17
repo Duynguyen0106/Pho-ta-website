@@ -32,14 +32,14 @@ export const metadata: Metadata = {
     template: "%s | Pho Ta",
   },
   description:
-    "An elevated Vietnamese dining experience at Kentish Town and Finchley Road, London. Reserve your table for refined flavours and warm hospitality.",
+    "An elevated Vietnamese dining experience at Pho Ta Finchley Road, London. Reserve your table for refined flavours and warm hospitality.",
   keywords: [
     "Pho Ta",
     "Vietnamese restaurant",
     "fine dining",
     "London",
     "Finchley Road",
-    "Kentish Town",
+    "South Hampstead",
   ],
   icons: {
     icon: "/images/logo.png",

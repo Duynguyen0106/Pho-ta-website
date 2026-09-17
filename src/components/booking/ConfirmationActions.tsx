@@ -69,7 +69,7 @@ export function ConfirmationActions({ details }: { details: ConfirmationDetails 
       referenceCode: details.referenceCode,
       customerName: details.customerName,
       location: {
-        slug: details.locationSlug as "kentish-town" | "finchley-road",
+        slug: details.locationSlug as "finchley-road",
         name: details.locationName,
         shortName: details.locationShortName,
         address: details.locationAddress,

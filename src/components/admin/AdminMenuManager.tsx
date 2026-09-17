@@ -11,7 +11,6 @@ import type {
   MenuType,
   MenuVariant,
 } from "@/lib/menu/types";
-import { locations } from "@/lib/data/locations";
 import { cn } from "@/lib/utils";
 
 async function menuAction(body: Record<string, unknown>) {
@@ -81,8 +80,7 @@ function AdminTabGroup<T extends string>({
 
 export function AdminMenuManager() {
   const [menu, setMenu] = useState<MenuData | null>(null);
-  const [locationSlug, setLocationSlug] =
-    useState<MenuLocationSlug>("kentish-town");
+  const locationSlug: MenuLocationSlug = "finchley-road";
   const [menuType, setMenuType] = useState<MenuType>("daily");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -310,7 +308,7 @@ export function AdminMenuManager() {
           Menu management
         </h2>
         <p className="mt-2 text-xl text-muted">
-          Edit daily and lunch menus for each branch
+          Edit daily and lunch menus for Pho Ta Finchley Road
         </p>
       </div>
 
@@ -324,14 +322,6 @@ export function AdminMenuManager() {
       )}
 
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <AdminTabGroup
-          value={locationSlug}
-          onChange={setLocationSlug}
-          options={locations.map((l) => ({
-            value: l.slug as MenuLocationSlug,
-            label: l.shortName,
-          }))}
-        />
         <AdminTabGroup
           value={menuType}
           onChange={setMenuType}
@@ -348,10 +338,7 @@ export function AdminMenuManager() {
       {menuType === "lunch" && menu && branchMenu && (
         <div className="luxury-card p-6">
           <label className="block">
-            <span className="label-caps">
-              Lunch hours note —{" "}
-              {locations.find((l) => l.slug === locationSlug)?.shortName}
-            </span>
+            <span className="label-caps">Lunch hours note</span>
             <div className="mt-3 flex flex-wrap gap-3">
               <input
                 value={branchMenu.lunchNote}

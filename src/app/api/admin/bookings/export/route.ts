@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/auth/admin";
 import { SEATING_LABELS, BOOKING_STATUS_LABELS, BOOKING_SOURCE_LABELS } from "@/lib/constants";
-import { locations } from "@/lib/data/locations";
 import { listBookings } from "@/lib/db/store";
 import type { BookingStatus } from "@/lib/types";
 
@@ -20,10 +19,13 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl;
     const date = searchParams.get("date") ?? undefined;
-    const locationSlug = searchParams.get("location") ?? undefined;
     const status = searchParams.get("status") as BookingStatus | undefined;
 
-    const bookings = await listBookings({ date, locationSlug, status });
+    const bookings = await listBookings({
+      date,
+      locationSlug: "finchley-road",
+      status,
+    });
 
     const headers = [
       "Reference",
@@ -34,7 +36,6 @@ export async function GET(request: NextRequest) {
       "Phone",
       "Guests",
       "Seating",
-      "Venue",
       "Status",
       "Source",
       "Table",
@@ -50,7 +51,6 @@ export async function GET(request: NextRequest) {
       b.customerPhone,
       String(b.partySize),
       SEATING_LABELS[b.seatingPreference],
-      locations.find((l) => l.slug === b.locationSlug)?.shortName ?? b.locationSlug,
       BOOKING_STATUS_LABELS[b.status],
       BOOKING_SOURCE_LABELS[b.source],
       b.seatedAtTable ?? "",

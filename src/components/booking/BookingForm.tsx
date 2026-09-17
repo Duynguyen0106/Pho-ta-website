@@ -6,16 +6,12 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { BookingStepper } from "@/components/booking/BookingStepper";
 import { BookingSummary } from "@/components/booking/BookingSummary";
-import { SEATING_PREFERENCES, MAX_PARTY_SIZE } from "@/lib/constants";
-import { locations } from "@/lib/data/locations";
-import type { AvailabilitySlot, LocationSlug, SeatingPreference } from "@/lib/types";
+import { LOCATION_SLUG, MAX_PARTY_SIZE, SEATING_PREFERENCES } from "@/lib/constants";
+import { location } from "@/lib/data/locations";
+import type { AvailabilitySlot, SeatingPreference } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-interface BookingFormProps {
-  defaultLocation?: LocationSlug;
-}
-
-export function BookingForm({ defaultLocation }: BookingFormProps) {
+export function BookingForm() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -23,9 +19,7 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
 
-  const [locationSlug, setLocationSlug] = useState<LocationSlug>(
-    defaultLocation ?? "finchley-road",
-  );
+  const locationSlug = LOCATION_SLUG;
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [partySize, setPartySize] = useState(2);
   const [time, setTime] = useState("");
@@ -38,8 +32,6 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
   const [consent, setConsent] = useState(false);
 
   const maxDate = format(addDays(new Date(), 30), "yyyy-MM-dd");
-  const location = locations.find((l) => l.slug === locationSlug)!;
-
   const fetchSlots = useCallback(async () => {
     setSlotsLoading(true);
     setError(null);
@@ -121,32 +113,14 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
           <div className="space-y-8">
             <header>
               <h2 className="font-display text-4xl font-normal text-foreground">
-                Select your venue
+                Date & guests
               </h2>
               <p className="mt-2 text-lg text-muted">
-                Choose a location, date, and party size to begin
+                Pho Ta {location.shortName} · {location.address}
               </p>
             </header>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              {locations.map((loc) => (
-                <button
-                  key={loc.slug}
-                  type="button"
-                  data-selected={locationSlug === loc.slug}
-                  onClick={() => setLocationSlug(loc.slug)}
-                  className="booking-select-card p-6 text-left"
-                >
-                  <span className="font-display text-2xl text-foreground">
-                    {loc.shortName}
-                  </span>
-                  <p className="mt-2 text-base text-muted">{loc.address}</p>
-                  <p className="mt-1 text-sm text-gold/80">{loc.phone}</p>
-                </button>
-              ))}
-            </div>
-
-            <div className="grid gap-6 border-t border-gold/15 pt-8 sm:grid-cols-2">
+            <div className="grid gap-6 sm:grid-cols-2">
               <label className="block">
                 <span className="label-caps">Date</span>
                 <input
@@ -192,7 +166,7 @@ export function BookingForm({ defaultLocation }: BookingFormProps) {
                 Select a time
               </h2>
               <p className="mt-2 text-lg text-muted">
-                {location.shortName} · {partySize}{" "}
+                Pho Ta {location.shortName} · {partySize}{" "}
                 {partySize === 1 ? "guest" : "guests"} ·{" "}
                 {format(new Date(`${date}T12:00:00`), "EEE d MMM yyyy")}
               </p>

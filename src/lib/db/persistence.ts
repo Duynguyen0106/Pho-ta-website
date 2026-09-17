@@ -9,7 +9,7 @@ export function canPersistBookings(): boolean {
 
 export function bookingPersistenceError(): string {
   if (isServerlessRuntime() || process.env.NODE_ENV === "production") {
-    return "Online booking is temporarily unavailable. Please call Kentish Town on 020 7428 9898 or Finchley Road on 020 7625 6889.";
+    return "Online booking is temporarily unavailable. Please call Pho Ta Finchley Road on 020 7625 6889.";
   }
   return "Booking storage is not configured. Add Supabase credentials to .env.local.";
 }

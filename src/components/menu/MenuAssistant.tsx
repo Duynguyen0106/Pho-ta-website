@@ -3,7 +3,7 @@
 import { MessageCircle, Send, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
-import type { MenuLocationSlug } from "@/lib/menu/types";
+import { LOCATION_SLUG } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 type MenuTab = "daily" | "lunch";
@@ -14,7 +14,6 @@ interface ChatMessage {
 }
 
 interface MenuAssistantProps {
-  locationSlug: MenuLocationSlug;
   menuTab: MenuTab;
   branchLabel: string;
 }
@@ -26,11 +25,7 @@ const SUGGESTIONS = [
   "Vegetarian dishes?",
 ];
 
-export function MenuAssistant({
-  locationSlug,
-  menuTab,
-  branchLabel,
-}: MenuAssistantProps) {
+export function MenuAssistant({ menuTab, branchLabel }: MenuAssistantProps) {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -58,7 +53,7 @@ export function MenuAssistant({
         content: `Showing the ${menuTab === "daily" ? "daily" : "lunch"} menu for ${branchLabel}. What would you like to know?`,
       },
     ]);
-  }, [locationSlug, menuTab, branchLabel]);
+  }, [menuTab, branchLabel]);
 
   async function sendMessage(text: string) {
     const trimmed = text.trim();
@@ -76,7 +71,7 @@ export function MenuAssistant({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: trimmed,
-          locationSlug,
+          locationSlug: LOCATION_SLUG,
           menuType: menuTab,
           history: nextMessages.slice(-8),
         }),

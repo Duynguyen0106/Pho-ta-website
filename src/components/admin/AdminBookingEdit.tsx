@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { MAX_PARTY_SIZE, SEATING_PREFERENCES } from "@/lib/constants";
-import { locations } from "@/lib/data/locations";
-import type { Booking, LocationSlug, SeatingPreference } from "@/lib/types";
+import { LOCATION_SLUG } from "@/lib/constants";
+import type { Booking, SeatingPreference } from "@/lib/types";
 
 interface AdminBookingEditProps {
   booking: Booking;
@@ -20,7 +20,6 @@ export function AdminBookingEdit({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState({
-    locationSlug: booking.locationSlug,
     date: booking.date,
     time: booking.time,
     partySize: booking.partySize,
@@ -40,7 +39,11 @@ export function AdminBookingEdit({
       const res = await fetch("/api/admin/bookings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: booking.id, ...form }),
+        body: JSON.stringify({
+          id: booking.id,
+          locationSlug: LOCATION_SLUG,
+          ...form,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Update failed");
@@ -87,25 +90,6 @@ export function AdminBookingEdit({
         )}
 
         <div className="grid gap-6 sm:grid-cols-2">
-          <label className="block">
-            <span className="label-caps">Location</span>
-            <select
-              value={form.locationSlug}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  locationSlug: e.target.value as LocationSlug,
-                })
-              }
-              className="luxury-input mt-3"
-            >
-              {locations.map((loc) => (
-                <option key={loc.slug} value={loc.slug} className="bg-surface">
-                  {loc.shortName}
-                </option>
-              ))}
-            </select>
-          </label>
           <label className="block">
             <span className="label-caps">Date</span>
             <input

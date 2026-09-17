@@ -15,7 +15,7 @@ export const faqCategories: { title: string; items: FaqItem[] }[] = [
       {
         question: "How far in advance can I book?",
         answer:
-          "Online reservations are available up to 30 days ahead. For larger parties or special occasions, please call your preferred branch and our team will be happy to help.",
+          "Online reservations are available up to 30 days ahead. For larger parties or special occasions, please call us on 020 7625 6889 and our team will be happy to help.",
       },
       {
         question: "Can I change or cancel my booking?",
@@ -35,7 +35,7 @@ export const faqCategories: { title: string; items: FaqItem[] }[] = [
       {
         question: "What are your opening hours?",
         answer:
-          "Both Kentish Town and Finchley Road are open Monday to Sunday, 11:30am – 9:30pm. Lunch specials are available on weekdays — see the menu for details.",
+          "We are open Monday to Sunday, 11:30am – 9:30pm. Lunch specials are available on weekdays — see the menu for details.",
       },
       {
         question: "Do you cater for dietary requirements?",
@@ -55,22 +55,22 @@ export const faqCategories: { title: string; items: FaqItem[] }[] = [
     ],
   },
   {
-    title: "Menu & locations",
+    title: "Menu & visit",
     items: [
       {
-        question: "Are the menus the same at both branches?",
+        question: "What is on the menu?",
         answer:
-          "Each location has its own daily and lunch menus with the same Pho Ta quality and style. Browse the menu page and select Kentish Town or Finchley Road to see what’s served at each venue.",
+          "We serve a full daily menu plus weekday lunch specials — pho, wok & grill, starters, and more. Browse the menu page or ask our menu helper about any dish.",
       },
       {
         question: "Do you offer takeaway or delivery?",
         answer:
-          "Please contact your local branch by phone for takeaway availability. We focus on dine-in service to ensure every dish is served at its best.",
+          "Please call us on 020 7625 6889 for takeaway availability. We focus on dine-in service to ensure every dish is served at its best.",
       },
       {
         question: "Where can I park?",
         answer:
-          "Street parking is available near both restaurants. Kentish Town and Finchley Road are well served by public transport — check our Locations page for addresses and maps.",
+          "Street parking is available near the restaurant. Finchley Road is well served by public transport — see our Visit page for the address and map.",
       },
     ],
   },

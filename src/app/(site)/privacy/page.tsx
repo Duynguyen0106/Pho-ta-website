@@ -5,7 +5,7 @@ import {
   LegalSection,
 } from "@/components/legal/LegalLayout";
 import { LEGAL_CONTACT_EMAIL } from "@/lib/data/legal";
-import { locations } from "@/lib/data/locations";
+import { location } from "@/lib/data/locations";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -22,9 +22,8 @@ export default function PrivacyPage() {
     >
       <LegalSection title="1. Who we are">
         <p>
-          Pho Ta Restaurant operates Vietnamese dining at two locations in
-          London:{" "}
-          {locations.map((l) => `${l.shortName} (${l.address})`).join(" and ")}.
+          Pho Ta Restaurant operates Vietnamese dining at {location.name},{" "}
+          {location.address}, {location.postcode}.
           We are the data controller for personal information collected through
           this website and our online reservation system.
         </p>

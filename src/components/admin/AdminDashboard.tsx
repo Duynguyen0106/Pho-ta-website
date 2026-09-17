@@ -28,7 +28,6 @@ import {
   BOOKING_STATUS_LABELS,
   SEATING_LABELS,
 } from "@/lib/constants";
-import { locations } from "@/lib/data/locations";
 import type { Booking, BookingStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -46,7 +45,6 @@ export function AdminDashboard() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
-  const [location, setLocation] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<BookingStatus | "">("");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Booking | null>(null);
@@ -70,13 +68,12 @@ export function AdminDashboard() {
     } else {
       params.set("date", date);
     }
-    if (location) params.set("location", location);
     if (statusFilter) params.set("status", statusFilter);
     const res = await fetch(`/api/admin/bookings?${params}`);
     const data = await res.json();
     if (res.ok) setBookings(data.bookings);
     setLoading(false);
-  }, [date, location, statusFilter, bookingsLayout]);
+  }, [date, statusFilter, bookingsLayout]);
 
   useEffect(() => {
     fetchBookings();
@@ -147,7 +144,6 @@ export function AdminDashboard() {
 
   function exportCsv() {
     const params = new URLSearchParams({ date });
-    if (location) params.set("location", location);
     if (statusFilter) params.set("status", statusFilter);
     window.location.href = `/api/admin/bookings/export?${params}`;
   }
@@ -215,23 +211,6 @@ export function AdminDashboard() {
                   onChange={(e) => setDate(e.target.value)}
                   className="luxury-input mt-3"
                 />
-              </label>
-              <label className="min-w-[180px] flex-1">
-                <span className="label-caps">Location</span>
-                <select
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="luxury-input mt-3"
-                >
-                  <option value="" className="bg-surface">
-                    All locations
-                  </option>
-                  {locations.map((loc) => (
-                    <option key={loc.slug} value={loc.slug} className="bg-surface">
-                      {loc.shortName}
-                    </option>
-                  ))}
-                </select>
               </label>
               <label className="min-w-[180px] flex-1">
                 <span className="label-caps">Status</span>
@@ -320,11 +299,7 @@ export function AdminDashboard() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {filteredBookings.map((booking) => {
-                    const loc = locations.find(
-                      (l) => l.slug === booking.locationSlug,
-                    );
-                    return (
+                  {filteredBookings.map((booking) => (
                       <button
                         key={booking.id}
                         type="button"
@@ -345,8 +320,7 @@ export function AdminDashboard() {
                             <p className="mt-2 text-lg text-muted">
                               {booking.partySize}{" "}
                               {booking.partySize === 1 ? "guest" : "guests"}{" "}
-                              · {SEATING_LABELS[booking.seatingPreference]} ·{" "}
-                              {loc?.shortName}
+                              · {SEATING_LABELS[booking.seatingPreference]}
                               {booking.seatedAtTable
                                 ? ` · Table ${booking.seatedAtTable}`
                                 : ""}
@@ -361,8 +335,7 @@ export function AdminDashboard() {
                           <AdminStatusBadge status={booking.status} />
                         </div>
                       </button>
-                    );
-                  })}
+                  ))}
                 </div>
               )}
             </div>
@@ -416,13 +389,6 @@ export function AdminDashboard() {
                     <DetailRow
                       label="Seating"
                       value={SEATING_LABELS[selected.seatingPreference]}
-                    />
-                    <DetailRow
-                      label="Venue"
-                      value={
-                        locations.find((l) => l.slug === selected.locationSlug)
-                          ?.shortName ?? selected.locationSlug
-                      }
                     />
                     <div>
                       <dt className="label-caps">Contact</dt>
