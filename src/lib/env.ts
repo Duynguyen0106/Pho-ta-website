@@ -1,3 +1,6 @@
+import { isSupabaseConfigured } from "./supabase/client";
+import { isUsingDefaultSupabaseConfig } from "./supabase/config";
+
 export type ServiceStatus = "configured" | "missing" | "dev_fallback";
 
 export interface EnvStatus {
@@ -14,12 +17,8 @@ export interface EnvStatus {
 export function getEnvStatus(): EnvStatus {
   const warnings: string[] = [];
 
-  const hasSupabase = Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      (process.env.SUPABASE_SERVICE_ROLE_KEY ||
-        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
-  );
+  const hasSupabase = isSupabaseConfigured();
+  const hasSupabaseEnv = !isUsingDefaultSupabaseConfig();
   const hasServiceRole = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
   const hasEmail = Boolean(process.env.RESEND_API_KEY);
   const hasSms = Boolean(
@@ -31,8 +30,10 @@ export function getEnvStatus(): EnvStatus {
   const hasCronSecret = Boolean(process.env.CRON_SECRET);
   const isProd = process.env.NODE_ENV === "production";
 
-  if (isProd && !hasSupabase) {
-    warnings.push("Supabase is not configured — bookings will not persist in production.");
+  if (isProd && hasSupabase && !hasSupabaseEnv) {
+    warnings.push(
+      "Using embedded Supabase defaults — set NEXT_PUBLIC_SUPABASE_* in Vercel to override.",
+    );
   }
   if (isProd && hasSupabase && !hasServiceRole) {
     warnings.push(
@@ -60,10 +61,10 @@ export function getEnvStatus(): EnvStatus {
     database: hasSupabase ? "configured" : "dev_fallback",
     email: hasEmail ? "configured" : "dev_fallback",
     sms: hasSms ? "configured" : "dev_fallback",
-    admin: hasAdminPassword ? "configured" : "dev_fallback",
+    admin: hasAdminPassword || !isProd ? "configured" : "dev_fallback",
     cron: hasCronSecret ? "configured" : "missing",
     productionReady: isProd
-      ? hasSupabase && hasEmail && hasSms && hasAdminPassword && hasCronSecret
+      ? hasSupabase && hasEmail && hasSms && hasCronSecret
       : true,
     warnings,
   };

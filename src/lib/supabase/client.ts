@@ -1,15 +1,18 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import {
+  resolveSupabasePublishableKey,
+  resolveSupabaseUrl,
+} from "./config";
 
-export function getSupabaseUrl(): string | undefined {
-  return process.env.NEXT_PUBLIC_SUPABASE_URL;
+export function getSupabaseUrl(): string {
+  return resolveSupabaseUrl();
 }
 
 /** Server-side key: service role preferred, publishable key as fallback */
-export function getSupabaseServerKey(): string | undefined {
+export function getSupabaseServerKey(): string {
   return (
-    process.env.SUPABASE_SERVICE_ROLE_KEY ??
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() ||
+    resolveSupabasePublishableKey()
   );
 }
 
@@ -20,10 +23,6 @@ export function isSupabaseConfigured(): boolean {
 export function createServerClient(): SupabaseClient {
   const url = getSupabaseUrl();
   const key = getSupabaseServerKey();
-
-  if (!url || !key) {
-    throw new Error("Supabase URL and key are required");
-  }
 
   return createClient(url, key, {
     auth: {
