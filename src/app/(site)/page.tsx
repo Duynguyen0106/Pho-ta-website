@@ -14,7 +14,7 @@ export default function HomePage() {
       <section className="relative flex min-h-[92vh] items-end">
         <Image
           src={siteImages.hero}
-          alt="Pho Ta fine Vietnamese dining"
+          alt="Pho Ta Finchley Road restaurant interior"
           fill
           className="object-cover brightness-[0.55] saturate-[0.85]"
           priority
@@ -68,7 +68,7 @@ export default function HomePage() {
             <div className="relative aspect-[4/5] overflow-hidden">
               <Image
                 src={siteImages.about}
-                alt="Signature Vietnamese dish"
+                alt="Pho Ta Finchley Road cherry blossom interior"
                 fill
                 className="object-cover brightness-90"
               />
