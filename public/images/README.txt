@@ -1,10 +1,11 @@
-Replace these placeholder images with your own Pho Ta restaurant photos:
+Pho Ta website images (sourced from Google Business / photarestaurants.com):
 
-  hero-pho.jpg         — Homepage hero (1920×1080 recommended)
-  bun-cha.jpg          — About section / Bun Cha dish
-  vegetable-pho.jpg    — Vegetable Pho dish
-  special-pho.jpg      — Special Pho dish
-  restaurant-interior.jpg — Restaurant interior (optional gallery)
+  hero-pho.jpg            — Finchley Road interior (cherry blossom tree)
+  about-restaurant.jpg    — Finchley Road interior detail
+  restaurant-interior.jpg — Finchley Road dining room
+  bun-cha.jpg             — Bun Cha signature dish
+  special-pho.jpg         — Special Pho Ta mixed beef
+  vegetable-pho.jpg       — Pho Chay (vegetarian)
+  cha-ca.jpg              — Cha Ca Ha Noi (optional gallery)
 
-Keep the same filenames so the site picks them up automatically.
-Recommended: use photos from your own branches or a professional shoot.
+Run `python3 scripts/enhance-images.py` after replacing source files in /tmp/phota-images.
