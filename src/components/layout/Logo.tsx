@@ -21,9 +21,10 @@ export function Logo({
     <Image
       src="/images/logo.png"
       alt="Pho Ta — Vietnamese restaurant"
-      width={160}
-      height={64}
+      width={392}
+      height={100}
       priority={priority}
+      sizes="(max-width: 640px) 160px, 200px"
       className={cn("h-14 w-auto object-contain sm:h-16", imageClassName)}
     />
   );
