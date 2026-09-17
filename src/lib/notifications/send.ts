@@ -12,9 +12,13 @@ export async function sendBookingConfirmation(
   ]);
 
   if (emailOk || smsOk) {
-    await updateBooking(booking.id, {
-      confirmationSentAt: new Date().toISOString(),
-    });
+    try {
+      await updateBooking(booking.id, {
+        confirmationSentAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("[notify:confirmation:update]", error);
+    }
   }
 }
 
@@ -25,8 +29,12 @@ export async function sendBookingReminder(booking: Booking): Promise<void> {
   ]);
 
   if (emailOk || smsOk) {
-    await updateBooking(booking.id, {
-      reminderSentAt: new Date().toISOString(),
-    });
+    try {
+      await updateBooking(booking.id, {
+        reminderSentAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("[notify:reminder:update]", error);
+    }
   }
 }

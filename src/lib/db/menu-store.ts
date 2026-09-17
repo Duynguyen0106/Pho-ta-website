@@ -3,6 +3,7 @@ import path from "path";
 import { randomUUID } from "crypto";
 import { buildSeedMenu } from "@/lib/menu/normalize";
 import { getBranchMenu, normalizeMenuData } from "@/lib/menu/migrate";
+import { getDataDir } from "@/lib/db/data-dir";
 import {
   createServerClient,
   isSupabaseConfigured,
@@ -19,8 +20,9 @@ import type {
   UpdateMenuItemInput,
 } from "@/lib/menu/types";
 
-const DATA_DIR = path.join(process.cwd(), ".data");
-const MENU_FILE = path.join(DATA_DIR, "menu.json");
+function menuFile(): string {
+  return path.join(getDataDir(), "menu.json");
+}
 
 let menuCache: MenuData | null = null;
 
@@ -34,7 +36,7 @@ function getSupabase() {
 
 async function readLocalMenu(): Promise<MenuData | null> {
   try {
-    const raw = await fs.readFile(MENU_FILE, "utf-8");
+    const raw = await fs.readFile(menuFile(), "utf-8");
     return normalizeMenuData(JSON.parse(raw));
   } catch {
     return null;
@@ -43,8 +45,9 @@ async function readLocalMenu(): Promise<MenuData | null> {
 
 async function writeLocalMenu(menu: MenuData): Promise<void> {
   menuCache = menu;
-  await fs.mkdir(DATA_DIR, { recursive: true });
-  await fs.writeFile(MENU_FILE, JSON.stringify(menu, null, 2));
+  const dataDir = getDataDir();
+  await fs.mkdir(dataDir, { recursive: true });
+  await fs.writeFile(menuFile(), JSON.stringify(menu, null, 2));
 }
 
 async function readSupabaseMenu(): Promise<MenuData | null> {

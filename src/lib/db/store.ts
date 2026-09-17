@@ -6,6 +6,7 @@ import {
   createServerClient,
   isSupabaseConfigured,
 } from "../supabase/client";
+import { getDataDir } from "./data-dir";
 import type {
   Booking,
   BookingStatus,
@@ -13,9 +14,13 @@ import type {
   Customer,
 } from "../types";
 
-const DATA_DIR = path.join(process.cwd(), ".data");
-const BOOKINGS_FILE = path.join(DATA_DIR, "bookings.json");
-const CUSTOMERS_FILE = path.join(DATA_DIR, "customers.json");
+function bookingsFile(): string {
+  return path.join(getDataDir(), "bookings.json");
+}
+
+function customersFile(): string {
+  return path.join(getDataDir(), "customers.json");
+}
 
 interface LocalStore {
   bookings: Booking[];
@@ -35,11 +40,13 @@ function getSupabase() {
 async function readLocalStore(): Promise<LocalStore> {
   if (localStoreCache) return localStoreCache;
 
+  const dataDir = getDataDir();
+
   try {
-    await fs.mkdir(DATA_DIR, { recursive: true });
+    await fs.mkdir(dataDir, { recursive: true });
     const [bookingsRaw, customersRaw] = await Promise.all([
-      fs.readFile(BOOKINGS_FILE, "utf-8").catch(() => "[]"),
-      fs.readFile(CUSTOMERS_FILE, "utf-8").catch(() => "[]"),
+      fs.readFile(bookingsFile(), "utf-8").catch(() => "[]"),
+      fs.readFile(customersFile(), "utf-8").catch(() => "[]"),
     ]);
     localStoreCache = {
       bookings: JSON.parse(bookingsRaw) as Booking[],
@@ -54,10 +61,11 @@ async function readLocalStore(): Promise<LocalStore> {
 
 async function writeLocalStore(store: LocalStore): Promise<void> {
   localStoreCache = store;
-  await fs.mkdir(DATA_DIR, { recursive: true });
+  const dataDir = getDataDir();
+  await fs.mkdir(dataDir, { recursive: true });
   await Promise.all([
-    fs.writeFile(BOOKINGS_FILE, JSON.stringify(store.bookings, null, 2)),
-    fs.writeFile(CUSTOMERS_FILE, JSON.stringify(store.customers, null, 2)),
+    fs.writeFile(bookingsFile(), JSON.stringify(store.bookings, null, 2)),
+    fs.writeFile(customersFile(), JSON.stringify(store.customers, null, 2)),
   ]);
 }
 
@@ -106,12 +114,22 @@ export async function findOrCreateCustomer(input: {
 
   if (useSupabase()) {
     const supabase = getSupabase();
-    const { data: existing } = await supabase
+
+    const { data: byEmail } = await supabase
       .from("customers")
       .select("*")
-      .or(`email.eq.${normalizedEmail},phone.eq.${normalizedPhone}`)
-      .limit(1)
+      .eq("email", normalizedEmail)
       .maybeSingle();
+
+    const existing =
+      byEmail ??
+      (
+        await supabase
+          .from("customers")
+          .select("*")
+          .eq("phone", normalizedPhone)
+          .maybeSingle()
+      ).data;
 
     if (existing) {
       return {

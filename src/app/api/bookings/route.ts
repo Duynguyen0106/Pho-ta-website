@@ -1,11 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isSlotAvailable } from "@/lib/bookings/availability";
+import {
+  bookingPersistenceError,
+  canPersistBookings,
+} from "@/lib/db/persistence";
 import { createBooking } from "@/lib/db/store";
 import { sendBookingConfirmation } from "@/lib/notifications/send";
 import { bookingSchema } from "@/lib/validation/booking";
 
 export async function POST(request: NextRequest) {
   try {
+    if (!canPersistBookings()) {
+      return NextResponse.json(
+        { error: bookingPersistenceError() },
+        { status: 503 },
+      );
+    }
+
     const body = await request.json();
     const parsed = bookingSchema.safeParse(body);
 
@@ -43,7 +54,12 @@ export async function POST(request: NextRequest) {
       specialRequests: data.specialRequests,
     });
 
-    await sendBookingConfirmation(booking);
+    try {
+      await sendBookingConfirmation(booking);
+    } catch (notifyError) {
+      // Booking is saved — do not fail the request if email/SMS fails
+      console.error("[api/bookings:notify]", notifyError);
+    }
 
     return NextResponse.json({
       id: booking.id,
@@ -51,8 +67,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("[api/bookings]", error);
+    const message =
+      error instanceof Error ? error.message : "Failed to create booking";
     return NextResponse.json(
-      { error: "Failed to create booking" },
+      { error: message.includes("Supabase") ? bookingPersistenceError() : message },
       { status: 500 },
     );
   }
