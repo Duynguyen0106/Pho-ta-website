@@ -4,12 +4,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Logo } from "@/components/layout/Logo";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/menu", label: "Menu" },
   { href: "/locations", label: "Locations" },
+  { href: "/faq", label: "Q&A" },
+  { href: "/food-safety", label: "Allergies" },
   { href: "/book", label: "Reservations" },
 ];
 
@@ -36,22 +39,10 @@ export function Header() {
           : "border-gold/15 bg-background/95 backdrop-blur-xl shadow-sm",
       )}
     >
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-        <Link href="/" className="group text-center">
-          <span
-            className={cn(
-              "font-display text-4xl font-normal tracking-[0.08em]",
-              onHero ? "text-white" : "text-foreground",
-            )}
-          >
-            Pho Ta
-          </span>
-          <span className="mt-1 block text-xs uppercase tracking-[0.32em] text-gold-light">
-            Fine Vietnamese
-          </span>
-        </Link>
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
+        <Logo priority={isHome} />
 
-        <nav className="hidden items-center gap-10 md:flex">
+        <nav className="hidden items-center gap-8 lg:flex xl:gap-10">
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -61,7 +52,7 @@ export function Header() {
                 pathname === link.href
                   ? "text-gold"
                   : onHero
-                    ? "text-white hover:text-white"
+                    ? "text-white/95 hover:text-white"
                     : "text-muted hover:text-foreground",
               )}
             >
@@ -73,7 +64,7 @@ export function Header() {
         <Link
           href="/book"
           className={cn(
-            "hidden border px-7 py-3 text-base font-medium uppercase tracking-[0.1em] transition md:inline-block",
+            "hidden border px-6 py-3 text-base font-medium uppercase tracking-[0.1em] transition lg:inline-block",
             onHero
               ? "border-white text-white hover:bg-white hover:text-foreground"
               : "border-gold text-gold hover:bg-gold hover:text-white",
@@ -93,7 +84,7 @@ export function Header() {
       </div>
 
       {open && (
-        <nav className="border-t border-gold/15 bg-background px-6 py-6 md:hidden">
+        <nav className="border-t border-gold/15 bg-background px-6 py-6 lg:hidden">
           <div className="flex flex-col gap-5">
             {navLinks.map((link) => (
               <Link
@@ -108,6 +99,13 @@ export function Header() {
                 {link.label}
               </Link>
             ))}
+            <Link
+              href="/book"
+              onClick={() => setOpen(false)}
+              className="mt-2 border border-gold px-6 py-3 text-center text-lg font-medium uppercase tracking-[0.1em] text-gold"
+            >
+              Reserve
+            </Link>
           </div>
         </nav>
       )}

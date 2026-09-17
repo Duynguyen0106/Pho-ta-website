@@ -88,6 +88,21 @@ create policy "Allow select bookings"
   on bookings for select using (true);
 create policy "Allow update bookings"
   on bookings for update using (true);
+create policy "Allow update customers"
+  on customers for update using (true);
+
+alter table blackout_dates enable row level security;
+
+drop policy if exists "Allow select blackouts" on blackout_dates;
+drop policy if exists "Allow insert blackouts" on blackout_dates;
+drop policy if exists "Allow delete blackouts" on blackout_dates;
+
+create policy "Allow select blackouts"
+  on blackout_dates for select using (true);
+create policy "Allow insert blackouts"
+  on blackout_dates for insert with check (true);
+create policy "Allow delete blackouts"
+  on blackout_dates for delete using (true);
 
 -- Menu (JSON snapshot for admin CRUD)
 create table if not exists menu_settings (

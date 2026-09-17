@@ -45,6 +45,12 @@ export const BOOKING_STATUS_LABELS = {
   no_show: "No show",
 } as const;
 
+export const BOOKING_SOURCE_LABELS = {
+  website: "Website",
+  phone: "Phone",
+  walk_in: "Walk-in",
+} as const;
+
 export const MAX_PARTY_SIZE = 12;
 export const MIN_PARTY_SIZE = 1;
 export const MAX_ADVANCE_DAYS = 30;

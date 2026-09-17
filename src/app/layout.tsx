@@ -41,6 +41,10 @@ export const metadata: Metadata = {
     "Finchley Road",
     "Kentish Town",
   ],
+  icons: {
+    icon: "/images/logo.jpg",
+    apple: "/images/logo.jpg",
+  },
 };
 
 export default function RootLayout({

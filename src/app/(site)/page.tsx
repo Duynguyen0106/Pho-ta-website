@@ -1,11 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, MapPin, Clock } from "lucide-react";
+import { ArrowRight, MapPin, Clock, HelpCircle, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { featuredDishes } from "@/lib/data/menu";
 import { locations } from "@/lib/data/locations";
 import { siteImages } from "@/lib/data/images";
+import { faqCategories } from "@/lib/data/faq";
 
 export default function HomePage() {
   return (
@@ -176,8 +177,65 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Guest information */}
+      <section className="border-t border-gold/10 bg-surface-alt py-28">
+        <div className="mx-auto max-w-6xl px-6">
+          <SectionHeading
+            eyebrow="Plan your visit"
+            title="Questions, hygiene & allergies"
+            description="Helpful information before you dine with us."
+          />
+
+          <div className="mt-16 grid gap-8 md:grid-cols-2">
+            <Link
+              href="/faq"
+              className="group luxury-card p-10 transition duration-300"
+            >
+              <HelpCircle
+                size={32}
+                className="text-gold"
+                strokeWidth={1.25}
+              />
+              <h3 className="mt-6 font-display text-4xl font-normal text-foreground">
+                Questions & Answers
+              </h3>
+              <p className="mt-4 text-xl leading-relaxed text-muted">
+                Reservations, opening hours, dietary requirements, parking, and
+                more —{" "}
+                {faqCategories.reduce((n, c) => n + c.items.length, 0)} topics
+                covered.
+              </p>
+              <span className="mt-8 inline-flex items-center gap-2 text-base font-medium uppercase tracking-[0.1em] text-gold group-hover:text-gold-light">
+                Read Q&A <ArrowRight size={16} strokeWidth={1.5} />
+              </span>
+            </Link>
+
+            <Link
+              href="/food-safety"
+              className="group luxury-card p-10 transition duration-300"
+            >
+              <ShieldCheck
+                size={32}
+                className="text-gold"
+                strokeWidth={1.25}
+              />
+              <h3 className="mt-6 font-display text-4xl font-normal text-foreground">
+                Food hygiene & allergies
+              </h3>
+              <p className="mt-4 text-xl leading-relaxed text-muted">
+                Our food safety standards and allergen guidance for the 14 major
+                allergens — please read if you or a guest has dietary needs.
+              </p>
+              <span className="mt-8 inline-flex items-center gap-2 text-base font-medium uppercase tracking-[0.1em] text-gold group-hover:text-gold-light">
+                Allergen info <ArrowRight size={16} strokeWidth={1.5} />
+              </span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
-      <section className="border-t border-gold/10 bg-surface-alt py-24">
+      <section className="border-t border-gold/10 bg-background py-24">
         <div className="mx-auto max-w-2xl px-6 text-center">
           <p className="text-base uppercase tracking-[0.16em] text-gold">
             Reservations
@@ -187,7 +245,7 @@ export default function HomePage() {
           </h2>
           <p className="mt-5 text-xl leading-relaxed text-muted">
             Secure your table in moments. Select your preferred seating and
-            receive confirmation by email and SMS.
+            receive confirmation by email.
           </p>
           <Link href="/book" className="mt-10 inline-block">
             <Button size="lg">Book a Table</Button>
