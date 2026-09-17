@@ -1,18 +1,26 @@
 @import "tailwindcss";
 
 :root {
-  --background: #faf7f2;
-  --foreground: #2d2d2d;
-  --primary: #1a3c34;
-  --accent: #c9a962;
-  --muted: #5c534a;
+  --background: #0a0908;
+  --foreground: #f5f0e6;
+  --surface: #12100e;
+  --surface-elevated: #1a1714;
+  --gold: #c9a962;
+  --gold-light: #dfc488;
+  --gold-muted: rgba(201, 169, 98, 0.45);
+  --muted: #9a9085;
+  --border: rgba(201, 169, 98, 0.22);
+  --border-subtle: rgba(245, 240, 230, 0.08);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-gold: var(--gold);
+  --color-surface: var(--surface);
   --font-sans: var(--font-dm-sans);
-  --font-serif: var(--font-playfair);
+  --font-serif: var(--font-cormorant);
+  --font-display: var(--font-cormorant);
 }
 
 body {
@@ -20,6 +28,54 @@ body {
   color: var(--foreground);
 }
 
-.font-serif {
-  font-family: var(--font-playfair), Georgia, serif;
+.font-serif,
+.font-display {
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+}
+
+/* Subtle luxury grain overlay */
+.luxury-grain::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.gold-line {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--gold-muted) 20%,
+    var(--gold) 50%,
+    var(--gold-muted) 80%,
+    transparent
+  );
+}
+
+.luxury-input {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--foreground);
+  padding: 0.875rem 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.luxury-input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px rgba(201, 169, 98, 0.15);
+}
+
+.luxury-card {
+  border: 1px solid var(--border);
+  background: var(--surface-elevated);
+}
+
+.luxury-card:hover {
+  border-color: var(--gold-muted);
 }

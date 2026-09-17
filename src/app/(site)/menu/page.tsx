@@ -1,51 +1,57 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { Button } from "@/components/ui/Button";
 import { menuCategories } from "@/lib/data/menu";
 
 export const metadata: Metadata = {
   title: "Menu",
-  description: "Explore Pho Ta's menu — pho, bun cha, rice dishes, starters, and drinks.",
+  description: "Explore Pho Ta's refined Vietnamese menu — pho, bun cha, and seasonal selections.",
 };
 
 export default function MenuPage() {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
-      <div className="text-center">
-        <p className="text-sm uppercase tracking-[0.2em] text-[#c9a962]">Our Menu</p>
-        <h1 className="mt-2 font-serif text-4xl text-[#1a3c34]">Flavourful & Fresh</h1>
-        <p className="mx-auto mt-4 max-w-lg text-[#5c534a]">
-          Healthy, delicious Vietnamese food with fresh ingredients. We cater to
-          vegetarian, vegan, and other dietary requirements.
-        </p>
-      </div>
+    <div className="mx-auto max-w-4xl px-6 py-24">
+      <SectionHeading
+        eyebrow="Cuisine"
+        title="The Menu"
+        description="Each dish is prepared with premium ingredients and the reverence of Vietnamese culinary tradition."
+      />
 
-      <div className="mt-16 space-y-14">
+      <div className="mt-24 space-y-20">
         {menuCategories.map((category) => (
           <section key={category.id}>
-            <h2 className="border-b border-[#e8e0d4] pb-3 font-serif text-2xl text-[#1a3c34]">
-              {category.name}
-            </h2>
-            <ul className="mt-6 divide-y divide-[#e8e0d4]">
+            <div className="flex items-end justify-between border-b border-[#c9a962]/20 pb-4">
+              <h2 className="font-serif text-3xl font-light text-[#f5f0e6]">
+                {category.name}
+              </h2>
+            </div>
+            <ul className="mt-8 space-y-0">
               {category.items.map((item) => (
                 <li
                   key={item.name}
-                  className="flex flex-col gap-2 py-5 sm:flex-row sm:items-start sm:justify-between"
+                  className="flex flex-col gap-3 border-b border-[#c9a962]/8 py-8 sm:flex-row sm:items-start sm:justify-between"
                 >
                   <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="font-medium text-[#1a3c34]">{item.name}</h3>
+                    <div className="flex flex-wrap items-baseline gap-3">
+                      <h3 className="font-serif text-xl font-light text-[#f5f0e6]">
+                        {item.name}
+                      </h3>
                       {item.tags?.map((tag) => (
                         <span
                           key={tag}
-                          className="rounded-full bg-[#1a3c34]/10 px-2 py-0.5 text-xs text-[#1a3c34]"
+                          className="text-[9px] uppercase tracking-[0.2em] text-[#c9a962]"
                         >
                           {tag}
                         </span>
                       ))}
                     </div>
-                    <p className="mt-1 text-sm text-[#5c534a]">{item.description}</p>
+                    <p className="mt-2 max-w-lg text-sm leading-relaxed text-[#9a9085]">
+                      {item.description}
+                    </p>
                   </div>
                   {item.price && (
-                    <span className="shrink-0 font-medium text-[#c9a962]">
+                    <span className="shrink-0 font-serif text-lg text-[#c9a962]">
                       {item.price}
                     </span>
                   )}
@@ -56,9 +62,15 @@ export default function MenuPage() {
         ))}
       </div>
 
-      <p className="mt-12 text-center text-sm text-[#8a7f72]">
-        Prices are indicative. Please ask your server about daily specials and extras.
+      <p className="mt-16 text-center text-[11px] uppercase tracking-[0.2em] text-[#6b635a]">
+        Seasonal availability · Please enquire with your server
       </p>
+
+      <div className="mt-12 text-center">
+        <Link href="/book">
+          <Button size="lg">Reserve a Table</Button>
+        </Link>
+      </div>
     </div>
   );
 }
