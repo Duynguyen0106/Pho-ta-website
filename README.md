@@ -58,14 +58,37 @@ npm run check-setup
    - `TWILIO_AUTH_TOKEN`
    - `TWILIO_PHONE_NUMBER`
 
-### Step 4 — Deploy to Vercel
+### Step 4 — Deploy to Vercel (one project only)
 
-1. Push this repo to GitHub
-2. Import project at [vercel.com](https://vercel.com) → connect your repo
-3. Add all variables from `.env.example` in **Settings → Environment Variables**
+This repo should be connected to **exactly one** Vercel project. If you imported the GitHub repo twice, you will get two live URLs:
+
+| URL | Vercel project | Action |
+|-----|----------------|--------|
+| **https://phota.vercel.app** | `phota` | **Keep** — use this as staging until your custom domain is live |
+| https://pho-ta-website.vercel.app | `pho-ta-website` | **Delete** — duplicate of the same codebase |
+
+**Why two URLs?** Each Vercel project gets its own `*.vercel.app` subdomain. Both projects were linked to `github.com/Duynguyen0106/Pho-ta-website`, so every push deploys twice.
+
+**Remove the duplicate:**
+
+1. Open [vercel.com/dashboard](https://vercel.com/dashboard)
+2. Open the **`pho-ta-website`** project (not `phota`)
+3. **Settings → General → Delete Project**
+4. Keep the **`phota`** project only
+
+**Configure the remaining project (`phota`):**
+
+1. **Settings → Git** — confirm it is connected to `Duynguyen0106/Pho-ta-website`, Production branch = `main`
+2. **Settings → Environment Variables** — add all variables from `.env.example`
+3. Set `NEXT_PUBLIC_SITE_URL=https://phota.vercel.app` until `photarestaurants.com` is connected (then switch to `https://www.photarestaurants.com`)
 4. Generate a cron secret: `openssl rand -hex 32` → `CRON_SECRET`
-5. Set a strong `ADMIN_PASSWORD` for staff login
+5. Set `ADMIN_PASSWORD` for staff login
 6. Deploy — daily reminder cron runs at **9:00 UTC** via `vercel.json` (Vercel Hobby). Set `REMINDER_MODE=daily` (default).
+
+**Canonical URLs:**
+
+- Staging (before custom domain): **https://phota.vercel.app**
+- Production (final): **https://www.photarestaurants.com**
 
 ### Step 5 — Connect domain
 
