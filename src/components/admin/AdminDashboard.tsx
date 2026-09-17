@@ -74,8 +74,8 @@ export function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-[#f5f2ed]">
-      <header className="border-b border-[#e8e0d4] bg-[#1a3c34] px-4 py-4 text-[#faf7f2] sm:px-6">
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
+      <header className="border-b border-[#e8e0d4] bg-[#1a3c34] text-[#faf7f2]">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
           <div>
             <h1 className="font-serif text-xl">Pho Ta Admin</h1>
             <p className="text-sm text-[#c9d5d0]">
@@ -91,33 +91,39 @@ export function AdminDashboard() {
             Log out
           </Button>
         </div>
+
+        <nav
+          aria-label="Admin sections"
+          className="border-t border-[#c9a962]/20 bg-[#153029]"
+        >
+          <div className="mx-auto flex max-w-6xl gap-1 px-4 sm:px-6">
+            {(
+              [
+                { id: "bookings" as const, label: "Bookings" },
+                { id: "menu" as const, label: "Menu" },
+              ] as const
+            ).map(({ id, label }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setView(id)}
+                aria-current={view === id ? "page" : undefined}
+                className={cn(
+                  "border-b-2 px-6 py-3 text-sm font-medium transition",
+                  view === id
+                    ? "border-[#c9a962] text-[#c9a962]"
+                    : "border-transparent text-[#c9d5d0] hover:border-[#c9a962]/40 hover:text-white",
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </nav>
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         <AdminHelp />
-
-        <div className="mb-6 inline-flex rounded-lg border border-[#e8e0d4] bg-white p-1">
-          {(
-            [
-              { id: "bookings" as const, label: "Bookings" },
-              { id: "menu" as const, label: "Menu" },
-            ] as const
-          ).map(({ id, label }) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => setView(id)}
-              className={cn(
-                "rounded-md px-5 py-2 text-sm transition",
-                view === id
-                  ? "bg-[#1a3c34] text-white"
-                  : "text-[#5c534a] hover:bg-[#f5f2ed]",
-              )}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
 
         {view === "menu" ? (
           <AdminMenuManager />

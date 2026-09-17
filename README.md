@@ -18,7 +18,7 @@ npm run dev
 ```
 
 - Site: http://localhost:3000
-- Admin: http://localhost:3000/admin/login (dev password: `phota-admin-dev`)
+- Admin: http://localhost:3000/admin/login (dev password: `123456`)
 - Health check: http://localhost:3000/api/health
 
 Validate your environment:
