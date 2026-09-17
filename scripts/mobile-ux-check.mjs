@@ -74,7 +74,7 @@ await page.goto("/menu");
 await page.waitForTimeout(500);
 results.push(await auditPage(page, "mobile_menu_top"));
 
-const rail = page.locator('[role="tablist"][aria-label="Menu categories"]');
+const rail = page.locator(".md\\:hidden [aria-label='Menu categories']");
 if (await rail.count()) {
   const before = await rail.evaluate((el) => el.scrollLeft);
   await rail.evaluate((el) => {
