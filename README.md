@@ -37,7 +37,10 @@ npm run check-setup
 2. Open **SQL Editor** → paste and run `supabase/schema.sql`
 3. Go to **Project Settings → API** and copy:
    - Project URL → `NEXT_PUBLIC_SUPABASE_URL`
-   - `service_role` key → `SUPABASE_SERVICE_ROLE_KEY` (keep secret)
+   - Publishable key → `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+   - (Optional) `service_role` key → `SUPABASE_SERVICE_ROLE_KEY` (keep secret)
+4. Run **`supabase/setup-complete.sql`** in the SQL Editor (creates tables + RLS policies)
+5. Verify: `npm run test-db`
 
 ### Step 2 — Email (Resend)
 
@@ -90,7 +93,8 @@ Share the admin URL and password with managers only:
 |----------|---------|
 | `NEXT_PUBLIC_SITE_URL` | Public site URL for links |
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `SUPABASE_SERVICE_ROLE_KEY` | Database access (server only) |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase publishable key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Optional — server admin access (bypasses RLS) |
 | `RESEND_API_KEY` | Transactional email |
 | `EMAIL_FROM` | Sender address |
 | `TWILIO_*` | SMS confirmations and reminders |

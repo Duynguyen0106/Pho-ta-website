@@ -1,7 +1,10 @@
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { promises as fs } from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
+import {
+  createServerClient,
+  isSupabaseConfigured,
+} from "../supabase/client";
 import type {
   Booking,
   BookingStatus,
@@ -21,17 +24,11 @@ interface LocalStore {
 let localStoreCache: LocalStore | null = null;
 
 function useSupabase(): boolean {
-  return Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      process.env.SUPABASE_SERVICE_ROLE_KEY,
-  );
+  return isSupabaseConfigured();
 }
 
-function getSupabase(): SupabaseClient {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
+function getSupabase() {
+  return createServerClient();
 }
 
 async function readLocalStore(): Promise<LocalStore> {

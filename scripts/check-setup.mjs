@@ -12,9 +12,14 @@ const checks = [
     required: "production",
   },
   {
+    name: "Supabase publishable key",
+    key: "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+    required: "production",
+  },
+  {
     name: "Supabase service role key",
     key: "SUPABASE_SERVICE_ROLE_KEY",
-    required: "production",
+    required: "recommended",
   },
   { name: "Resend API key", key: "RESEND_API_KEY", required: "production" },
   { name: "Email sender", key: "EMAIL_FROM", required: "recommended" },

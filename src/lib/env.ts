@@ -16,8 +16,11 @@ export function getEnvStatus(): EnvStatus {
 
   const hasSupabase = Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      process.env.SUPABASE_SERVICE_ROLE_KEY,
+      (process.env.SUPABASE_SERVICE_ROLE_KEY ||
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
   );
+  const hasServiceRole = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
   const hasEmail = Boolean(process.env.RESEND_API_KEY);
   const hasSms = Boolean(
     process.env.TWILIO_ACCOUNT_SID &&
@@ -30,6 +33,11 @@ export function getEnvStatus(): EnvStatus {
 
   if (isProd && !hasSupabase) {
     warnings.push("Supabase is not configured — bookings will not persist in production.");
+  }
+  if (isProd && hasSupabase && !hasServiceRole) {
+    warnings.push(
+      "Using publishable key only — add SUPABASE_SERVICE_ROLE_KEY for production, or ensure rls-policies.sql is applied.",
+    );
   }
   if (isProd && !hasEmail) {
     warnings.push("Resend is not configured — confirmation emails will not be sent.");

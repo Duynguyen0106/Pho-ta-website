@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "check-setup": "node scripts/check-setup.mjs"
+    "check-setup": "node scripts/check-setup.mjs",
+    "test-db": "node scripts/test-supabase.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.116.0",
