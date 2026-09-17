@@ -56,6 +56,10 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-[#245046] py-4 text-center text-xs text-[#8aa39a]">
+        <Link href="/privacy" className="hover:text-[#c9a962]">
+          Privacy Policy
+        </Link>
+        <span className="mx-2">·</span>
         © {new Date().getFullYear()} Pho Ta Restaurant. All rights reserved.
       </div>
     </footer>

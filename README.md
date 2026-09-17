@@ -7,7 +7,7 @@ Modern website and booking system for [Pho Ta](https://www.photarestaurants.com/
 - **Public website** — Home, menu, locations, elegant Vietnamese branding
 - **Online booking** — Party size + seating preference (side, centre, near window, quiet)
 - **Confirmations** — Email and SMS on booking (via Resend + Twilio)
-- **Reminders** — Automated email + SMS 2 hours before reservation
+- **Reminders** — Automated email + SMS (daily on Vercel Hobby, or 2h before with Pro/external cron)
 - **Admin dashboard** — Manage bookings, phone/walk-in entries, customer info
 
 ## Quick start (local)
@@ -65,7 +65,7 @@ npm run check-setup
 3. Add all variables from `.env.example` in **Settings → Environment Variables**
 4. Generate a cron secret: `openssl rand -hex 32` → `CRON_SECRET`
 5. Set a strong `ADMIN_PASSWORD` for staff login
-6. Deploy — cron reminders run automatically via `vercel.json`
+6. Deploy — daily reminder cron runs at **9:00 UTC** via `vercel.json` (Vercel Hobby). Set `REMINDER_MODE=daily` (default).
 
 ### Step 5 — Connect domain
 
@@ -100,8 +100,27 @@ Share the admin URL and password with managers only:
 | `TWILIO_*` | SMS confirmations and reminders |
 | `ADMIN_PASSWORD` | Staff dashboard login |
 | `CRON_SECRET` | Secures `/api/cron/reminders` |
+| `REMINDER_MODE` | `daily` (Hobby default) or `two_hours` (Pro / cron-job.org) |
 
 Without Supabase credentials, bookings are stored locally in `.data/` for development only.
+
+### Vercel env vars checklist
+
+Copy these into **Project → Settings → Environment Variables** (all three environments):
+
+```
+NEXT_PUBLIC_SITE_URL=https://www.photarestaurants.com
+NEXT_PUBLIC_SUPABASE_URL=https://sccrvdqrllsgnxctyrhr.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-key
+RESEND_API_KEY=your-key
+EMAIL_FROM=Pho Ta <bookings@photarestaurants.com>
+TWILIO_ACCOUNT_SID=your-sid
+TWILIO_AUTH_TOKEN=your-token
+TWILIO_PHONE_NUMBER=+44...
+ADMIN_PASSWORD=your-strong-password
+CRON_SECRET=your-generated-secret
+REMINDER_MODE=daily
+```
 
 ## Project structure
 
