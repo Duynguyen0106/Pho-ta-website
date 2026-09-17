@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowRight } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { MenuAssistant } from "@/components/menu/MenuAssistant";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
@@ -134,11 +134,156 @@ function MenuItemRow({ item }: { item: MenuItem }) {
   );
 }
 
+function categoryPillLabel(name: string): string {
+  const labels: Record<string, string> = {
+    STARTERS: "Starters",
+    "VIETNAMESE NOM SALAD": "Salads",
+    "CHEF’s SPECIAL MENU": "Chef's special",
+    "MAIN COURSES PHO SOUP STYLE": "Pho & noodles",
+    "WOK AND GRILL": "Wok & grill",
+    "VIETNAMESE BROKEN RICE": "Broken rice",
+    "VEGETERIAN MENU": "Vegetarian",
+    "KID’s CORNER": "Kids",
+    "Noodle Soup": "Noodle soup",
+    "Wok & Grill": "Wok & grill",
+    "Broken Rice": "Broken rice",
+  };
+  return labels[name] ?? name.replace(/\s+MENU$/i, "").trim();
+}
+
+function CategoryScrollBar({
+  categories,
+  activeCategory,
+  onSelect,
+}: {
+  categories: MenuCategory[];
+  activeCategory: string | null;
+  onSelect: (id: string) => void;
+}) {
+  const railRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateScrollState = useCallback(() => {
+    const rail = railRef.current;
+    if (!rail) return;
+    const maxScroll = rail.scrollWidth - rail.clientWidth;
+    setCanScrollLeft(rail.scrollLeft > 8);
+    setCanScrollRight(maxScroll > 8 && rail.scrollLeft < maxScroll - 8);
+  }, []);
+
+  useEffect(() => {
+    updateScrollState();
+    const rail = railRef.current;
+    if (!rail) return;
+
+    const observer = new ResizeObserver(updateScrollState);
+    observer.observe(rail);
+    window.addEventListener("resize", updateScrollState);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", updateScrollState);
+    };
+  }, [categories, updateScrollState]);
+
+  useEffect(() => {
+    if (!activeCategory) return;
+    const pill = document.getElementById(`menu-cat-${activeCategory}`);
+    pill?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "center",
+    });
+  }, [activeCategory]);
+
+  function scrollByAmount(direction: "left" | "right") {
+    railRef.current?.scrollBy({
+      left: direction === "left" ? -220 : 220,
+      behavior: "smooth",
+    });
+  }
+
+  if (categories.length <= 1) return null;
+
+  return (
+    <div className="relative min-w-0 w-full">
+      {canScrollLeft && (
+        <>
+          <div
+            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-background via-background/90 to-transparent sm:w-12"
+            aria-hidden
+          />
+          <button
+            type="button"
+            onClick={() => scrollByAmount("left")}
+            className="absolute left-0 top-1/2 z-20 hidden -translate-y-1/2 rounded-full border border-gold/30 bg-background/95 p-1.5 text-gold shadow-sm transition hover:border-gold hover:bg-gold/10 sm:flex"
+            aria-label="Scroll categories left"
+          >
+            <ChevronLeft size={18} strokeWidth={1.5} />
+          </button>
+        </>
+      )}
+
+      {canScrollRight && (
+        <>
+          <div
+            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-background via-background/90 to-transparent sm:w-12"
+            aria-hidden
+          />
+          <button
+            type="button"
+            onClick={() => scrollByAmount("right")}
+            className="absolute right-0 top-1/2 z-20 hidden -translate-y-1/2 rounded-full border border-gold/30 bg-background/95 p-1.5 text-gold shadow-sm transition hover:border-gold hover:bg-gold/10 sm:flex"
+            aria-label="Scroll categories right"
+          >
+            <ChevronRight size={18} strokeWidth={1.5} />
+          </button>
+        </>
+      )}
+
+      <div
+        ref={railRef}
+        onScroll={updateScrollState}
+        role="tablist"
+        aria-label="Menu categories"
+        className="menu-category-rail flex min-w-0 w-full snap-x snap-mandatory gap-2 overflow-x-auto overflow-y-hidden pb-2 pt-0.5 [-ms-overflow-style:auto] [scrollbar-gutter:stable]"
+      >
+        {categories.map((category) => (
+          <button
+            key={category.id}
+            id={`menu-cat-${category.id}`}
+            type="button"
+            role="tab"
+            aria-selected={activeCategory === category.id}
+            title={category.name}
+            onClick={() => onSelect(category.id)}
+            className={cn(
+              "max-w-[11rem] shrink-0 snap-start truncate rounded-full border px-4 py-2.5 text-sm uppercase tracking-[0.08em] transition sm:max-w-none sm:whitespace-nowrap",
+              activeCategory === category.id
+                ? "border-gold bg-gold/15 text-gold"
+                : "border-gold/20 text-muted hover:border-gold/40 hover:text-foreground",
+            )}
+          >
+            {categoryPillLabel(category.name)}
+          </button>
+        ))}
+      </div>
+
+      {canScrollRight && (
+        <p className="mt-1 text-center text-xs text-muted sm:hidden">
+          Swipe categories →
+        </p>
+      )}
+    </div>
+  );
+}
+
 function MenuCategorySection({ category }: { category: MenuCategory }) {
   return (
     <section
       id={`menu-${category.id}`}
-      className="scroll-mt-44 luxury-card overflow-hidden"
+      className="scroll-mt-48 luxury-card overflow-hidden"
     >
       <div className="border-b border-gold/15 bg-surface-alt/40 px-6 py-5 sm:px-8">
         <div className="flex flex-wrap items-end justify-between gap-3">
@@ -235,13 +380,13 @@ export function MenuTabs({
 
   return (
     <>
-      <div className="sticky top-[4.5rem] z-30 -mx-6 border-b border-gold/10 bg-background/95 px-6 py-4 backdrop-blur-xl sm:-mx-0 sm:rounded-none">
-        <div className="mx-auto max-w-5xl space-y-4">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="sticky top-[4.5rem] z-30 -mx-6 min-w-0 overflow-hidden border-b border-gold/10 bg-background/95 px-6 py-4 backdrop-blur-xl sm:-mx-0">
+        <div className="mx-auto min-w-0 max-w-5xl space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div
               role="tablist"
               aria-label="Menu type"
-              className="fine-dining-panel inline-flex self-start"
+              className="fine-dining-panel inline-flex shrink-0"
             >
               {(
                 [
@@ -266,45 +411,31 @@ export function MenuTabs({
                 </button>
               ))}
             </div>
+            <p className="text-sm text-muted">
+              <span className="text-gold">{itemCount}</span> dishes
+            </p>
           </div>
 
-          {categories.length > 1 && (
-            <nav
-              aria-label="Menu categories"
-              className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            >
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  type="button"
-                  onClick={() => scrollToCategory(category.id)}
-                  className={cn(
-                    "shrink-0 rounded-full border px-4 py-2 text-sm uppercase tracking-[0.08em] transition",
-                    activeCategory === category.id
-                      ? "border-gold bg-gold/15 text-gold"
-                      : "border-gold/20 text-muted hover:border-gold/40 hover:text-foreground",
-                  )}
-                >
-                  {category.name}
-                </button>
-              ))}
-            </nav>
-          )}
+          <CategoryScrollBar
+            categories={categories}
+            activeCategory={activeCategory}
+            onSelect={scrollToCategory}
+          />
         </div>
       </div>
 
       <div className="mx-auto mt-8 max-w-5xl">
-        <div className="flex flex-wrap items-center justify-between gap-4 rounded border border-gold/15 bg-surface-alt/30 px-5 py-4">
+        <div className="flex flex-col gap-3 rounded border border-gold/15 bg-surface-alt/30 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-lg text-muted">
-            <span className="text-foreground">{branchLabel}</span>
+            <span className="text-foreground">Pho Ta {branchLabel}</span>
             {" · "}
             {tab === "daily" ? "Daily menu" : "Lunch menu"}
-            {" · "}
-            <span className="text-gold">{itemCount} dishes</span>
           </p>
-          <div className="flex flex-wrap gap-2">
-            {DIETARY_LEGEND.map(({ label, short }) => (
-              <MenuTagBadge key={label} tag={label} />
+          <div className="menu-category-rail flex min-w-0 gap-2 overflow-x-auto pb-0.5">
+            {DIETARY_LEGEND.map(({ label }) => (
+              <span key={label} className="shrink-0">
+                <MenuTagBadge tag={label} />
+              </span>
             ))}
           </div>
         </div>

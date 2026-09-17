@@ -35,7 +35,7 @@ export default async function MenuPage({ searchParams }: MenuPageProps) {
         </div>
       </section>
 
-      <div className="mx-auto max-w-6xl px-6 py-12 sm:py-16">
+      <div className="mx-auto min-w-0 max-w-6xl overflow-x-hidden px-6 py-12 sm:py-16">
         <MenuTabs branchMenu={branchMenu} initialTab={initialTab} />
       </div>
     </>
