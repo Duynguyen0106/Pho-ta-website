@@ -311,6 +311,8 @@ export async function getBookingByReference(
 export async function listBookings(filters?: {
   locationSlug?: string;
   date?: string;
+  from?: string;
+  to?: string;
   status?: BookingStatus;
 }): Promise<Booking[]> {
   if (useSupabase()) {
@@ -324,6 +326,12 @@ export async function listBookings(filters?: {
     }
     if (filters?.date) {
       query = query.eq("booking_date", filters.date);
+    }
+    if (filters?.from) {
+      query = query.gte("booking_date", filters.from);
+    }
+    if (filters?.to) {
+      query = query.lte("booking_date", filters.to);
     }
     if (filters?.status) {
       query = query.eq("status", filters.status);
@@ -341,12 +349,27 @@ export async function listBookings(filters?: {
         return false;
       }
       if (filters?.date && b.date !== filters.date) return false;
+      if (filters?.from && b.date < filters.from) return false;
+      if (filters?.to && b.date > filters.to) return false;
       if (filters?.status && b.status !== filters.status) return false;
       return true;
     })
     .sort((a, b) =>
       `${a.date}${a.time}`.localeCompare(`${b.date}${b.time}`),
     );
+}
+
+export async function getCustomerStats(customerId: string): Promise<{
+  totalBookings: number;
+  noShowCount: number;
+  cancelledCount: number;
+}> {
+  const history = await listBookingsForCustomer(customerId);
+  return {
+    totalBookings: history.length,
+    noShowCount: history.filter((b) => b.status === "no_show").length,
+    cancelledCount: history.filter((b) => b.status === "cancelled").length,
+  };
 }
 
 export async function updateBooking(

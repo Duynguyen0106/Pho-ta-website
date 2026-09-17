@@ -102,9 +102,8 @@ export function ConfirmationActions({ details }: { details: ConfirmationDetails 
   return (
     <div className="mt-10 space-y-6 print:hidden">
       <p className="text-base text-muted">
-        Save this page as your confirmation. You can print it, add the visit to
-        your calendar, or email the details to yourself until automated
-        confirmations are live.
+        Keep this page as your reference. You can print it, add the visit to
+        your calendar, or email the details to yourself.
       </p>
 
       <div className="flex flex-wrap justify-center gap-3">

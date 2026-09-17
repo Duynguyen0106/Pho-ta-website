@@ -160,6 +160,45 @@ See you soon!`;
   return { subject, html, text };
 }
 
+export function buildCancellationEmail(booking: Booking): {
+  subject: string;
+  html: string;
+  text: string;
+} {
+  const location = getLocation(booking.locationSlug)!;
+  const dateTime = formatBookingDateTime(booking);
+  const subject = `Reservation cancelled — Pho Ta ${location.shortName}`;
+
+  const text = `Dear ${booking.customerName},
+
+Your reservation at Pho Ta ${location.shortName} has been cancelled.
+
+Reference: ${booking.referenceCode}
+Was booked for: ${dateTime}
+Guests: ${booking.partySize}
+
+To make a new reservation, visit our website or call ${location.phone}.
+
+Pho Ta Restaurant`;
+
+  const html = `
+    <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; background: #0a0908; color: #f5f0e6;">
+      <div style="padding: 40px 32px; text-align: center; border-bottom: 1px solid #c9a96240;">
+        <p style="margin: 0; font-size: 11px; letter-spacing: 0.35em; text-transform: uppercase; color: #c9a962;">Pho Ta</p>
+        <h1 style="margin: 16px 0 0; font-size: 28px; font-weight: 300;">Reservation Cancelled</h1>
+      </div>
+      <div style="padding: 40px 32px;">
+        <p style="color: #9a9085;">Dear ${booking.customerName},</p>
+        <p>Your table at <strong style="color: #c9a962;">Pho Ta ${location.shortName}</strong> on ${dateTime} has been cancelled.</p>
+        <p style="margin-top: 24px; color: #9a9085;">Reference: ${booking.referenceCode}</p>
+        <p style="color: #9a9085; margin-top: 16px;">${location.phone}</p>
+      </div>
+    </div>
+  `;
+
+  return { subject, html, text };
+}
+
 export function buildConfirmationSms(booking: Booking): string {
   const location = getLocation(booking.locationSlug)!;
   const seating = SEATING_LABELS[booking.seatingPreference];

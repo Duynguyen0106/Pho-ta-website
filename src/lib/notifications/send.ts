@@ -1,6 +1,7 @@
 import { updateBooking } from "../db/store";
 import type { Booking } from "../types";
 import {
+  sendCancellationEmail,
   sendConfirmationEmail,
   sendReminderEmail,
   sendRestaurantNotificationEmail,
@@ -34,6 +35,12 @@ export async function sendBookingConfirmation(
       restaurantNotified: restaurantOk,
     });
   }
+}
+
+export async function sendBookingCancellation(
+  booking: Booking,
+): Promise<boolean> {
+  return sendCancellationEmail(booking);
 }
 
 export async function sendBookingReminder(booking: Booking): Promise<void> {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/auth/admin";
 import {
+  getCustomerStats,
   listBookingsForCustomer,
   listCustomers,
   updateCustomerNotes,
@@ -17,8 +18,11 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search") ?? undefined;
 
     if (customerId) {
-      const bookings = await listBookingsForCustomer(customerId);
-      return NextResponse.json({ bookings });
+      const [bookings, stats] = await Promise.all([
+        listBookingsForCustomer(customerId),
+        getCustomerStats(customerId),
+      ]);
+      return NextResponse.json({ bookings, stats });
     }
 
     const customers = await listCustomers(search);

@@ -124,3 +124,49 @@ create policy "Allow insert menu"
   on menu_settings for insert with check (true);
 create policy "Allow update menu"
   on menu_settings for update using (true);
+
+-- Site settings (hours, capacity, slots — admin overrides)
+create table if not exists site_settings (
+  id text primary key default 'default',
+  data jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
+alter table site_settings enable row level security;
+
+drop policy if exists "Allow select site_settings" on site_settings;
+drop policy if exists "Allow insert site_settings" on site_settings;
+drop policy if exists "Allow update site_settings" on site_settings;
+
+create policy "Allow select site_settings"
+  on site_settings for select using (true);
+create policy "Allow insert site_settings"
+  on site_settings for insert with check (true);
+create policy "Allow update site_settings"
+  on site_settings for update using (true);
+
+-- Notification delivery log
+create table if not exists notification_log (
+  id uuid primary key default gen_random_uuid(),
+  booking_id uuid references bookings(id) on delete set null,
+  reference_code text,
+  channel text not null,
+  type text not null,
+  recipient text not null,
+  status text not null,
+  error_message text,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists notification_log_created_idx
+  on notification_log (created_at desc);
+
+alter table notification_log enable row level security;
+
+drop policy if exists "Allow select notification_log" on notification_log;
+drop policy if exists "Allow insert notification_log" on notification_log;
+
+create policy "Allow select notification_log"
+  on notification_log for select using (true);
+create policy "Allow insert notification_log"
+  on notification_log for insert with check (true);

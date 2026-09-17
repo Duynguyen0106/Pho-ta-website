@@ -47,8 +47,21 @@ export default async function ConfirmationPage({
       </h1>
       <p className="mt-6 text-lg leading-relaxed text-muted">
         Thank you, {booking.customerName}. Your table at Pho Ta{" "}
-        {location.shortName} is reserved for {dateTime}. This screen is your
-        confirmation — please save or print it before you leave.
+        {location.shortName} is reserved for {dateTime}.
+        {booking.confirmationSentAt ? (
+          <>
+            {" "}
+            We have sent a confirmation to{" "}
+            <span className="text-foreground">{booking.customerEmail}</span>.
+          </>
+        ) : (
+          <>
+            {" "}
+            A confirmation will be sent to{" "}
+            <span className="text-foreground">{booking.customerEmail}</span>.
+          </>
+        )}{" "}
+        Please also save this page or print it before you leave.
       </p>
 
       <div

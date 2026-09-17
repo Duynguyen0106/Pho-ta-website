@@ -3,7 +3,7 @@ import {
   MAX_ADVANCE_DAYS,
   MIN_LEAD_MINUTES,
 } from "../constants";
-import { getLocation } from "../data/locations";
+import { getResolvedLocation } from "../db/settings-store";
 import { isDateBlackout } from "../db/blackout-store";
 import { getBookingsForSlot } from "../db/store";
 import type { AvailabilitySlot, LocationSlug } from "../types";
@@ -38,8 +38,7 @@ export async function getAvailability(
   date: string,
   partySize: number,
 ): Promise<AvailabilitySlot[]> {
-  const location = getLocation(locationSlug);
-  if (!location) return [];
+  const location = await getResolvedLocation(locationSlug);
 
   const selectedDate = startOfDay(parse(date, "yyyy-MM-dd", new Date()));
   const today = startOfDay(new Date());

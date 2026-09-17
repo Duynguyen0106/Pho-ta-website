@@ -1,11 +1,19 @@
 "use client";
 
-import { format } from "date-fns";
+import {
+  addDays,
+  format,
+  parse,
+  startOfWeek,
+} from "date-fns";
 import { Search } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AdminBlackouts } from "@/components/admin/AdminBlackouts";
 import { AdminBookingEdit } from "@/components/admin/AdminBookingEdit";
+import { AdminCalendar } from "@/components/admin/AdminCalendar";
 import { AdminCustomers } from "@/components/admin/AdminCustomers";
+import { AdminNotifications } from "@/components/admin/AdminNotifications";
+import { AdminSettings } from "@/components/admin/AdminSettings";
 import { AdminHelp } from "@/components/admin/AdminHelp";
 import { AdminMenuManager } from "@/components/admin/AdminMenuManager";
 import { AdminReports } from "@/components/admin/AdminReports";
@@ -45,17 +53,29 @@ export function AdminDashboard() {
   const [savingTable, setSavingTable] = useState(false);
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
   const [resending, setResending] = useState(false);
+  const [bookingsLayout, setBookingsLayout] = useState<
+    "list" | "day" | "week"
+  >("list");
 
   const fetchBookings = useCallback(async () => {
     setLoading(true);
-    const params = new URLSearchParams({ date });
+    const params = new URLSearchParams();
+    if (bookingsLayout === "week") {
+      const anchor = parse(date, "yyyy-MM-dd", new Date());
+      const weekStart = startOfWeek(anchor, { weekStartsOn: 1 });
+      const weekEnd = addDays(weekStart, 6);
+      params.set("from", format(weekStart, "yyyy-MM-dd"));
+      params.set("to", format(weekEnd, "yyyy-MM-dd"));
+    } else {
+      params.set("date", date);
+    }
     if (location) params.set("location", location);
     if (statusFilter) params.set("status", statusFilter);
     const res = await fetch(`/api/admin/bookings?${params}`);
     const data = await res.json();
     if (res.ok) setBookings(data.bookings);
     setLoading(false);
-  }, [date, location, statusFilter]);
+  }, [date, location, statusFilter, bookingsLayout]);
 
   useEffect(() => {
     fetchBookings();
@@ -77,11 +97,15 @@ export function AdminDashboard() {
     );
   }, [bookings, search]);
 
-  async function updateStatus(id: string, status: BookingStatus) {
+  async function updateStatus(
+    id: string,
+    status: BookingStatus,
+    notifyGuest = false,
+  ) {
     const res = await fetch("/api/admin/bookings", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, status }),
+      body: JSON.stringify({ id, status, notifyGuest }),
     });
     if (res.ok) {
       fetchBookings();
@@ -156,6 +180,10 @@ export function AdminDashboard() {
         <AdminCustomers />
       ) : view === "blackouts" ? (
         <AdminBlackouts />
+      ) : view === "settings" ? (
+        <AdminSettings />
+      ) : view === "notifications" ? (
+        <AdminNotifications />
       ) : view === "reports" ? (
         <AdminReports />
       ) : (
@@ -247,6 +275,25 @@ export function AdminDashboard() {
               >
                 Today
               </Button>
+              <div className="flex gap-2">
+                {(
+                  [
+                    ["list", "List"],
+                    ["day", "Day"],
+                    ["week", "Week"],
+                  ] as const
+                ).map(([layout, label]) => (
+                  <Button
+                    key={layout}
+                    type="button"
+                    variant={bookingsLayout === layout ? "primary" : "outline"}
+                    size="sm"
+                    onClick={() => setBookingsLayout(layout)}
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </div>
               <div className="relative min-w-[240px] flex-1">
                 <Search
                   size={20}
@@ -270,6 +317,15 @@ export function AdminDashboard() {
                   <span className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-gold/30 border-t-gold" />
                   Loading bookings…
                 </div>
+              ) : bookingsLayout === "day" || bookingsLayout === "week" ? (
+                <AdminCalendar
+                  bookings={filteredBookings}
+                  anchorDate={date}
+                  mode={bookingsLayout}
+                  selectedId={selected?.id}
+                  onSelect={setSelected}
+                  onAnchorChange={setDate}
+                />
               ) : filteredBookings.length === 0 ? (
                 <div className="luxury-card px-8 py-16 text-center text-xl text-muted">
                   No bookings match your filters
@@ -435,7 +491,6 @@ export function AdminDashboard() {
                           "confirmed",
                           "seated",
                           "completed",
-                          "cancelled",
                           "no_show",
                         ] as const
                       ).map((status) => (
@@ -454,6 +509,26 @@ export function AdminDashboard() {
                         </button>
                       ))}
                     </div>
+                    {selected.status !== "cancelled" && (
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => updateStatus(selected.id, "cancelled")}
+                          className="rounded-full border border-red-500/35 px-4 py-2.5 text-base text-red-300 transition hover:border-red-400 hover:bg-red-500/10"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            updateStatus(selected.id, "cancelled", true)
+                          }
+                          className="rounded-full border border-red-500/35 px-4 py-2.5 text-base text-red-300 transition hover:border-red-400 hover:bg-red-500/10"
+                        >
+                          Cancel & email guest
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               ) : (

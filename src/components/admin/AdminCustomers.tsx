@@ -14,6 +14,11 @@ export function AdminCustomers() {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Customer | null>(null);
   const [history, setHistory] = useState<Booking[]>([]);
+  const [stats, setStats] = useState<{
+    totalBookings: number;
+    noShowCount: number;
+    cancelledCount: number;
+  } | null>(null);
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -37,9 +42,13 @@ export function AdminCustomers() {
     setSelected(customer);
     setNotes(customer.notes ?? "");
     setError("");
+    setStats(null);
     const res = await fetch(`/api/admin/customers?id=${customer.id}`);
     const data = await res.json();
-    if (res.ok) setHistory(data.bookings);
+    if (res.ok) {
+      setHistory(data.bookings);
+      setStats(data.stats ?? null);
+    }
   }
 
   async function saveNotes() {
@@ -135,6 +144,34 @@ export function AdminCustomers() {
                 </h3>
                 <p className="mt-2 text-lg text-muted">{selected.email}</p>
                 <p className="text-lg text-muted">{selected.phone}</p>
+                {stats && (
+                  <dl className="mt-4 grid grid-cols-3 gap-3 text-center">
+                    <div className="rounded border border-gold/15 bg-surface-alt/40 p-3">
+                      <dt className="text-sm uppercase tracking-[0.1em] text-gold">
+                        Visits
+                      </dt>
+                      <dd className="mt-1 font-display text-2xl text-foreground">
+                        {stats.totalBookings}
+                      </dd>
+                    </div>
+                    <div className="rounded border border-orange-500/25 bg-orange-500/10 p-3">
+                      <dt className="text-sm uppercase tracking-[0.1em] text-orange-300">
+                        No-shows
+                      </dt>
+                      <dd className="mt-1 font-display text-2xl text-orange-300">
+                        {stats.noShowCount}
+                      </dd>
+                    </div>
+                    <div className="rounded border border-red-500/25 bg-red-500/10 p-3">
+                      <dt className="text-sm uppercase tracking-[0.1em] text-red-300">
+                        Cancelled
+                      </dt>
+                      <dd className="mt-1 font-display text-2xl text-red-300">
+                        {stats.cancelledCount}
+                      </dd>
+                    </div>
+                  </dl>
+                )}
               </div>
 
               <div>

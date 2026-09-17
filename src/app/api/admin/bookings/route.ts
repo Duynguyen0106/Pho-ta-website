@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/auth/admin";
 import { createBooking, listBookings, updateBooking } from "@/lib/db/store";
-import { sendBookingConfirmation } from "@/lib/notifications/send";
+import {
+  sendBookingCancellation,
+  sendBookingConfirmation,
+} from "@/lib/notifications/send";
 import type { BookingStatus } from "@/lib/types";
 
 export async function GET(request: NextRequest) {
@@ -12,9 +15,17 @@ export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const locationSlug = searchParams.get("location") ?? undefined;
   const date = searchParams.get("date") ?? undefined;
+  const from = searchParams.get("from") ?? undefined;
+  const to = searchParams.get("to") ?? undefined;
   const status = searchParams.get("status") as BookingStatus | undefined;
 
-  const bookings = await listBookings({ locationSlug, date, status });
+  const bookings = await listBookings({
+    locationSlug,
+    date,
+    from,
+    to,
+    status,
+  });
   return NextResponse.json({ bookings });
 }
 
@@ -50,7 +61,7 @@ export async function PATCH(request: NextRequest) {
   }
 
   try {
-    const { id, ...updates } = await request.json();
+    const { id, notifyGuest, ...updates } = await request.json();
     if (!id) {
       return NextResponse.json({ error: "id is required" }, { status: 400 });
     }
@@ -58,6 +69,10 @@ export async function PATCH(request: NextRequest) {
     const booking = await updateBooking(id, updates);
     if (!booking) {
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
+    }
+
+    if (updates.status === "cancelled" && notifyGuest) {
+      await sendBookingCancellation(booking);
     }
 
     return NextResponse.json({ booking });
