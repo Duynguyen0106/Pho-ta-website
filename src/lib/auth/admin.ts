@@ -1,9 +1,10 @@
 import { cookies } from "next/headers";
+import { ADMIN_PASSWORD } from "./config";
 
 const COOKIE_NAME = "pho_ta_admin_session";
 
 export function getAdminPassword(): string {
-  return process.env.ADMIN_PASSWORD ?? "123456";
+  return ADMIN_PASSWORD;
 }
 
 export async function isAdminAuthenticated(): Promise<boolean> {

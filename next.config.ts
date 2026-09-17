@@ -8,7 +8,6 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
       "sb_publishable_TgjoQQxJW0tN17Ad8s6zJA_Irzwq727",
-    ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ?? "123456",
   },
   images: {
     remotePatterns: [

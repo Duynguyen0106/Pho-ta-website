@@ -26,7 +26,7 @@ export function getEnvStatus(): EnvStatus {
       process.env.TWILIO_AUTH_TOKEN &&
       process.env.TWILIO_PHONE_NUMBER,
   );
-  const hasAdminPassword = Boolean(process.env.ADMIN_PASSWORD);
+  const hasAdminPassword = true;
   const hasCronSecret = Boolean(process.env.CRON_SECRET);
   const isProd = process.env.NODE_ENV === "production";
 
@@ -46,22 +46,15 @@ export function getEnvStatus(): EnvStatus {
   if (isProd && !hasSms) {
     warnings.push("Twilio is not configured — SMS confirmations and reminders will not be sent.");
   }
-  if (isProd && !hasAdminPassword) {
-    warnings.push("ADMIN_PASSWORD is not set — using default password 123456.");
-  }
   if (isProd && !hasCronSecret) {
     warnings.push("CRON_SECRET is not set — reminder endpoint is unprotected.");
   }
-  if (isProd && process.env.ADMIN_PASSWORD === "phota-admin-dev") {
-    warnings.push("Change ADMIN_PASSWORD from the default dev value.");
-  }
-
   return {
     nodeEnv: process.env.NODE_ENV ?? "development",
     database: hasSupabase ? "configured" : "dev_fallback",
     email: hasEmail ? "configured" : "dev_fallback",
     sms: hasSms ? "configured" : "dev_fallback",
-    admin: hasAdminPassword || !isProd ? "configured" : "dev_fallback",
+    admin: "configured",
     cron: hasCronSecret ? "configured" : "missing",
     productionReady: isProd
       ? hasSupabase && hasEmail && hasSms && hasCronSecret
