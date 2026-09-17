@@ -146,12 +146,13 @@ Share the admin URL and password with managers only:
 | `ADMIN_PASSWORD` | Staff dashboard login |
 | `CRON_SECRET` | Secures `/api/cron/reminders` |
 | `REMINDER_MODE` | `daily` (Hobby default) or `two_hours` (Pro / cron-job.org) |
-| `OPENAI_API_KEY` | Optional — enables GPT answers in the menu helper (keyword fallback without it) |
-| `OPENAI_MODEL` | Optional — defaults to `gpt-4o-mini` |
+| `OPENAI_API_KEY` | Optional — OpenAI (`sk-...`) or OpenRouter (`sk-or-v1-...`) key for menu helper |
+| `OPENAI_MODEL` | Optional — defaults to `gpt-4o-mini` (OpenAI) or `openai/gpt-4o-mini` (OpenRouter) |
+| `OPENAI_BASE_URL` | Optional — custom chat API base (e.g. `https://openrouter.ai/api/v1`) |
 
 Without Supabase credentials, bookings are stored locally in `.data/` for development only.
 
-**Menu helper:** Set `OPENAI_API_KEY` in Vercel for natural-language answers from live menu data. Without it, the helper still works using keyword search over the menu.
+**Menu helper:** Set `OPENAI_API_KEY` in Vercel for natural-language answers from live menu data. OpenRouter keys are detected automatically. Without a key, the helper still works using keyword search over the menu.
 
 **Email confirmations:** Use **SMTP** (restaurant Gmail + app password) or **Resend** (verified domain). SMTP sends guest confirmations immediately from your restaurant address without Resend.
 

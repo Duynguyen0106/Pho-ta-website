@@ -21,12 +21,24 @@ Rules:
 - Encourage booking at /book for reservations.
 - Do not discuss topics unrelated to Pho Ta food, menu, dining, or visiting the restaurant.`;
 
-function resolveOpenAiKey(): string | null {
+function resolveApiKey(): string | null {
   return process.env.OPENAI_API_KEY?.trim() || null;
 }
 
-function resolveModel(): string {
-  return process.env.OPENAI_MODEL?.trim() || "gpt-4o-mini";
+function resolveChatEndpoint(apiKey: string): string {
+  const custom = process.env.OPENAI_BASE_URL?.trim();
+  if (custom) return `${custom.replace(/\/$/, "")}/chat/completions`;
+  if (apiKey.startsWith("sk-or-")) {
+    return "https://openrouter.ai/api/v1/chat/completions";
+  }
+  return "https://api.openai.com/v1/chat/completions";
+}
+
+function resolveModel(apiKey: string): string {
+  const configured = process.env.OPENAI_MODEL?.trim();
+  if (configured) return configured;
+  if (apiKey.startsWith("sk-or-")) return "openai/gpt-4o-mini";
+  return "gpt-4o-mini";
 }
 
 export async function askMenuAssistant(input: {
@@ -42,7 +54,7 @@ export async function askMenuAssistant(input: {
     input.menuType,
   );
 
-  const apiKey = resolveOpenAiKey();
+  const apiKey = resolveApiKey();
   if (!apiKey) {
     return {
       reply: searchMenuFallback(
@@ -61,14 +73,22 @@ export async function askMenuAssistant(input: {
   }));
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const endpoint = resolveChatEndpoint(apiKey);
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    };
+    if (endpoint.includes("openrouter.ai")) {
+      headers["HTTP-Referer"] =
+        process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://phota.vercel.app";
+      headers["X-Title"] = "Pho Ta Menu Helper";
+    }
+
+    const response = await fetch(endpoint, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({
-        model: resolveModel(),
+        model: resolveModel(apiKey),
         temperature: 0.35,
         max_tokens: 600,
         messages: [
