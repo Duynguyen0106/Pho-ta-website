@@ -1,7 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { SectionHeading } from "@/components/ui/SectionHeading";
-import { Button } from "@/components/ui/Button";
 import { MenuTabs } from "@/components/menu/MenuTabs";
 import { getMenu } from "@/lib/db/menu-store";
 import { locations } from "@/lib/data/locations";
@@ -19,7 +16,7 @@ const VALID_LOCATIONS = new Set<MenuLocationSlug>([
 ]);
 
 interface MenuPageProps {
-  searchParams: Promise<{ location?: string }>;
+  searchParams: Promise<{ location?: string; type?: string }>;
 }
 
 export default async function MenuPage({ searchParams }: MenuPageProps) {
@@ -29,6 +26,7 @@ export default async function MenuPage({ searchParams }: MenuPageProps) {
     requestedLocation && VALID_LOCATIONS.has(requestedLocation)
       ? requestedLocation
       : "kentish-town";
+  const initialTab = params.type === "lunch" ? "lunch" : "daily";
 
   const menu = await getMenu();
 
@@ -38,29 +36,29 @@ export default async function MenuPage({ searchParams }: MenuPageProps) {
   }));
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-24">
-      <SectionHeading
-        eyebrow="Cuisine"
-        title="The Menu"
-        description="Each dish is prepared with premium ingredients and the reverence of Vietnamese culinary tradition — explore the menu for your chosen location."
-      />
+    <>
+      <section className="border-b border-gold/15 bg-surface-alt/60">
+        <div className="mx-auto max-w-6xl px-6 py-16 text-center sm:py-20">
+          <p className="label-caps">Cuisine</p>
+          <h1 className="mt-4 font-display text-5xl font-normal tracking-wide text-foreground sm:text-6xl">
+            The Menu
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-xl leading-relaxed text-muted">
+            Premium ingredients and Vietnamese tradition — browse by location,
+            jump to a section, and reserve when you are ready.
+          </p>
+          <div className="gold-line mx-auto mt-8 w-20" />
+        </div>
+      </section>
 
-      <MenuTabs
-        branches={branchOptions}
-        branchMenus={menu.branches}
-        initialLocation={initialLocation}
-      />
-
-      <p className="mt-16 text-center text-base uppercase tracking-[0.1em] text-muted">
-        Gluten free · Mild · Vegetarian · Vegan options marked · Please enquire
-        with your server
-      </p>
-
-      <div className="mt-12 text-center">
-        <Link href={`/book?location=${initialLocation}`}>
-          <Button size="lg">Reserve a Table</Button>
-        </Link>
+      <div className="mx-auto max-w-6xl px-6 py-12 sm:py-16">
+        <MenuTabs
+          branches={branchOptions}
+          branchMenus={menu.branches}
+          initialLocation={initialLocation}
+          initialTab={initialTab}
+        />
       </div>
-    </div>
+    </>
   );
 }
