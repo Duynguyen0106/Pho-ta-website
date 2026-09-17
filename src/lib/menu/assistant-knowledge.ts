@@ -1,6 +1,10 @@
 import { location } from "@/lib/data/locations";
+import { faqCategories } from "@/lib/data/faq";
+import { featuredDishes } from "@/lib/data/legacy-menu";
+import { findDishByQuery } from "@/lib/menu/assistant-context";
 import { formatPricePence, priceRangeLabel } from "@/lib/menu/format";
 import { getBranchMenu } from "@/lib/menu/migrate";
+import { VIETNAMESE_EXPERTISE } from "@/lib/menu/assistant-vietnamese-expertise";
 import type {
   BranchMenu,
   MenuCategory,
@@ -52,12 +56,33 @@ function itemHasTag(item: MenuItem, tag: string): boolean {
   return item.tags.some((t) => t.toLowerCase().includes(needle));
 }
 
+function cleanDisplayName(name: string): string {
+  return name.replace(/^★\s*/, "").trim();
+}
+
 function formatItemLine(item: MenuItem): string {
   const price = priceRangeLabel(item.variants) ?? "Price on request";
   const tags = item.tags.length ? ` (${item.tags.join(", ")})` : "";
   const sig = item.featured ? "★ " : "";
   const desc = item.description ? ` — ${item.description}` : "";
-  return `• ${sig}${item.name}${tags}: ${price}${desc}`;
+  const name = cleanDisplayName(item.name);
+  const variants =
+    item.variants.length > 1
+      ? ` — options: ${item.variants.map((v) => (v.protein ? `${v.protein} ${formatPricePence(v.pricePence)}` : formatPricePence(v.pricePence))).join(", ")}`
+      : "";
+  return `• ${sig}${name}${tags}: ${price}${desc}${variants}`;
+}
+
+function formatDishDetail(
+  item: MenuItem,
+  categoryName: string,
+  menuLabel: string,
+): string {
+  const lines = [formatItemLine(item), `Category: ${categoryName} (${menuLabel})`];
+  if (item.featured) {
+    lines.push("This is one of our signature ★ dishes — a house favourite.");
+  }
+  return lines.join("\n") + allergenFooter();
 }
 
 function formatItemList(items: MenuItem[], limit = 6): string {
@@ -365,6 +390,174 @@ const PREPARED_TOPICS: PreparedTopic[] = [
     },
   },
   {
+    id: "banh-xeo",
+    phrases: ["banh xeo", "vietnamese crepe", "savoury pancake", "savory pancake"],
+    keywords: ["xeo", "crepe"],
+    minScore: 2,
+    answer: (ctx) => {
+      const branch = getBranchMenu(ctx.menu, ctx.locationSlug);
+      const items = collectItems(branch, ctx.menuType)
+        .filter(
+          ({ item }) =>
+            item.name.toLowerCase().includes("banh xeo") ||
+            item.description.toLowerCase().includes("crepe"),
+        )
+        .map(({ item }) => item);
+      return (
+        `Bánh xèo is a sizzling Vietnamese turmeric crêpe — crisp at the edges, filled with prawns, chicken, and bean sprouts. Fold it with herbs and dip in nước chấm.\n\n` +
+        `On our ${menuLabel(ctx.menuType)}:\n\n` +
+        formatItemList(items.length ? items : filterByTag(ctx, "vegetarian", 2), 4) +
+        allergenFooter()
+      );
+    },
+  },
+  {
+    id: "broken-rice",
+    phrases: [
+      "broken rice",
+      "com tam",
+      "rice plate",
+      "pork chop rice",
+    ],
+    keywords: ["com ", "broken"],
+    minScore: 2,
+    answer: (ctx) => {
+      const branch = getBranchMenu(ctx.menu, ctx.locationSlug);
+      const items = collectItems(branch, ctx.menuType)
+        .filter(({ category, item }) =>
+          category.name.toLowerCase().includes("broken") ||
+          category.name.toLowerCase().includes("rice") ||
+          item.name.toLowerCase().startsWith("com ") ||
+          item.name.toLowerCase().startsWith("m17") ||
+          item.name.toLowerCase().startsWith("m21"),
+        )
+        .map(({ item }) => item)
+        .slice(0, 8);
+      return (
+        `Cơm tấm (broken rice) uses fractured rice grains for a softer, slightly sticky texture — a Vietnamese classic served with grilled meats, curries, or pork chop.\n\n` +
+        `Broken rice dishes on the ${menuLabel(ctx.menuType)}:\n\n` +
+        formatItemList(items) +
+        allergenFooter()
+      );
+    },
+  },
+  {
+    id: "bun-cha",
+    phrases: ["bun cha", "grilled pork vermicelli", "hanoi classic"],
+    keywords: ["bun cha"],
+    minScore: 2,
+    answer: (ctx) => {
+      const match = findDishByQuery(ctx.menu, ctx.locationSlug, "bun cha");
+      if (match) {
+        return (
+          `Bún chả is a Hanoi classic — grilled pork belly and patties with vermicelli, fresh herbs, and dipping sauce.\n\n` +
+          formatDishDetail(match.item, match.categoryName, match.menuLabel)
+        );
+      }
+      return (
+        `Bún chả is a Hanoi classic — grilled pork with vermicelli and herbs. Ask about M16 Bun Cha on our daily menu.` +
+        allergenFooter()
+      );
+    },
+  },
+  {
+    id: "spring-rolls",
+    phrases: [
+      "spring roll",
+      "spring rolls",
+      "summer roll",
+      "summer rolls",
+      "difference between spring",
+    ],
+    keywords: ["nem", "goi cuon", "roll"],
+    minScore: 2,
+    answer: (ctx) => {
+      const branch = getBranchMenu(ctx.menu, ctx.locationSlug);
+      const fried = collectItems(branch, ctx.menuType)
+        .filter(({ item }) =>
+          item.name.toLowerCase().includes("nem") ||
+          item.description.toLowerCase().includes("spring roll"),
+        )
+        .map(({ item }) => item)
+        .slice(0, 4);
+      const fresh = collectItems(branch, ctx.menuType)
+        .filter(({ item }) =>
+          item.name.toLowerCase().includes("goi cuon") ||
+          item.description.toLowerCase().includes("summer roll"),
+        )
+        .map(({ item }) => item)
+        .slice(0, 4);
+      return (
+        `Two styles:\n` +
+        `• Fried spring rolls (nem / cha gio) — crispy, served with nước chấm\n` +
+        `• Fresh summer rolls (goi cuon) — rice paper, herbs, served with peanut sauce\n\n` +
+        `Fried:\n${formatItemList(fried, 4)}\n\nFresh:\n${formatItemList(fresh, 4)}` +
+        allergenFooter()
+      );
+    },
+  },
+  {
+    id: "first-visit",
+    phrases: [
+      "first time",
+      "first visit",
+      "never been",
+      "what should i order",
+      "what to order",
+      "beginner",
+      "new to vietnamese",
+    ],
+    keywords: ["recommend", "suggest", "try"],
+    minScore: 2,
+    answer: (ctx) => {
+      const signatures = filterFeatured(ctx, 6);
+      return (
+        `Welcome! For a first visit at Pho Ta Finchley Road we'd suggest:\n\n` +
+        `1. A signature pho — M01 Pho Bo Tai (rare steak) or M09 Special Pho Ta Mixed Beef\n` +
+        `2. A starter to share — Special Platter for 2, or Goi Cuon Tom (prawn summer rolls)\n` +
+        `3. Something beyond soup — Bun Cha, Bun Hue, or a sizzling plate\n\n` +
+        `Our ★ signatures on the ${menuLabel(ctx.menuType)}:\n\n` +
+        formatItemList(signatures) +
+        `\n\nReserve at /book when you're ready.` +
+        allergenFooter()
+      );
+    },
+  },
+  {
+    id: "sizzling",
+    phrases: ["sizzling", "sizzling plate", "hot plate", "iron plate"],
+    keywords: ["sizzling"],
+    minScore: 2,
+    answer: (ctx) => {
+      const branch = getBranchMenu(ctx.menu, ctx.locationSlug);
+      const items = collectItems(branch, ctx.menuType)
+        .filter(({ item }) => item.name.toLowerCase().includes("sizzling"))
+        .map(({ item }) => item);
+      return (
+        `Our sizzling plates arrive on a hot iron skillet — aromatic onion & ginger, black bean, or Lan-style with galangal and lemongrass. Choose chicken, beef, king prawns, duck, or tofu.\n\n` +
+        formatItemList(items) +
+        allergenFooter()
+      );
+    },
+  },
+  {
+    id: "kids",
+    phrases: ["kids menu", "kid menu", "children", "for kids", "family"],
+    keywords: ["kid", "child"],
+    minScore: 2,
+    answer: (ctx) => {
+      const branch = getBranchMenu(ctx.menu, ctx.locationSlug);
+      const items = collectItems(branch, ctx.menuType)
+        .filter(({ category }) => category.name.toLowerCase().includes("kid"))
+        .map(({ item }) => item);
+      return (
+        `Kids Corner has mild, child-sized portions — curries, fried rice, stir-fried noodles, and noodle soup from about £7.50.\n\n` +
+        formatItemList(items) +
+        allergenFooter()
+      );
+    },
+  },
+  {
     id: "takeaway",
     phrases: ["take away", "takeaway", "take-out", "takeout", "delivery", "deliver"],
     keywords: ["delivery", "uber", "deliveroo"],
@@ -397,6 +590,36 @@ const PREPARED_TOPICS: PreparedTopic[] = [
   },
 ];
 
+/** Match a specific dish name or menu code (M01, bun cha, etc.). */
+export function findDishAnswer(
+  query: string,
+  ctx: AssistantContext,
+): { reply: string; dishName: string } | null {
+  const normalized = normalizeQuery(query);
+  if (!normalized || normalized.length < 3) return null;
+
+  const skip =
+    /^(hi|hello|hey|thanks|thank you|ok|yes|no)$/.test(normalized) ||
+    (normalized.split(" ").length === 1 &&
+      ["menu", "food", "help", "book", "hours"].includes(normalized));
+
+  if (skip) return null;
+
+  const match = findDishByQuery(ctx.menu, ctx.locationSlug, normalized);
+  if (!match) return null;
+
+  const name = match.item.name.replace(/^★\s*/, "");
+  const intro =
+    normalized.length <= 20 || normalized.includes(name.toLowerCase().slice(0, 6))
+      ? `Here's what we serve:\n\n`
+      : `This may help — a dish from our menu:\n\n`;
+
+  return {
+    reply: intro + formatDishDetail(match.item, match.categoryName, match.menuLabel),
+    dishName: name,
+  };
+}
+
 /** Instant answer for common questions — works without an AI API key. */
 export function findPreparedAnswer(
   query: string,
@@ -404,6 +627,31 @@ export function findPreparedAnswer(
 ): { reply: string; topicId: string } | null {
   const normalized = normalizeQuery(query);
   if (!normalized) return null;
+
+  const hasMenuCode = /\b[smvk]\d{2}[a-z]?\b/i.test(normalized);
+  const dishMatch = findDishByQuery(ctx.menu, ctx.locationSlug, normalized);
+  if (dishMatch) {
+    const dishNameLower = cleanDisplayName(dishMatch.item.name).toLowerCase();
+    const keywords = normalized
+      .split(" ")
+      .filter((w) => w.length > 1 && !/^(what|tell|about|the|how|is|are|me|a|an)$/.test(w));
+    const nameMatch =
+      hasMenuCode ||
+      (keywords.length >= 2 &&
+        dishNameLower.includes(keywords.join(" "))) ||
+      normalized.includes(dishNameLower);
+
+    if (nameMatch) {
+      return {
+        reply: formatDishDetail(
+          dishMatch.item,
+          dishMatch.categoryName,
+          dishMatch.menuLabel,
+        ),
+        topicId: `dish:${cleanDisplayName(dishMatch.item.name)}`,
+      };
+    }
+  }
 
   let best: { topic: PreparedTopic; score: number } | null = null;
 
@@ -422,20 +670,44 @@ export function findPreparedAnswer(
   };
 }
 
+function summarizeCategories(
+  branch: BranchMenu,
+  menuType: MenuType,
+): string[] {
+  const categories =
+    menuType === "daily" ? branch.daily : branch.lunch;
+  return categories.map(
+    (c) =>
+      `- ${c.name}: ${c.items.length} dishes${c.note ? ` (${c.note})` : ""}`,
+  );
+}
+
 /** Reference facts injected into the AI system prompt. */
 export function buildAssistantKnowledgeText(ctx: AssistantContext): string {
   const branch = getBranchMenu(ctx.menu, ctx.locationSlug);
-  const items = collectItems(branch, ctx.menuType);
-  const featured = items.filter(({ item }) => item.featured).length;
-  const glutenFree = items.filter(({ item }) =>
-    itemHasTag(item, "gluten free"),
-  ).length;
-  const vegetarian = items.filter(({ item }) =>
-    itemHasTag(item, "vegetarian"),
-  ).length;
+  const dailyItems = collectItems(branch, "daily");
+  const lunchItems = collectItems(branch, "lunch");
+  const allItems = [...dailyItems, ...lunchItems];
+
+  const featuredNames = allItems
+    .filter(({ item }) => item.featured)
+    .map(({ item }) => item.name.replace(/^★\s*/, ""))
+    .slice(0, 12);
+
+  const faqSnippet = faqCategories
+    .flatMap((c) => c.items)
+    .slice(0, 6)
+    .map((f) => `Q: ${f.question}\nA: ${f.answer}`)
+    .join("\n\n");
+
+  const heroDishes = featuredDishes
+    .map((d) => `- ${d.name}: ${d.description}`)
+    .join("\n");
 
   return [
-    "RESTAURANT FACTS (use for general questions):",
+    VIETNAMESE_EXPERTISE,
+    "",
+    "RESTAURANT FACTS:",
     `- Name: Pho Ta Finchley Road`,
     `- Address: ${location.address}, ${location.postcode}`,
     `- Phone: ${location.phone} | Email: ${location.email}`,
@@ -446,19 +718,24 @@ export function buildAssistantKnowledgeText(ctx: AssistantContext): string {
     `- Takeaway: call ${location.phone} for availability`,
     `- Dress code: smart casual`,
     "",
-    `CURRENT MENU VIEW: ${menuLabel(ctx.menuType)} (${items.length} dishes)`,
+    `GUEST VIEW: ${menuLabel(ctx.menuType)} tab (${collectItems(branch, ctx.menuType).length} dishes visible)`,
     ctx.menuType === "lunch" && branch.lunchNote
       ? `- Lunch note: ${branch.lunchNote}`
-      : "",
-    `- Signature (★) dishes on this tab: ${featured}`,
-    `- Gluten free tagged: ${glutenFree} | Vegetarian tagged: ${vegetarian}`,
+      : `- Full daily menu has ${dailyItems.length} dishes; lunch specials have ${lunchItems.length} dishes`,
     "",
-    "PREPARED GUIDANCE (prefer these facts for common topics):",
-    "- Signature: featured ★ items — especially Pho Bo Tai, sharing platters, sizzling plates",
-    "- Pho: rice noodle soups; M01 Pho Bo Tai is the signature beef pho",
-    "- Gluten free: many pho, starters, and grills tagged GF — always remind guests to confirm with staff",
-    "- Vegetarian/Vegan: look for tags; tofu options in wok & grill",
-    "- Mild: tagged dishes for less spice; many items can be adjusted on request",
+    "MENU OVERVIEW — Daily categories:",
+    ...summarizeCategories(branch, "daily"),
+    "",
+    "MENU OVERVIEW — Lunch categories:",
+    ...summarizeCategories(branch, "lunch"),
+    "",
+    `Signature ★ dishes (reference when recommending): ${featuredNames.join("; ")}`,
+    "",
+    "Featured on homepage:",
+    heroDishes,
+    "",
+    "FAQ excerpts:",
+    faqSnippet,
   ]
     .filter(Boolean)
     .join("\n");

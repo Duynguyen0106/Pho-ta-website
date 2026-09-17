@@ -19,12 +19,12 @@ interface MenuAssistantProps {
 }
 
 const SUGGESTIONS = [
-  "Signature dishes?",
+  "What should I order first visit?",
+  "Tell me about M01 Pho Bo Tai",
+  "Bun cha vs pho?",
   "Gluten-free options?",
-  "Tell me about the pho",
-  "Opening hours?",
+  "Vegetarian dishes?",
   "How do I book?",
-  "Allergies & dietary info",
 ];
 
 export function MenuAssistant({ menuTab, branchLabel }: MenuAssistantProps) {
@@ -34,7 +34,7 @@ export function MenuAssistant({ menuTab, branchLabel }: MenuAssistantProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
-      content: `Hello! I can help with the ${menuTab === "daily" ? "daily" : "lunch"} menu at Pho Ta ${branchLabel} — dishes, dietary tags, signatures, hours, and booking. Tap a suggestion below or ask anything.`,
+      content: `Hello! I'm your Vietnamese food guide for Pho Ta ${branchLabel}. Ask about any dish, ingredients, dietary tags, or what to order — I know our full menu. Tap a suggestion below or ask anything.`,
     },
   ]);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -52,7 +52,7 @@ export function MenuAssistant({ menuTab, branchLabel }: MenuAssistantProps) {
     setMessages([
       {
         role: "assistant",
-        content: `Showing the ${menuTab === "daily" ? "daily" : "lunch"} menu for ${branchLabel}. Try "Signature dishes?" or ask about any dish.`,
+        content: `Showing the ${menuTab === "daily" ? "daily" : "lunch"} menu for ${branchLabel}. Try "What should I order first visit?" or ask about any dish by name.`,
       },
     ]);
   }, [menuTab, branchLabel]);
