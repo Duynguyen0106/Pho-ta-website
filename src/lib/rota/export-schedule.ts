@@ -1,5 +1,9 @@
 import { format, parseISO } from "date-fns";
-import { hoursBetween } from "./generate-schedule";
+import {
+  formatBreakLabel,
+  shiftHoursBetween,
+  workingHoursBetween,
+} from "./shift-hours";
 import type { RotaEmployee, RotaShift } from "./types";
 
 function escapeCsv(value: string): string {
@@ -42,6 +46,8 @@ export function buildTeamScheduleCsv(input: {
     "Start",
     "End",
     "Shift hours",
+    "Break",
+    "Working hours",
   ];
 
   const rows = teamShifts
@@ -53,7 +59,8 @@ export function buildTeamScheduleCsv(input: {
     )
     .map((shift) => {
       const employee = employees.find((e) => e.id === shift.employeeId);
-      const shiftHours = hoursBetween(shift.startTime, shift.endTime);
+      const shiftHours = shiftHoursBetween(shift.startTime, shift.endTime);
+      const workingHours = workingHoursBetween(shift.startTime, shift.endTime);
       return [
         monthKey,
         shift.shiftDate,
@@ -64,6 +71,8 @@ export function buildTeamScheduleCsv(input: {
         shift.startTime,
         shift.endTime,
         shiftHours.toFixed(1),
+        formatBreakLabel(shift.startTime, shift.endTime),
+        workingHours.toFixed(1),
       ];
     });
 
@@ -96,9 +105,20 @@ export function buildEmployeeScheduleCsv(input: {
     teamShifts,
   );
 
-  const headers = ["Employee", "Month", "Date", "Day", "Start", "End", "Hours"];
+  const headers = [
+    "Employee",
+    "Month",
+    "Date",
+    "Day",
+    "Start",
+    "End",
+    "Shift hours",
+    "Break",
+    "Working hours",
+  ];
   const rows = employeeShifts.map((shift) => {
-    const hours = hoursBetween(shift.startTime, shift.endTime);
+    const shiftHours = shiftHoursBetween(shift.startTime, shift.endTime);
+    const workingHours = workingHoursBetween(shift.startTime, shift.endTime);
     return [
       employee.name,
       monthKey,
@@ -106,12 +126,14 @@ export function buildEmployeeScheduleCsv(input: {
       format(parseISO(shift.shiftDate), "EEEE"),
       shift.startTime,
       shift.endTime,
-      hours.toFixed(1),
+      shiftHours.toFixed(1),
+      formatBreakLabel(shift.startTime, shift.endTime),
+      workingHours.toFixed(1),
     ];
   });
 
   const totalHours = employeeShifts.reduce(
-    (sum, shift) => sum + hoursBetween(shift.startTime, shift.endTime),
+    (sum, shift) => sum + shiftHoursBetween(shift.startTime, shift.endTime),
     0,
   );
 
@@ -150,7 +172,7 @@ export function buildEmployeeScheduleText(input: {
   );
 
   const totalHours = employeeShifts.reduce(
-    (sum, shift) => sum + hoursBetween(shift.startTime, shift.endTime),
+    (sum, shift) => sum + shiftHoursBetween(shift.startTime, shift.endTime),
     0,
   );
 
@@ -171,8 +193,12 @@ export function buildEmployeeScheduleText(input: {
   } else {
     for (const shift of employeeShifts) {
       const day = format(parseISO(shift.shiftDate), "EEE d MMM");
-      const hours = hoursBetween(shift.startTime, shift.endTime);
-      lines.push(`  ${day}  ${shift.startTime} – ${shift.endTime}  (${hours}h)`);
+      const hours = shiftHoursBetween(shift.startTime, shift.endTime);
+      const breakLabel = formatBreakLabel(shift.startTime, shift.endTime);
+      const working = workingHoursBetween(shift.startTime, shift.endTime);
+      lines.push(
+        `  ${day}  ${shift.startTime} – ${shift.endTime}  (${hours}h incl. break · ${working}h working · ${breakLabel})`,
+      );
     }
   }
 
