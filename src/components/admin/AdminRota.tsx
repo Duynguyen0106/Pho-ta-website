@@ -21,6 +21,7 @@ import {
 import { Button } from "@/components/ui/Button";
 import { visaAlert, visaTypeLabel } from "@/lib/rota/compliance";
 import { restaurantHoursLabel } from "@/lib/rota/generate-schedule";
+import { MAX_DAILY_SHIFT_HOURS, UNPAID_BREAK_MINUTES } from "@/lib/rota/types";
 import {
   FULL_TIME_WEEKLY_HOURS,
   PART_TIME_MAX_WEEKLY_HOURS,
@@ -287,7 +288,9 @@ export function AdminRota() {
         </h2>
         <p className="mt-2 text-xl text-muted">
           Add employee records once, then generate a whole-team schedule each
-          month. Restaurant hours {restaurantHoursLabel()}.
+          month. Shifts are capped at {MAX_DAILY_SHIFT_HOURS} hours per day
+          (including a {UNPAID_BREAK_MINUTES}-minute unpaid break on longer
+          shifts). Restaurant hours {restaurantHoursLabel()}.
         </p>
       </div>
 
@@ -587,8 +590,9 @@ export function AdminRota() {
                 Monthly team schedule
               </h3>
               <p className="mt-1 text-muted">
-                Generate one rota for the whole team, then export individual
-                schedules from it.
+                Generate one rota for the whole team (max{" "}
+                {MAX_DAILY_SHIFT_HOURS}h per employee per day, break included),
+                then export individual schedules from it.
               </p>
             </div>
           </div>

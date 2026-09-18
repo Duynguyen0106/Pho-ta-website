@@ -9,6 +9,7 @@ import {
   startOfMonth,
   startOfWeek,
 } from "date-fns";
+import { unpaidBreakMinutes } from "@/lib/rota/shift-hours";
 import type { RotaEmployee, RotaShift } from "@/lib/rota/types";
 import { cn } from "@/lib/utils";
 
@@ -108,6 +109,19 @@ export function AdminRotaTeamGrid({
                               {shift.startTime}
                               <br />
                               {shift.endTime}
+                              {unpaidBreakMinutes(shift.startTime, shift.endTime) >
+                                0 && (
+                                <>
+                                  <br />
+                                  <span className="text-muted">
+                                    {unpaidBreakMinutes(
+                                      shift.startTime,
+                                      shift.endTime,
+                                    )}
+                                    m break
+                                  </span>
+                                </>
+                              )}
                             </span>
                           ) : (
                             "—"

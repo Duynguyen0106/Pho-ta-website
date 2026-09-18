@@ -10,7 +10,12 @@ import {
 import { location } from "@/lib/data/locations";
 import type { BlackoutDate } from "@/lib/types";
 import {
+  shiftHoursBetween,
+  wallClockHoursBetween,
+} from "@/lib/rota/shift-hours";
+import {
   FULL_TIME_WEEKLY_HOURS,
+  MAX_DAILY_SHIFT_HOURS,
   PART_TIME_MAX_WEEKLY_HOURS,
   type EmploymentType,
   type RotaEmployee,
@@ -23,10 +28,10 @@ interface ShiftTemplate {
   hours: number;
 }
 
+/** All templates are at most MAX_DAILY_SHIFT_HOURS (break taken within the shift). */
 const SHIFT_TEMPLATES: ShiftTemplate[] = [
   { startTime: "11:30", endTime: "19:30", hours: 8 },
   { startTime: "13:30", endTime: "21:30", hours: 8 },
-  { startTime: "11:30", endTime: "21:30", hours: 10 },
   { startTime: "11:30", endTime: "17:30", hours: 6 },
   { startTime: "15:30", endTime: "21:30", hours: 6 },
 ];
@@ -55,13 +60,16 @@ export function targetHoursForMonth(
 }
 
 function pickTemplate(remainingHours: number): ShiftTemplate {
-  const sorted = [...SHIFT_TEMPLATES].sort((a, b) => b.hours - a.hours);
+  const eligible = SHIFT_TEMPLATES.filter(
+    (template) => template.hours <= MAX_DAILY_SHIFT_HOURS,
+  );
+  const sorted = [...eligible].sort((a, b) => b.hours - a.hours);
   for (const template of sorted) {
     if (template.hours <= remainingHours + 0.5) {
       return template;
     }
   }
-  return SHIFT_TEMPLATES[SHIFT_TEMPLATES.length - 1];
+  return sorted[sorted.length - 1] ?? eligible[0];
 }
 
 function isOpenDay(date: Date, blackouts: BlackoutDate[]): boolean {
@@ -98,7 +106,10 @@ export function generateMonthlyRota(input: {
     let remaining = targetHoursForMonth(employee, monthKey);
     let dayCursor = employeeIndex % openDays.length;
 
-    while (remaining >= 4 && shifts.filter((s) => s.employeeId === employee.id).length < openDays.length) {
+    while (
+      remaining >= 4 &&
+      shifts.filter((s) => s.employeeId === employee.id).length < openDays.length
+    ) {
       const day = openDays[dayCursor % openDays.length];
       dayCursor += 1;
 
@@ -109,6 +120,12 @@ export function generateMonthlyRota(input: {
       if (alreadyScheduled) continue;
 
       const template = pickTemplate(remaining);
+      const shiftLength = wallClockHoursBetween(
+        template.startTime,
+        template.endTime,
+      );
+      if (shiftLength > MAX_DAILY_SHIFT_HOURS) continue;
+
       shifts.push({
         id: shiftId(employee.id, dateStr, template.startTime),
         employeeId: employee.id,
@@ -142,12 +159,11 @@ export function summarizeEmployeeMonth(
   const employeeShifts = shifts.filter(
     (s) => s.employeeId === employee.id && s.monthKey === monthKey,
   );
-  const scheduledHours = employeeShifts.reduce((sum, shift) => {
-    const template = SHIFT_TEMPLATES.find(
-      (t) => t.startTime === shift.startTime && t.endTime === shift.endTime,
-    );
-    return sum + (template?.hours ?? 8);
-  }, 0);
+  const scheduledHours = employeeShifts.reduce(
+    (sum, shift) =>
+      sum + shiftHoursBetween(shift.startTime, shift.endTime),
+    0,
+  );
 
   return {
     scheduledHours: Math.round(scheduledHours * 10) / 10,
@@ -184,14 +200,9 @@ export function formatShiftRange(startTime: string, endTime: string): string {
   return `${startTime} – ${endTime}`;
 }
 
+/** @deprecated Use shiftHoursBetween from shift-hours.ts */
 export function hoursBetween(startTime: string, endTime: string): number {
-  const template = SHIFT_TEMPLATES.find(
-    (t) => t.startTime === startTime && t.endTime === endTime,
-  );
-  if (template) return template.hours;
-  const [sh, sm] = startTime.split(":").map(Number);
-  const [eh, em] = endTime.split(":").map(Number);
-  return (eh * 60 + em - (sh * 60 + sm)) / 60;
+  return shiftHoursBetween(startTime, endTime);
 }
 
 export function isWeekend(dateStr: string): boolean {
@@ -203,3 +214,5 @@ export function nextMonthKey(monthKey: string): string {
   const date = addDays(endOfMonth(parseISO(`${monthKey}-01`)), 1);
   return format(date, "yyyy-MM");
 }
+
+export { SHIFT_TEMPLATES, MAX_DAILY_SHIFT_HOURS };
