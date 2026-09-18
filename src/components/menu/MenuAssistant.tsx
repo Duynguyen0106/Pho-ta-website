@@ -1,7 +1,7 @@
 "use client";
 
 import { MessageCircle, Send, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { LOCATION_SLUG } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -28,6 +28,92 @@ const SUGGESTIONS = [
   "How do I book?",
 ];
 
+function ThinkingIndicator() {
+  return (
+    <div
+      className="flex items-center gap-1.5 py-0.5"
+      role="status"
+      aria-label="Thinking"
+    >
+      {[0, 1, 2].map((i) => (
+        <span
+          key={i}
+          className="h-2 w-2 rounded-full bg-gold/70 animate-pulse"
+          style={{ animationDelay: `${i * 180}ms`, animationDuration: "1s" }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function tokenizeForTyping(text: string): string[] {
+  return text.match(/\S+\s*/g) ?? [text];
+}
+
+function useTypingReply(onComplete: (fullText: string) => void) {
+  const [visibleText, setVisibleText] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const onCompleteRef = useRef(onComplete);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cancelledRef = useRef(false);
+
+  onCompleteRef.current = onComplete;
+
+  const cancelTyping = useCallback(() => {
+    cancelledRef.current = true;
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    setVisibleText("");
+    setIsTyping(false);
+  }, []);
+
+  const startTyping = useCallback(
+    (text: string) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      cancelledRef.current = false;
+
+      const tokens = tokenizeForTyping(text);
+      let index = 0;
+      setVisibleText("");
+      setIsTyping(true);
+
+      const tick = () => {
+        if (cancelledRef.current) return;
+
+        if (index >= tokens.length) {
+          setIsTyping(false);
+          setVisibleText("");
+          onCompleteRef.current(text);
+          return;
+        }
+
+        const token = tokens[index];
+        index += 1;
+        setVisibleText((prev) => prev + token);
+
+        const delay = /[.!?]\s*$/.test(token)
+          ? 120
+          : token.length > 12
+            ? 55
+            : 38;
+        timeoutRef.current = setTimeout(tick, delay);
+      };
+
+      timeoutRef.current = setTimeout(tick, 100);
+    },
+    [],
+  );
+
+  useEffect(() => () => cancelTyping(), [cancelTyping]);
+
+  return { visibleText, isTyping, startTyping, cancelTyping };
+}
+
 export function MenuAssistant({ menuTab, branchLabel }: MenuAssistantProps) {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
@@ -40,6 +126,15 @@ export function MenuAssistant({ menuTab, branchLabel }: MenuAssistantProps) {
   ]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const commitAssistantReply = useCallback((content: string) => {
+    setMessages((prev) => [...prev, { role: "assistant", content }]);
+  }, []);
+
+  const { visibleText, isTyping, startTyping, cancelTyping } =
+    useTypingReply(commitAssistantReply);
+
+  const busy = loading || isTyping;
+
   useEffect(() => {
     if (open) {
       scrollRef.current?.scrollTo({
@@ -47,20 +142,23 @@ export function MenuAssistant({ menuTab, branchLabel }: MenuAssistantProps) {
         behavior: "smooth",
       });
     }
-  }, [messages, open, loading]);
+  }, [messages, open, loading, visibleText, isTyping]);
 
   useEffect(() => {
+    cancelTyping();
     setMessages([
       {
         role: "assistant",
         content: `Showing the ${menuTab === "daily" ? "daily" : "lunch"} menu for ${branchLabel}. Try "What should I order first visit?" or ask about any dish by name.`,
       },
     ]);
-  }, [menuTab, branchLabel]);
+  }, [menuTab, branchLabel, cancelTyping]);
+
+  useEffect(() => () => cancelTyping(), [cancelTyping]);
 
   async function sendMessage(text: string) {
     const trimmed = text.trim();
-    if (!trimmed || loading) return;
+    if (!trimmed || busy) return;
 
     setInput("");
     const userMessage: ChatMessage = { role: "user", content: trimmed };
@@ -82,19 +180,11 @@ export function MenuAssistant({ menuTab, branchLabel }: MenuAssistantProps) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Request failed");
 
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: data.reply },
-      ]);
+      startTyping(data.reply);
     } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content:
-            "Sorry, I couldn't answer that just now. Please try again or ask our team when you visit.",
-        },
-      ]);
+      startTyping(
+        "Sorry, I couldn't answer that just now. Please try again or ask our team when you visit.",
+      );
     } finally {
       setLoading(false);
     }
@@ -159,7 +249,21 @@ export function MenuAssistant({ menuTab, branchLabel }: MenuAssistantProps) {
             ))}
             {loading && (
               <div className="mr-auto rounded-lg border border-gold/15 bg-surface-alt/50 px-4 py-3 text-muted">
-                Thinking…
+                <p className="mb-1 text-xs uppercase tracking-[0.12em] text-gold/80">
+                  Thinking
+                </p>
+                <ThinkingIndicator />
+              </div>
+            )}
+            {isTyping && (
+              <div className="mr-auto rounded-lg border border-gold/15 bg-surface-alt/50 px-4 py-3 text-muted">
+                <p className="whitespace-pre-wrap">
+                  {visibleText}
+                  <span
+                    className="ml-0.5 inline-block h-[1.1em] w-0.5 animate-pulse bg-gold/70 align-text-bottom"
+                    aria-hidden
+                  />
+                </p>
               </div>
             )}
           </div>
@@ -170,7 +274,7 @@ export function MenuAssistant({ menuTab, branchLabel }: MenuAssistantProps) {
                 <button
                   key={suggestion}
                   type="button"
-                  disabled={loading}
+                  disabled={busy}
                   onClick={() => sendMessage(suggestion)}
                   className="min-h-11 shrink-0 whitespace-nowrap rounded-full border border-gold/20 px-4 py-2 text-xs uppercase tracking-[0.06em] text-muted transition hover:border-gold/40 hover:text-gold disabled:opacity-50"
                 >
@@ -189,14 +293,14 @@ export function MenuAssistant({ menuTab, branchLabel }: MenuAssistantProps) {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask about a dish…"
-                disabled={loading}
+                disabled={busy}
                 className="luxury-input flex-1 py-3 text-base"
                 maxLength={1000}
               />
               <Button
                 type="submit"
                 size="sm"
-                disabled={loading || !input.trim()}
+                disabled={busy || !input.trim()}
                 aria-label="Send"
               >
                 <Send size={18} />
