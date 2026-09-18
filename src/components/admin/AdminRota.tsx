@@ -10,7 +10,7 @@ import {
   Trash2,
   Users,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AdminRotaTeamGrid } from "@/components/admin/AdminRotaTeamGrid";
 import {
   complianceValuesFromEmployee,
@@ -65,6 +65,8 @@ export function AdminRota() {
   const [editCompliance, setEditCompliance] = useState<ComplianceFormValues>(
     emptyComplianceValues(),
   );
+  const addEmployeeRef = useRef<HTMLElement>(null);
+  const hasScrolledToAdd = useRef(false);
 
   const fetchEmployees = useCallback(async () => {
     setLoadingEmployees(true);
@@ -103,6 +105,13 @@ export function AdminRota() {
   useEffect(() => {
     fetchMonthSchedule();
   }, [fetchMonthSchedule]);
+
+  useEffect(() => {
+    if (loadingEmployees || hasScrolledToAdd.current) return;
+    if (employees.length > 0) return;
+    hasScrolledToAdd.current = true;
+    addEmployeeRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [loadingEmployees, employees.length]);
 
   const hasTeamSchedule = teamShifts.length > 0;
 
@@ -266,17 +275,61 @@ export function AdminRota() {
     setTimeout(() => setCopiedId(null), 2000);
   }
 
+  function scrollToAddEmployee() {
+    addEmployeeRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   return (
     <div className="space-y-8">
       <div>
         <h2 className="font-display text-4xl font-normal text-foreground">
-          Staff rota
+          Staff & rota
         </h2>
         <p className="mt-2 text-xl text-muted">
-          Save your team once, then generate a whole-team schedule each month.
-          Individual exports are pulled from the published team rota. Restaurant
-          hours {restaurantHoursLabel()}.
+          Add employee records once, then generate a whole-team schedule each
+          month. Restaurant hours {restaurantHoursLabel()}.
         </p>
+      </div>
+
+      <div className="luxury-card border-gold/25 bg-gold/5 p-5 sm:p-6">
+        <p className="label-caps text-gold">How it works</p>
+        <ol className="mt-4 grid gap-4 sm:grid-cols-3">
+          <li className="rounded border border-gold/20 bg-background/60 p-4">
+            <p className="text-sm font-medium uppercase tracking-[0.1em] text-gold">
+              Step 1
+            </p>
+            <p className="mt-2 text-foreground">
+              Add each employee&apos;s name, contract, date of birth, and right
+              to work details in{" "}
+              <button
+                type="button"
+                onClick={scrollToAddEmployee}
+                className="text-gold underline decoration-gold/40 underline-offset-2 hover:decoration-gold"
+              >
+                Saved team roster
+              </button>{" "}
+              below.
+            </p>
+          </li>
+          <li className="rounded border border-gold/20 bg-background/60 p-4">
+            <p className="text-sm font-medium uppercase tracking-[0.1em] text-gold">
+              Step 2
+            </p>
+            <p className="mt-2 text-foreground">
+              Pick a month and generate the team schedule. Edit shifts in the
+              grid if needed.
+            </p>
+          </li>
+          <li className="rounded border border-gold/20 bg-background/60 p-4">
+            <p className="text-sm font-medium uppercase tracking-[0.1em] text-gold">
+              Step 3
+            </p>
+            <p className="mt-2 text-foreground">
+              Export team or individual CSV files, or share staff download
+              links.
+            </p>
+          </li>
+        </ol>
       </div>
 
       {error && (
@@ -285,20 +338,41 @@ export function AdminRota() {
         </p>
       )}
 
-      <section className="luxury-card p-6 sm:p-8">
-        <div className="flex items-center gap-2">
-          <Users size={20} className="text-gold" />
-          <h3 className="font-display text-2xl text-foreground">
-            Saved team roster
-          </h3>
+      <section
+        id="add-employee"
+        ref={addEmployeeRef}
+        className="luxury-card scroll-mt-28 p-6 sm:p-8"
+      >
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <Users size={20} className="text-gold" />
+            <div>
+              <h3 className="font-display text-2xl text-foreground">
+                Saved team roster
+              </h3>
+              <p className="mt-1 text-muted">
+                Add and edit employee records here — stored permanently for every
+                month.
+              </p>
+            </div>
+          </div>
+          {employees.length === 0 && !loadingEmployees && (
+            <span className="rounded border border-gold/30 bg-gold/10 px-3 py-1 text-xs uppercase tracking-[0.12em] text-gold">
+              Start here
+            </span>
+          )}
         </div>
-        <p className="mt-2 text-muted">
-          Employee details are stored permanently — add staff once and reuse them
-          every month when generating schedules.
-        </p>
 
-        <form onSubmit={handleAddEmployee} className="mt-6 border-t border-gold/15 pt-6">
-          <p className="label-caps">Add employee</p>
+        <form
+          onSubmit={handleAddEmployee}
+          className="mt-6 rounded border border-gold/25 bg-surface-alt/30 p-5 sm:p-6"
+        >
+          <p className="font-display text-xl text-foreground">Add employee</p>
+          <p className="mt-1 text-sm text-muted">
+            Name, contract hours, date of birth, visa status, and right to work
+            category. Upload documents after saving by clicking Edit on the
+            employee.
+          </p>
           <div className="mt-4 grid min-w-0 grid-cols-1 gap-6 md:grid-cols-2">
             <label className="block min-w-0">
               <span className="label-caps">Name</span>
@@ -360,7 +434,12 @@ export function AdminRota() {
         {loadingEmployees ? (
           <p className="mt-6 text-muted">Loading saved employees…</p>
         ) : employees.length === 0 ? (
-          <p className="mt-6 text-muted">No saved employees yet.</p>
+          <div className="mt-6 rounded border border-dashed border-gold/25 bg-surface-alt/20 p-5 text-center">
+            <p className="text-muted">
+              No employees saved yet. Use the form above to add your first team
+              member.
+            </p>
+          </div>
         ) : (
           <ul className="mt-6 space-y-3">
             {employees.map((employee) => (

@@ -7,6 +7,7 @@ import {
   startOfWeek,
 } from "date-fns";
 import { Search } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AdminBlackouts } from "@/components/admin/AdminBlackouts";
 import { AdminBookingEdit } from "@/components/admin/AdminBookingEdit";
@@ -42,8 +43,36 @@ const STATUS_OPTIONS: (BookingStatus | "")[] = [
   "no_show",
 ];
 
-export function AdminDashboard() {
-  const [view, setView] = useState<AdminView>("bookings");
+const ADMIN_VIEWS: AdminView[] = [
+  "bookings",
+  "menu",
+  "customers",
+  "blackouts",
+  "rota",
+  "settings",
+  "notifications",
+  "reports",
+];
+
+function parseAdminView(tab: string | undefined): AdminView {
+  if (tab && ADMIN_VIEWS.includes(tab as AdminView)) {
+    return tab as AdminView;
+  }
+  return "bookings";
+}
+
+interface AdminDashboardProps {
+  initialTab?: string;
+}
+
+export function AdminDashboard({ initialTab }: AdminDashboardProps) {
+  const router = useRouter();
+  const [view, setView] = useState<AdminView>(() => parseAdminView(initialTab));
+
+  function handleViewChange(next: AdminView) {
+    setView(next);
+    router.replace(`/admin?tab=${next}`, { scroll: false });
+  }
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
@@ -157,7 +186,7 @@ export function AdminDashboard() {
   const totalCovers = activeBookings.reduce((sum, b) => sum + b.partySize, 0);
 
   return (
-    <AdminShell view={view} onViewChange={setView} onLogout={handleLogout}>
+    <AdminShell view={view} onViewChange={handleViewChange} onLogout={handleLogout}>
       <AdminHelp />
 
       {view === "menu" ? (

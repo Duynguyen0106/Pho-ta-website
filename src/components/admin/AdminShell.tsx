@@ -17,10 +17,10 @@ export type AdminView =
 
 const NAV_ITEMS: { id: AdminView; label: string }[] = [
   { id: "bookings", label: "Bookings" },
+  { id: "rota", label: "Staff & Rota" },
   { id: "menu", label: "Menu" },
   { id: "customers", label: "Customers" },
   { id: "blackouts", label: "Closures" },
-  { id: "rota", label: "Rota" },
   { id: "settings", label: "Settings" },
   { id: "notifications", label: "Notifications" },
   { id: "reports", label: "Reports" },

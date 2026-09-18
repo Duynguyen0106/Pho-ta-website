@@ -86,6 +86,11 @@ export function AdminHelp() {
                   dates when the restaurant is closed
                 </li>
                 <li>
+                  <strong className="text-foreground">Staff & Rota</strong> — add
+                  employees (name, visa, right to work), generate monthly schedules,
+                  and export shifts
+                </li>
+                <li>
                   <strong className="text-foreground">Reports</strong> — weekly
                   booking summary and export CSV from Bookings
                 </li>
