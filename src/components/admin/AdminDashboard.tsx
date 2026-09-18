@@ -19,6 +19,7 @@ import { AdminHelp } from "@/components/admin/AdminHelp";
 import { AdminMobileDetailSheet } from "@/components/admin/AdminMobileDetailSheet";
 import { AdminMenuManager } from "@/components/admin/AdminMenuManager";
 import { AdminReports } from "@/components/admin/AdminReports";
+import { AdminRota } from "@/components/admin/AdminRota";
 import { AdminShell, type AdminView } from "@/components/admin/AdminShell";
 import { AdminStatCard } from "@/components/admin/AdminStatCard";
 import { AdminStatusBadge } from "@/components/admin/AdminStatusBadge";
@@ -165,6 +166,8 @@ export function AdminDashboard() {
         <AdminCustomers />
       ) : view === "blackouts" ? (
         <AdminBlackouts />
+      ) : view === "rota" ? (
+        <AdminRota />
       ) : view === "settings" ? (
         <AdminSettings />
       ) : view === "notifications" ? (
