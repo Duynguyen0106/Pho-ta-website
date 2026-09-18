@@ -1,22 +1,21 @@
--- Staff rota tables (run after schema.sql)
+-- Staff rota settings (employees + monthly schedules as JSON)
+-- Run in Supabase SQL editor for persistent rota data on production
 
-create table if not exists rota_employees (
-  id uuid primary key,
-  name text not null,
-  employment_type text not null check (employment_type in ('part_time', 'full_time')),
-  requested_hours_per_week numeric(4, 1) not null,
-  download_token text not null unique,
-  active boolean not null default true,
-  created_at timestamptz not null default now()
+create table if not exists rota_settings (
+  id text primary key default 'default',
+  data jsonb not null default '{"employees":[],"monthlySchedules":{}}'::jsonb,
+  updated_at timestamptz not null default now()
 );
 
-create table if not exists rota_shifts (
-  id text primary key,
-  employee_id uuid not null references rota_employees(id) on delete cascade,
-  shift_date date not null,
-  start_time time not null,
-  end_time time not null,
-  month_key text not null
-);
+alter table rota_settings enable row level security;
 
-create index if not exists rota_shifts_month_idx on rota_shifts (month_key, shift_date);
+drop policy if exists "Allow select rota_settings" on rota_settings;
+drop policy if exists "Allow insert rota_settings" on rota_settings;
+drop policy if exists "Allow update rota_settings" on rota_settings;
+
+create policy "Allow select rota_settings"
+  on rota_settings for select using (true);
+create policy "Allow insert rota_settings"
+  on rota_settings for insert with check (true);
+create policy "Allow update rota_settings"
+  on rota_settings for update using (true);

@@ -23,6 +23,12 @@ export interface RotaShift {
   monthKey: string;
 }
 
+/** Persisted rota state — employees are saved permanently; schedules are per month. */
+export interface RotaSettingsData {
+  employees: RotaEmployee[];
+  monthlySchedules: Record<string, RotaShift[]>;
+}
+
 export interface RotaMonthSummary {
   monthKey: string;
   employeeId: string;
