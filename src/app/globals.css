@@ -71,6 +71,9 @@ body {
 
 .luxury-input {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   border: 1px solid var(--border);
   background: var(--surface-elevated);
   color: var(--foreground);
@@ -91,6 +94,16 @@ body {
   border-color: var(--gold);
   background: var(--surface);
   box-shadow: 0 0 0 3px rgba(201, 169, 98, 0.14);
+}
+
+.luxury-input-date {
+  display: block;
+  overflow: hidden;
+}
+
+.luxury-input-date::-webkit-date-and-time-value {
+  min-width: 0;
+  text-align: left;
 }
 
 .luxury-card {

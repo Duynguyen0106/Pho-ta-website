@@ -23,7 +23,7 @@ export default function BookPage() {
         </div>
       </section>
 
-      <div className="mx-auto max-w-6xl px-6 py-8 pb-24 sm:py-16 sm:pb-16 lg:py-20">
+      <div className="mx-auto min-w-0 max-w-6xl overflow-x-hidden px-4 py-8 pb-24 sm:px-6 sm:py-16 sm:pb-16 lg:py-20">
         <BookingForm />
       </div>
     </>
