@@ -96,9 +96,21 @@ export function BookingForm() {
   const availableSlots = slots.filter((s) => s.available);
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[1fr_320px] lg:gap-14">
-      <form onSubmit={handleSubmit} className="min-w-0 space-y-10">
-        <BookingStepper currentStep={step} />
+    <div className="grid gap-8 lg:grid-cols-[1fr_320px] lg:gap-14">
+      <form onSubmit={handleSubmit} className="min-w-0 space-y-8 sm:space-y-10">
+        <div className="space-y-3">
+          <BookingStepper currentStep={step} />
+          <p className="text-center text-sm text-muted sm:hidden">
+            Step {step} of 4 ·{" "}
+            {step === 1
+              ? "Date & guests"
+              : step === 2
+                ? "Select a time"
+                : step === 3
+                  ? "Seating"
+                  : "Your details"}
+          </p>
+        </div>
 
         {error && (
           <div
@@ -112,7 +124,7 @@ export function BookingForm() {
         {step === 1 && (
           <div className="space-y-8">
             <header>
-              <h2 className="font-display text-4xl font-normal text-foreground">
+              <h2 className="font-display text-3xl font-normal text-foreground sm:text-4xl">
                 Date & guests
               </h2>
               <p className="mt-2 text-lg text-muted">
@@ -151,8 +163,13 @@ export function BookingForm() {
               </label>
             </div>
 
-            <div className="flex justify-end pt-2">
-              <Button type="button" size="lg" onClick={() => setStep(2)}>
+            <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
+              <Button
+                type="button"
+                size="lg"
+                className="w-full sm:w-auto"
+                onClick={() => setStep(2)}
+              >
                 Continue
               </Button>
             </div>
@@ -162,7 +179,7 @@ export function BookingForm() {
         {step === 2 && (
           <div className="space-y-8">
             <header>
-              <h2 className="font-display text-4xl font-normal text-foreground">
+              <h2 className="font-display text-3xl font-normal text-foreground sm:text-4xl">
                 Select a time
               </h2>
               <p className="mt-2 text-lg text-muted">
@@ -182,7 +199,7 @@ export function BookingForm() {
                 No tables available for this date. Please try another day.
               </p>
             ) : (
-              <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 md:grid-cols-5">
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-2.5 md:grid-cols-5">
                 {slots.map((slot) => (
                   <button
                     key={slot.time}
@@ -190,7 +207,7 @@ export function BookingForm() {
                     disabled={!slot.available}
                     onClick={() => setTime(slot.time)}
                     className={cn(
-                      "border py-3.5 font-sans text-base tracking-widest transition duration-200",
+                      "min-h-11 border py-3 font-sans text-sm tracking-widest transition duration-200 sm:py-3.5 sm:text-base",
                       !slot.available && "cursor-not-allowed opacity-25",
                       time === slot.time
                         ? "border-gold bg-gold text-background shadow-lg shadow-gold/20"
@@ -205,11 +222,21 @@ export function BookingForm() {
               </div>
             )}
 
-            <div className="flex flex-wrap gap-4 border-t border-gold/15 pt-6">
-              <Button type="button" variant="outline" onClick={() => setStep(1)}>
+            <div className="flex flex-col-reverse gap-3 border-t border-gold/15 pt-6 sm:flex-row sm:flex-wrap sm:gap-4">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full sm:w-auto"
+                onClick={() => setStep(1)}
+              >
                 Back
               </Button>
-              <Button type="button" disabled={!time} onClick={() => setStep(3)}>
+              <Button
+                type="button"
+                disabled={!time}
+                className="w-full sm:w-auto"
+                onClick={() => setStep(3)}
+              >
                 Continue
               </Button>
             </div>
@@ -219,7 +246,7 @@ export function BookingForm() {
         {step === 3 && (
           <div className="space-y-8">
             <header>
-              <h2 className="font-display text-4xl font-normal text-foreground">
+              <h2 className="font-display text-3xl font-normal text-foreground sm:text-4xl">
                 Seating preference
               </h2>
               <p className="mt-2 text-lg text-muted">
@@ -234,7 +261,7 @@ export function BookingForm() {
                   type="button"
                   data-selected={seatingPreference === pref.value}
                   onClick={() => setSeatingPreference(pref.value)}
-                  className="booking-select-card p-5 text-left"
+                  className="booking-select-card min-h-11 p-5 text-left"
                 >
                   <span className="font-medium text-foreground">{pref.label}</span>
                   <p className="mt-1.5 text-base leading-relaxed text-muted">
@@ -244,11 +271,20 @@ export function BookingForm() {
               ))}
             </div>
 
-            <div className="flex flex-wrap gap-4 border-t border-gold/15 pt-6">
-              <Button type="button" variant="outline" onClick={() => setStep(2)}>
+            <div className="flex flex-col-reverse gap-3 border-t border-gold/15 pt-6 sm:flex-row sm:flex-wrap sm:gap-4">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full sm:w-auto"
+                onClick={() => setStep(2)}
+              >
                 Back
               </Button>
-              <Button type="button" onClick={() => setStep(4)}>
+              <Button
+                type="button"
+                className="w-full sm:w-auto"
+                onClick={() => setStep(4)}
+              >
                 Continue
               </Button>
             </div>
@@ -258,7 +294,7 @@ export function BookingForm() {
         {step === 4 && (
           <div className="space-y-8">
             <header>
-              <h2 className="font-display text-4xl font-normal text-foreground">
+              <h2 className="font-display text-3xl font-normal text-foreground sm:text-4xl">
                 Your details
               </h2>
               <p className="mt-2 text-lg text-muted">
@@ -325,15 +361,15 @@ export function BookingForm() {
               </label>
             </div>
 
-            <label className="flex items-start gap-3 rounded border border-gold/15 bg-surface-alt/50 p-4 text-base leading-relaxed text-muted">
+            <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded border border-gold/15 bg-surface-alt/50 p-4 text-base leading-relaxed text-muted">
               <input
                 type="checkbox"
                 checked={consent}
                 onChange={(e) => setConsent(e.target.checked)}
-                className="mt-1 h-4 w-4 accent-gold"
+                className="mt-1 h-5 w-5 shrink-0 accent-gold"
                 required
               />
-              <span>
+              <span className="min-w-0 flex-1">
                 I agree to receive booking confirmations and reminders by email,
                 and I accept the{" "}
                 <a href="/terms" className="text-gold underline-offset-2 hover:underline">
@@ -347,11 +383,21 @@ export function BookingForm() {
               </span>
             </label>
 
-            <div className="flex flex-wrap gap-4 border-t border-gold/15 pt-6">
-              <Button type="button" variant="outline" onClick={() => setStep(3)}>
+            <div className="flex flex-col-reverse gap-3 border-t border-gold/15 pt-6 sm:flex-row sm:flex-wrap sm:gap-4">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full sm:w-auto"
+                onClick={() => setStep(3)}
+              >
                 Back
               </Button>
-              <Button type="submit" size="lg" disabled={loading || !consent}>
+              <Button
+                type="submit"
+                size="lg"
+                className="w-full sm:w-auto"
+                disabled={loading || !consent}
+              >
                 {loading ? "Confirming…" : "Confirm Reservation"}
               </Button>
             </div>
