@@ -59,9 +59,9 @@ export function BookingSummary({
             {partySize} {partySize === 1 ? "guest" : "guests"}
           </span>
         </li>
-        <li className="flex items-center gap-3">
-          <Clock size={18} className="shrink-0 text-gold" strokeWidth={1.25} />
-          <span>
+        <li className="flex min-w-0 items-start gap-3">
+          <Clock size={18} className="mt-0.5 shrink-0 text-gold" strokeWidth={1.25} />
+          <span className="min-w-0 break-words">
             {time ? `${formattedDate} at ${time}` : formattedDate}
           </span>
         </li>

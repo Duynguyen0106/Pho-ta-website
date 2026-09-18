@@ -132,9 +132,9 @@ const labelStyle = "text-base uppercase tracking-[0.1em] text-gold print:text-bl
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col gap-1 border-b border-gold/10 pb-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6 print:border-black/15">
+    <div className="flex min-w-0 flex-col gap-1 border-b border-gold/10 pb-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6 print:border-black/15">
       <dt className={labelStyle}>{label}</dt>
-      <dd className="text-foreground sm:text-right print:text-black">{value}</dd>
+      <dd className="min-w-0 break-words text-foreground sm:text-right print:text-black">{value}</dd>
     </div>
   );
 }

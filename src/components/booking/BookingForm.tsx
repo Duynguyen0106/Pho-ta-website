@@ -132,8 +132,8 @@ export function BookingForm() {
               </p>
             </header>
 
-            <div className="grid gap-6 sm:grid-cols-2">
-              <label className="block">
+            <div className="grid min-w-0 grid-cols-1 gap-6 md:grid-cols-2">
+              <label className="block min-w-0">
                 <span className="label-caps">Date</span>
                 <input
                   type="date"
@@ -141,11 +141,11 @@ export function BookingForm() {
                   min={format(new Date(), "yyyy-MM-dd")}
                   max={maxDate}
                   onChange={(e) => setDate(e.target.value)}
-                  className="luxury-input mt-3"
+                  className="luxury-input luxury-input-date mt-3"
                   required
                 />
               </label>
-              <label className="block">
+              <label className="block min-w-0">
                 <span className="label-caps">Guests</span>
                 <select
                   value={partySize}
@@ -182,10 +182,13 @@ export function BookingForm() {
               <h2 className="font-display text-3xl font-normal text-foreground sm:text-4xl">
                 Select a time
               </h2>
-              <p className="mt-2 text-lg text-muted">
+              <p className="mt-2 text-lg leading-relaxed text-muted">
                 Pho Ta {location.shortName} · {partySize}{" "}
-                {partySize === 1 ? "guest" : "guests"} ·{" "}
-                {format(new Date(`${date}T12:00:00`), "EEE d MMM yyyy")}
+                {partySize === 1 ? "guest" : "guests"}
+                <span className="block sm:inline">
+                  <span className="hidden sm:inline"> · </span>
+                  {format(new Date(`${date}T12:00:00`), "EEE d MMM yyyy")}
+                </span>
               </p>
             </header>
 
@@ -311,8 +314,8 @@ export function BookingForm() {
               seatingPreference={seatingPreference}
             />
 
-            <div className="grid gap-6 sm:grid-cols-2">
-              <label className="block sm:col-span-2">
+            <div className="grid min-w-0 grid-cols-1 gap-6 md:grid-cols-2">
+              <label className="block min-w-0 md:col-span-2">
                 <span className="label-caps">Full name</span>
                 <input
                   type="text"
