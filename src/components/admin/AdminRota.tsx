@@ -12,7 +12,14 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { AdminRotaTeamGrid } from "@/components/admin/AdminRotaTeamGrid";
+import {
+  complianceValuesFromEmployee,
+  EmployeeComplianceFields,
+  emptyComplianceValues,
+  type ComplianceFormValues,
+} from "@/components/admin/EmployeeComplianceFields";
 import { Button } from "@/components/ui/Button";
+import { visaAlert, visaTypeLabel } from "@/lib/rota/compliance";
 import { restaurantHoursLabel } from "@/lib/rota/generate-schedule";
 import {
   FULL_TIME_WEEKLY_HOURS,
@@ -52,6 +59,12 @@ export function AdminRota() {
   const [editName, setEditName] = useState("");
   const [editType, setEditType] = useState<EmploymentType>("part_time");
   const [editHours, setEditHours] = useState(16);
+  const [addCompliance, setAddCompliance] = useState<ComplianceFormValues>(
+    emptyComplianceValues(),
+  );
+  const [editCompliance, setEditCompliance] = useState<ComplianceFormValues>(
+    emptyComplianceValues(),
+  );
 
   const fetchEmployees = useCallback(async () => {
     setLoadingEmployees(true);
@@ -109,12 +122,23 @@ export function AdminRota() {
             employmentType === "full_time"
               ? FULL_TIME_WEEKLY_HOURS
               : requestedHours,
+          dateOfBirth: addCompliance.dateOfBirth || null,
+          rightToWorkCategory: addCompliance.rightToWorkCategory,
+          visaType:
+            addCompliance.rightToWorkCategory === "visa"
+              ? addCompliance.visaType
+              : null,
+          visaExpiryDate:
+            addCompliance.rightToWorkCategory === "visa"
+              ? addCompliance.visaExpiryDate
+              : null,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Failed to add employee");
       setName("");
       setRequestedHours(16);
+      setAddCompliance(emptyComplianceValues());
       await fetchEmployees();
       await fetchMonthSchedule();
     } catch (err) {
@@ -129,6 +153,7 @@ export function AdminRota() {
     setEditName(employee.name);
     setEditType(employee.employmentType);
     setEditHours(employee.requestedHoursPerWeek);
+    setEditCompliance(complianceValuesFromEmployee(employee));
   }
 
   async function handleSaveEdit(id: string) {
@@ -145,6 +170,16 @@ export function AdminRota() {
           employmentType: editType,
           requestedHoursPerWeek:
             editType === "full_time" ? FULL_TIME_WEEKLY_HOURS : editHours,
+          dateOfBirth: editCompliance.dateOfBirth || null,
+          rightToWorkCategory: editCompliance.rightToWorkCategory,
+          visaType:
+            editCompliance.rightToWorkCategory === "visa"
+              ? editCompliance.visaType
+              : null,
+          visaExpiryDate:
+            editCompliance.rightToWorkCategory === "visa"
+              ? editCompliance.visaExpiryDate
+              : null,
         }),
       });
       const data = await res.json();
@@ -309,6 +344,13 @@ export function AdminRota() {
             )}
           </div>
           <div className="mt-6">
+            <EmployeeComplianceFields
+              values={addCompliance}
+              onChange={setAddCompliance}
+              disabled={saving}
+            />
+          </div>
+          <div className="mt-6">
             <Button type="submit" disabled={saving}>
               Save to team roster
             </Button>
@@ -363,6 +405,18 @@ export function AdminRota() {
                         />
                       </label>
                     )}
+                    <div className="md:col-span-2">
+                      <EmployeeComplianceFields
+                        values={editCompliance}
+                        onChange={setEditCompliance}
+                        employee={employee}
+                        disabled={saving}
+                        onDocumentChange={() => {
+                          void fetchEmployees();
+                          void fetchMonthSchedule();
+                        }}
+                      />
+                    </div>
                     <div className="flex flex-wrap gap-2 md:col-span-2">
                       <Button
                         type="button"
@@ -390,7 +444,35 @@ export function AdminRota() {
                         {employee.employmentType === "full_time"
                           ? `Full-time · ${FULL_TIME_WEEKLY_HOURS}h/week`
                           : `Part-time · ${employee.requestedHoursPerWeek}h/week`}
+                        {employee.dateOfBirth
+                          ? ` · DOB ${format(parseISO(employee.dateOfBirth), "d MMM yyyy")}`
+                          : ""}
                       </p>
+                      {employee.rightToWorkCategory === "visa" && (
+                        <p className="mt-1 text-sm text-muted">
+                          {visaTypeLabel(employee.visaType)}
+                          {employee.visaExpiryDate
+                            ? ` · expires ${format(parseISO(employee.visaExpiryDate), "d MMM yyyy")}`
+                            : ""}
+                        </p>
+                      )}
+                      {visaAlert(employee.visaExpiryDate) === "expired" && (
+                        <p className="mt-1 text-sm text-red-300">Visa expired</p>
+                      )}
+                      {visaAlert(employee.visaExpiryDate) === "expiring_soon" && (
+                        <p className="mt-1 text-sm text-amber-300">
+                          Visa expiring within 60 days
+                        </p>
+                      )}
+                      {employee.rightToWorkDocument ? (
+                        <p className="mt-1 text-sm text-gold/80">
+                          Right to work document on file
+                        </p>
+                      ) : (
+                        <p className="mt-1 text-sm text-muted">
+                          No right to work document uploaded
+                        </p>
+                      )}
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <button

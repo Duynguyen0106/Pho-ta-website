@@ -4,10 +4,16 @@ import { randomUUID } from "crypto";
 import { endOfMonth, format, parseISO, startOfMonth } from "date-fns";
 import { listBlackoutDates } from "@/lib/db/blackout-store";
 import { getDataDir } from "@/lib/db/data-dir";
+import { deleteRightToWorkDocument } from "@/lib/db/rota-documents";
 import { generateMonthlyRota, validateEmployeeInput } from "@/lib/rota/generate-schedule";
+import {
+  normalizeEmployeeCompliance,
+  validateCompliance,
+} from "@/lib/rota/compliance";
 import {
   FULL_TIME_WEEKLY_HOURS,
   type EmploymentType,
+  type RightToWorkDocument,
   type RotaEmployee,
   type RotaSettingsData,
   type RotaShift,
@@ -27,18 +33,37 @@ function emptyData(): RotaSettingsData {
   return { employees: [], monthlySchedules: {} };
 }
 
+function normalizeEmployee(raw: Partial<RotaEmployee>): RotaEmployee {
+  const compliance = normalizeEmployeeCompliance(raw);
+  return {
+    id: String(raw.id ?? randomUUID()),
+    name: String(raw.name ?? "").trim(),
+    employmentType:
+      raw.employmentType === "full_time" ? "full_time" : "part_time",
+    requestedHoursPerWeek: Number(raw.requestedHoursPerWeek ?? 0),
+    downloadToken: String(raw.downloadToken ?? randomUUID().replace(/-/g, "")),
+    active: raw.active !== false,
+    createdAt: String(raw.createdAt ?? new Date().toISOString()),
+    ...compliance,
+  };
+}
+
 function normalizeRotaData(raw: unknown): RotaSettingsData {
   if (!raw || typeof raw !== "object") return emptyData();
   const obj = raw as Record<string, unknown>;
 
   if (obj.monthlySchedules && typeof obj.monthlySchedules === "object") {
     return {
-      employees: (obj.employees as RotaEmployee[]) ?? [],
+      employees: ((obj.employees as Partial<RotaEmployee>[]) ?? []).map(
+        normalizeEmployee,
+      ),
       monthlySchedules: obj.monthlySchedules as Record<string, RotaShift[]>,
     };
   }
 
-  const employees = (obj.employees as RotaEmployee[]) ?? [];
+  const employees = ((obj.employees as Partial<RotaEmployee>[]) ?? []).map(
+    normalizeEmployee,
+  );
   const shifts = (obj.shifts as RotaShift[]) ?? [];
   const monthlySchedules: Record<string, RotaShift[]> = {};
   for (const shift of shifts) {
@@ -169,9 +194,22 @@ export async function createRotaEmployee(input: {
   name: string;
   employmentType: EmploymentType;
   requestedHoursPerWeek: number;
+  dateOfBirth?: string | null;
+  rightToWorkCategory?: RotaEmployee["rightToWorkCategory"];
+  visaType?: string | null;
+  visaExpiryDate?: string | null;
 }): Promise<RotaEmployee> {
   const validation = validateEmployeeInput(input);
   if (validation) throw new Error(validation);
+
+  const rightToWorkCategory = input.rightToWorkCategory ?? "uk_irish";
+  const complianceError = validateCompliance({
+    dateOfBirth: input.dateOfBirth ?? null,
+    rightToWorkCategory,
+    visaType: input.visaType ?? null,
+    visaExpiryDate: input.visaExpiryDate ?? null,
+  });
+  if (complianceError) throw new Error(complianceError);
 
   const requestedHours =
     input.employmentType === "full_time"
@@ -186,6 +224,15 @@ export async function createRotaEmployee(input: {
     downloadToken: randomUUID().replace(/-/g, ""),
     active: true,
     createdAt: new Date().toISOString(),
+    dateOfBirth: input.dateOfBirth?.trim() || null,
+    rightToWorkCategory,
+    visaType:
+      rightToWorkCategory === "visa" ? input.visaType?.trim() || null : null,
+    visaExpiryDate:
+      rightToWorkCategory === "visa"
+        ? input.visaExpiryDate?.trim() || null
+        : null,
+    rightToWorkDocument: null,
   };
 
   const data = await getData();
@@ -201,6 +248,10 @@ export async function updateRotaEmployee(
     employmentType?: EmploymentType;
     requestedHoursPerWeek?: number;
     active?: boolean;
+    dateOfBirth?: string | null;
+    rightToWorkCategory?: RotaEmployee["rightToWorkCategory"];
+    visaType?: string | null;
+    visaExpiryDate?: string | null;
   },
 ): Promise<RotaEmployee | null> {
   const data = await getData();
@@ -215,6 +266,23 @@ export async function updateRotaEmployee(
     employee.requestedHoursPerWeek = updates.requestedHoursPerWeek;
   }
   if (updates.active !== undefined) employee.active = updates.active;
+  if (updates.dateOfBirth !== undefined) {
+    employee.dateOfBirth = updates.dateOfBirth?.trim() || null;
+  }
+  if (updates.rightToWorkCategory !== undefined) {
+    employee.rightToWorkCategory = updates.rightToWorkCategory;
+  }
+  if (updates.visaType !== undefined) {
+    employee.visaType = updates.visaType?.trim() || null;
+  }
+  if (updates.visaExpiryDate !== undefined) {
+    employee.visaExpiryDate = updates.visaExpiryDate?.trim() || null;
+  }
+
+  if (employee.rightToWorkCategory !== "visa") {
+    employee.visaType = null;
+    employee.visaExpiryDate = null;
+  }
 
   if (employee.employmentType === "full_time") {
     employee.requestedHoursPerWeek = FULL_TIME_WEEKLY_HOURS;
@@ -227,6 +295,38 @@ export async function updateRotaEmployee(
     if (validation) throw new Error(validation);
   }
 
+  const complianceError = validateCompliance({
+    dateOfBirth: employee.dateOfBirth,
+    rightToWorkCategory: employee.rightToWorkCategory,
+    visaType: employee.visaType,
+    visaExpiryDate: employee.visaExpiryDate,
+  });
+  if (complianceError) throw new Error(complianceError);
+
+  await persist(data);
+  return employee;
+}
+
+export async function setEmployeeRightToWorkDocument(
+  id: string,
+  document: RightToWorkDocument,
+): Promise<RotaEmployee | null> {
+  const data = await getData();
+  const employee = data.employees.find((e) => e.id === id);
+  if (!employee) return null;
+  employee.rightToWorkDocument = document;
+  await persist(data);
+  return employee;
+}
+
+export async function clearEmployeeRightToWorkDocument(
+  id: string,
+): Promise<RotaEmployee | null> {
+  const data = await getData();
+  const employee = data.employees.find((e) => e.id === id);
+  if (!employee) return null;
+  await deleteRightToWorkDocument(id, employee.rightToWorkDocument);
+  employee.rightToWorkDocument = null;
   await persist(data);
   return employee;
 }
@@ -236,7 +336,8 @@ export async function deleteRotaEmployee(id: string): Promise<boolean> {
   const index = data.employees.findIndex((e) => e.id === id);
   if (index === -1) return false;
 
-  data.employees.splice(index, 1);
+  const [removed] = data.employees.splice(index, 1);
+  await deleteRightToWorkDocument(removed.id, removed.rightToWorkDocument);
   for (const monthKey of Object.keys(data.monthlySchedules)) {
     data.monthlySchedules[monthKey] = data.monthlySchedules[monthKey].filter(
       (s) => s.employeeId !== id,

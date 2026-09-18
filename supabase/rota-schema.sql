@@ -19,3 +19,8 @@ create policy "Allow insert rota_settings"
   on rota_settings for insert with check (true);
 create policy "Allow update rota_settings"
   on rota_settings for update using (true);
+
+-- Optional: private bucket for right-to-work document uploads
+-- Create in Supabase Dashboard → Storage → New bucket: rota-documents (private)
+-- Or run (requires storage extension):
+-- insert into storage.buckets (id, name, public) values ('rota-documents', 'rota-documents', false) on conflict do nothing;

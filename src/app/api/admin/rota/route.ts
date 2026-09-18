@@ -53,6 +53,10 @@ export async function POST(request: NextRequest) {
           name: String(body.name ?? ""),
           employmentType: body.employmentType as EmploymentType,
           requestedHoursPerWeek: Number(body.requestedHoursPerWeek ?? 0),
+          dateOfBirth: body.dateOfBirth ?? null,
+          rightToWorkCategory: body.rightToWorkCategory,
+          visaType: body.visaType ?? null,
+          visaExpiryDate: body.visaExpiryDate ?? null,
         });
         return NextResponse.json({ employee });
       }
@@ -65,6 +69,10 @@ export async function POST(request: NextRequest) {
               ? Number(body.requestedHoursPerWeek)
               : undefined,
           active: body.active,
+          dateOfBirth: body.dateOfBirth,
+          rightToWorkCategory: body.rightToWorkCategory,
+          visaType: body.visaType,
+          visaExpiryDate: body.visaExpiryDate,
         });
         if (!employee) {
           return NextResponse.json({ error: "Employee not found" }, { status: 404 });
