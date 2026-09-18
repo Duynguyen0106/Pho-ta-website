@@ -9,20 +9,92 @@ function escapeCsv(value: string): string {
   return value;
 }
 
-export function buildEmployeeScheduleCsv(input: {
-  employee: RotaEmployee;
-  monthKey: string;
-  shifts: RotaShift[];
-  venueName?: string;
-}): string {
-  const { employee, monthKey, shifts, venueName = "Pho Ta Finchley Road" } = input;
-  const employeeShifts = shifts
-    .filter((s) => s.employeeId === employee.id && s.monthKey === monthKey)
+function employeeShiftsForMonth(
+  employeeId: string,
+  monthKey: string,
+  teamShifts: RotaShift[],
+): RotaShift[] {
+  return teamShifts
+    .filter((s) => s.employeeId === employeeId && s.monthKey === monthKey)
     .sort((a, b) =>
       a.shiftDate === b.shiftDate
         ? a.startTime.localeCompare(b.startTime)
         : a.shiftDate.localeCompare(b.shiftDate),
     );
+}
+
+export function buildTeamScheduleCsv(input: {
+  monthKey: string;
+  employees: RotaEmployee[];
+  teamShifts: RotaShift[];
+  venueName?: string;
+}): string {
+  const { monthKey, employees, teamShifts, venueName = "Pho Ta Finchley Road" } =
+    input;
+
+  const headers = [
+    "Month",
+    "Date",
+    "Day",
+    "Employee",
+    "Contract",
+    "Weekly hours",
+    "Start",
+    "End",
+    "Shift hours",
+  ];
+
+  const rows = teamShifts
+    .filter((s) => s.monthKey === monthKey)
+    .sort((a, b) =>
+      a.shiftDate === b.shiftDate
+        ? a.startTime.localeCompare(b.startTime)
+        : a.shiftDate.localeCompare(b.shiftDate),
+    )
+    .map((shift) => {
+      const employee = employees.find((e) => e.id === shift.employeeId);
+      const shiftHours = hoursBetween(shift.startTime, shift.endTime);
+      return [
+        monthKey,
+        shift.shiftDate,
+        format(parseISO(shift.shiftDate), "EEEE"),
+        employee?.name ?? "Unknown",
+        employee?.employmentType === "full_time" ? "Full-time" : "Part-time",
+        employee ? String(employee.requestedHoursPerWeek) : "",
+        shift.startTime,
+        shift.endTime,
+        shiftHours.toFixed(1),
+      ];
+    });
+
+  const meta = [
+    ["Venue", venueName],
+    ["Team schedule", format(parseISO(`${monthKey}-01`), "MMMM yyyy")],
+    ["Total shifts", String(rows.length)],
+    ["Staff count", String(employees.filter((e) => e.active).length)],
+    [],
+  ];
+
+  return [
+    ...meta.map((row) => row.map((cell) => escapeCsv(cell)).join(",")),
+    headers.map((cell) => escapeCsv(cell)).join(","),
+    ...rows.map((row) => row.map((cell) => escapeCsv(String(cell))).join(",")),
+  ].join("\n");
+}
+
+export function buildEmployeeScheduleCsv(input: {
+  employee: RotaEmployee;
+  monthKey: string;
+  teamShifts: RotaShift[];
+  venueName?: string;
+}): string {
+  const { employee, monthKey, teamShifts, venueName = "Pho Ta Finchley Road" } =
+    input;
+  const employeeShifts = employeeShiftsForMonth(
+    employee.id,
+    monthKey,
+    teamShifts,
+  );
 
   const headers = ["Employee", "Month", "Date", "Day", "Start", "End", "Hours"];
   const rows = employeeShifts.map((shift) => {
@@ -44,9 +116,15 @@ export function buildEmployeeScheduleCsv(input: {
   );
 
   const meta = [
-    [`Venue`, venueName],
-    [`Employment`, employee.employmentType === "full_time" ? "Full-time (40h/week)" : `Part-time (${employee.requestedHoursPerWeek}h/week)`],
-    [`Total scheduled hours`, totalHours.toFixed(1)],
+    ["Venue", venueName],
+    ["Extracted from team schedule", format(parseISO(`${monthKey}-01`), "MMMM yyyy")],
+    [
+      "Employment",
+      employee.employmentType === "full_time"
+        ? "Full-time (40h/week)"
+        : `Part-time (${employee.requestedHoursPerWeek}h/week)`,
+    ],
+    ["Total scheduled hours", totalHours.toFixed(1)],
     [],
   ];
 
@@ -60,13 +138,16 @@ export function buildEmployeeScheduleCsv(input: {
 export function buildEmployeeScheduleText(input: {
   employee: RotaEmployee;
   monthKey: string;
-  shifts: RotaShift[];
+  teamShifts: RotaShift[];
   venueName?: string;
 }): string {
-  const { employee, monthKey, shifts, venueName = "Pho Ta Finchley Road" } = input;
-  const employeeShifts = shifts
-    .filter((s) => s.employeeId === employee.id && s.monthKey === monthKey)
-    .sort((a, b) => a.shiftDate.localeCompare(b.shiftDate));
+  const { employee, monthKey, teamShifts, venueName = "Pho Ta Finchley Road" } =
+    input;
+  const employeeShifts = employeeShiftsForMonth(
+    employee.id,
+    monthKey,
+    teamShifts,
+  );
 
   const totalHours = employeeShifts.reduce(
     (sum, shift) => sum + hoursBetween(shift.startTime, shift.endTime),
@@ -74,9 +155,10 @@ export function buildEmployeeScheduleText(input: {
   );
 
   const lines = [
-    `${venueName}`,
+    venueName,
     `Work schedule — ${employee.name}`,
     `Month: ${format(parseISO(`${monthKey}-01`), "MMMM yyyy")}`,
+    "Extracted from published team rota",
     employee.employmentType === "full_time"
       ? "Contract: Full-time (40 hours/week)"
       : `Contract: Part-time (${employee.requestedHoursPerWeek} hours/week)`,
@@ -90,9 +172,7 @@ export function buildEmployeeScheduleText(input: {
     for (const shift of employeeShifts) {
       const day = format(parseISO(shift.shiftDate), "EEE d MMM");
       const hours = hoursBetween(shift.startTime, shift.endTime);
-      lines.push(
-        `  ${day}  ${shift.startTime} – ${shift.endTime}  (${hours}h)`,
-      );
+      lines.push(`  ${day}  ${shift.startTime} – ${shift.endTime}  (${hours}h)`);
     }
   }
 

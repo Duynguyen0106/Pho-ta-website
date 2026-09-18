@@ -29,11 +29,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Schedule not found" }, { status: 404 });
     }
 
-    const { shifts } = await getRotaForMonth(monthKey);
+    const { shifts: teamShifts } = await getRotaForMonth(monthKey);
     const safeName = employee.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase();
 
+    if (teamShifts.length === 0) {
+      return NextResponse.json(
+        { error: "Team schedule not published for this month yet" },
+        { status: 404 },
+      );
+    }
+
     if (format === "txt") {
-      const text = buildEmployeeScheduleText({ employee, monthKey, shifts });
+      const text = buildEmployeeScheduleText({ employee, monthKey, teamShifts });
       return new NextResponse(text, {
         headers: {
           "Content-Type": "text/plain; charset=utf-8",
@@ -42,7 +49,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const csv = buildEmployeeScheduleCsv({ employee, monthKey, shifts });
+    const csv = buildEmployeeScheduleCsv({ employee, monthKey, teamShifts });
     return new NextResponse(csv, {
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
