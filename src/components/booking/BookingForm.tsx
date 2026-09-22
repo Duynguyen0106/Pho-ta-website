@@ -6,7 +6,12 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { BookingStepper } from "@/components/booking/BookingStepper";
 import { BookingSummary } from "@/components/booking/BookingSummary";
-import { LOCATION_SLUG, MAX_PARTY_SIZE, SEATING_PREFERENCES } from "@/lib/constants";
+import {
+  LOCATION_SLUG,
+  MAX_PARTY_SIZE,
+  MIN_LEAD_MINUTES,
+  SEATING_PREFERENCES,
+} from "@/lib/constants";
 import { location } from "@/lib/data/locations";
 import type { AvailabilitySlot, SeatingPreference } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -190,6 +195,10 @@ export function BookingForm() {
                   {format(new Date(`${date}T12:00:00`), "EEE d MMM yyyy")}
                 </span>
               </p>
+              <p className="mt-2 text-base text-muted">
+                Times must be at least {MIN_LEAD_MINUTES / 60} hours from now.
+                Need something sooner? Call {location.phone}.
+              </p>
             </header>
 
             {slotsLoading ? (
@@ -199,7 +208,9 @@ export function BookingForm() {
               </div>
             ) : availableSlots.length === 0 ? (
               <p className="rounded border border-gold/20 bg-surface-alt px-5 py-4 text-muted">
-                No tables available for this date. Please try another day.
+                {date === format(new Date(), "yyyy-MM-dd")
+                  ? `No times available at least ${MIN_LEAD_MINUTES / 60} hours from now. Try a later time today, another day, or call ${location.phone}.`
+                  : "No tables available for this date. Please try another day."}
               </p>
             ) : (
               <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-2.5 md:grid-cols-5">

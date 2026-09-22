@@ -325,7 +325,7 @@ const PREPARED_TOPICS: PreparedTopic[] = [
     keywords: ["book", "reserv", "table"],
     minScore: 2,
     answer: () =>
-      `You can reserve online in a few minutes at /book — choose your date, time, party size, and seating preference. You'll receive a confirmation on screen and by email.\n\n` +
+      `You can reserve online in a few minutes at /book — choose your date, time, party size, and seating preference. Online bookings need at least 3 hours' notice before your table time. You'll receive a confirmation on screen and by email.\n\n` +
       `Walk-ins are welcome when tables are available. For groups of four or more or special occasions, booking ahead is recommended.\n\n` +
       `To change or cancel, call us on ${location.phone} with your booking reference.`,
   },
@@ -697,7 +697,7 @@ export function buildAssistantKnowledgeText(ctx: AssistantContext): string {
     `- Address: ${location.address}, ${location.postcode}`,
     `- Phone: ${location.phone} | Email: ${location.email}`,
     `- Hours: Mon–Sun 11:30am – 9:30pm`,
-    `- Booking: online at /book (up to 30 days ahead); call ${location.phone} to change/cancel`,
+    `- Booking: online at /book (up to 30 days ahead, at least 3 hours' notice); call ${location.phone} to change/cancel`,
     `- Parking: street parking nearby; good public transport links`,
     buildFoodSafetyKnowledgeText(),
     `- Takeaway: call ${location.phone} for availability`,

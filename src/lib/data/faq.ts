@@ -18,6 +18,11 @@ export const faqCategories: { title: string; items: FaqItem[] }[] = [
           "Online reservations are available up to 30 days ahead. For larger parties or special occasions, please call us on 020 7625 6889 and our team will be happy to help.",
       },
       {
+        question: "How soon can I book for today?",
+        answer:
+          "Online bookings must be made at least 3 hours before your preferred time. For same-day tables sooner than that, please call us on 020 7625 6889 — we will help if we can.",
+      },
+      {
         question: "Can I change or cancel my booking?",
         answer:
           "Yes. Call the restaurant directly and quote your booking reference. We ask for at least two hours’ notice for changes or cancellations when possible.",
