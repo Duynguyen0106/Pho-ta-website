@@ -16,8 +16,9 @@ export default function BookPage() {
             Book a Table
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-muted sm:mt-6 sm:text-xl">
-            Choose your date, time, and seating. We confirm by email and show a
-            reference to save or print.
+            Choose your date, time, and seating. Online bookings require at
+            least 3 hours&apos; notice before your table time. We confirm by
+            email and show a reference to save or print.
           </p>
           <div className="gold-line mx-auto mt-6 w-20 sm:mt-8" />
         </div>

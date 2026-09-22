@@ -77,7 +77,7 @@ export async function getAvailability(
         new Date(),
       );
 
-      if (selectedDate.getTime() === today.getTime() && slotDateTime < minBookingTime) {
+      if (slotDateTime < minBookingTime) {
         return {
           time,
           available: false,

@@ -57,6 +57,7 @@ export const BOOKING_SOURCE_LABELS = {
 export const MAX_PARTY_SIZE = 12;
 export const MIN_PARTY_SIZE = 1;
 export const MAX_ADVANCE_DAYS = 30;
-export const MIN_LEAD_MINUTES = 60;
+/** Minimum notice for online bookings (3 hours before the requested slot). */
+export const MIN_LEAD_MINUTES = 180;
 export const REMINDER_HOURS_BEFORE = 2;
 export const DEFAULT_DURATION_MINUTES = 90;
