@@ -57,7 +57,7 @@ npm run check-setup
    SMTP_USER=Photafinchley@gmail.com
    SMTP_PASS=your-16-char-app-password
    EMAIL_FROM="Pho Ta <Photafinchley@gmail.com>"
-   STAFF_NOTIFICATION_EMAIL=duydichdanh@gmail.com
+   STAFF_NOTIFICATION_EMAIL=v.tran64@yahoo.com.uk
    ```
 
 **Option B — Resend** — better for high volume; requires domain DNS verification:

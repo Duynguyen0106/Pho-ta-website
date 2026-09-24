@@ -7,7 +7,7 @@
  * Set EMAIL_PROVIDER=resend|smtp to force a provider; otherwise SMTP wins if
  * SMTP_HOST is set, else Resend if RESEND_API_KEY is set.
  */
-export const RESEND_OWNER_EMAIL = "duydichdanh@gmail.com";
+export const DEFAULT_STAFF_NOTIFICATION_EMAIL = "v.tran64@yahoo.com.uk";
 
 export type EmailProvider = "resend" | "smtp" | "none";
 
@@ -62,7 +62,8 @@ export function shouldSkipGuestEmail(): boolean {
 
 export function resolveStaffNotificationEmail(): string {
   return (
-    process.env.STAFF_NOTIFICATION_EMAIL?.trim() || RESEND_OWNER_EMAIL
+    process.env.STAFF_NOTIFICATION_EMAIL?.trim() ||
+    DEFAULT_STAFF_NOTIFICATION_EMAIL
   );
 }
 
