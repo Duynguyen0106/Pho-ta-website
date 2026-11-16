@@ -77,7 +77,11 @@ If both are configured, **SMTP is used by default** (unless `EMAIL_PROVIDER=rese
    - `TWILIO_AUTH_TOKEN`
    - `TWILIO_PHONE_NUMBER`
 
-### Step 4 — Deploy to Vercel (one project only)
+### Step 4 — Deploy (Cloudflare or Vercel)
+
+**Cloudflare Workers (recommended for new hosting):** see **[docs/CLOUDFLARE.md](docs/CLOUDFLARE.md)** — `npm run build:cloudflare`, GitHub Action `deploy-cloudflare.yml`, add `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` secrets.
+
+### Step 4b — Deploy to Vercel (one project only)
 
 This repo should be connected to **exactly one** Vercel project. If you imported the GitHub repo twice, you will get two live URLs:
 

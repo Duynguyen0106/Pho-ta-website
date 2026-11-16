@@ -1,0 +1,3 @@
+# Copy to .dev.vars for local Cloudflare preview (wrangler / opennext preview).
+# Do not commit .dev.vars — it may contain secrets.
+NEXTJS_ENV=development
