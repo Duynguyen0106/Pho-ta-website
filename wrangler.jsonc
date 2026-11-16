@@ -1,6 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "pho-ta",
+  "workers_dev": true,
   "main": ".open-next/worker.js",
   "compatibility_date": "2025-11-16",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
@@ -14,9 +15,13 @@
       "service": "pho-ta"
     }
   ],
+  "routes": [
+    { "pattern": "www.photarestaurants.com", "custom_domain": true },
+    { "pattern": "photarestaurants.com", "custom_domain": true }
+  ],
   "vars": {
     "PHO_TA_SERVERLESS": "1",
-    "NEXT_PUBLIC_SITE_URL": "https://pho-ta.duydichdanh.workers.dev",
+    "NEXT_PUBLIC_SITE_URL": "https://www.photarestaurants.com",
     "NEXT_PUBLIC_SUPABASE_URL": "https://sccrvdqrllsgnxctyrhr.supabase.co",
     "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_TgjoQQxJW0tN17Ad8s6zJA_Irzwq727"
   },
