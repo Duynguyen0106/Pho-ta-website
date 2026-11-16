@@ -77,13 +77,29 @@ npm run deploy:cloudflare      # Build and deploy (needs CLOUDFLARE_API_TOKEN)
 
 For local preview with secrets, copy `.dev.vars.example` → `.dev.vars` and add variables Wrangler should inject locally.
 
-## Current Workers URL
+## Domain: photarestaurants.com
 
-After the first deploy, the app is available at:
+The zone **photarestaurants.com** is on your Cloudflare account (zone ID `11c300bef5e5a2ed85008b5f07ff2c51`).
+
+**Custom domains** on the `pho-ta` worker (in `wrangler.jsonc`):
+
+- `www.photarestaurants.com` (canonical — `NEXT_PUBLIC_SITE_URL`)
+- `photarestaurants.com` (apex)
+
+### Nameservers (required — Wix registrar)
+
+The zone stays **pending** until Wix uses Cloudflare nameservers. In **Wix → Domains → photarestaurants.com → Nameservers**, switch to custom and set:
+
+| Nameserver |
+|------------|
+| `dina.ns.cloudflare.com` |
+| `jack.ns.cloudflare.com` |
+
+(Currently the domain still points at `ns6.wixdns.net` / `ns7.wixdns.net` and Vercel — traffic will move only after this change propagates, usually within a few hours.)
+
+### Workers.dev URL (backup)
 
 **https://pho-ta.duydichdanh.workers.dev**
-
-Attach `photarestaurants.com` in the Worker custom domains settings, then update `NEXT_PUBLIC_SITE_URL` in `wrangler.jsonc` and redeploy.
 
 ## Cutover from Vercel
 
