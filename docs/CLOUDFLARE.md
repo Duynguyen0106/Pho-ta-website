@@ -92,6 +92,10 @@ Attach `photarestaurants.com` in the Worker custom domains settings, then update
 3. Attach production domain on Cloudflare
 4. When satisfied, remove or pause the Vercel project to avoid double deploys
 
+## Vercel GitHub check
+
+If the **Vercel** status check fails with “Account is blocked”, that is expected after moving to Cloudflare. You can ignore it or disconnect the Vercel GitHub app for this repository (**GitHub → Settings → Integrations → Vercel**). GitHub Actions `build` and `cloudflare` jobs are the source of truth for CI.
+
 ## Security note
 
 If an API token was shared in chat or email, **revoke it** in Cloudflare → My Profile → API Tokens and create a new one for CI only.
