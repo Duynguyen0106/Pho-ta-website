@@ -1,0 +1,29 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "pho-ta",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-11-16",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "pho-ta"
+    }
+  ],
+  "vars": {
+    "PHO_TA_SERVERLESS": "1",
+    "NEXT_PUBLIC_SITE_URL": "https://pho-ta.duydichdanh.workers.dev",
+    "NEXT_PUBLIC_SUPABASE_URL": "https://sccrvdqrllsgnxctyrhr.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_TgjoQQxJW0tN17Ad8s6zJA_Irzwq727"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "triggers": {
+    "crons": ["0 9 * * *"]
+  }
+}
