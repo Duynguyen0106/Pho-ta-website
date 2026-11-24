@@ -33,6 +33,7 @@ Or via CLI (never commit values):
 
 ```bash
 npx wrangler secret put ADMIN_PASSWORD
+npx wrangler secret put ADMIN_SESSION_SECRET
 npx wrangler secret put CRON_SECRET
 npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
 # … SMTP_*, RESEND_*, TWILIO_*, OPENAI_API_KEY, etc.

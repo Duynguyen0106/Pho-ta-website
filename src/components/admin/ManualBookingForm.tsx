@@ -8,7 +8,7 @@ import {
   MAX_PARTY_SIZE,
   SEATING_PREFERENCES,
 } from "@/lib/constants";
-import type { SeatingPreference } from "@/lib/types";
+import type { BookingSource, SeatingPreference } from "@/lib/types";
 
 interface ManualBookingFormProps {
   onCreated: () => void;
@@ -28,6 +28,8 @@ export function ManualBookingForm({ onCreated }: ManualBookingFormProps) {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [specialRequests, setSpecialRequests] = useState("");
+  const [source, setSource] = useState<BookingSource>("phone");
+  const [overrideCapacity, setOverrideCapacity] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -48,13 +50,21 @@ export function ManualBookingForm({ onCreated }: ManualBookingFormProps) {
           email: email || "walkin@photarestaurants.com",
           phone,
           specialRequests: specialRequests || undefined,
-          source: "phone",
+          source,
           sendConfirmation: Boolean(email),
+          overrideCapacity,
         }),
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Failed to create booking");
+      if (!res.ok) {
+        throw new Error(
+          data.error ??
+            (res.status === 409
+              ? "Slot full or restaurant closed for that date"
+              : "Failed to create booking"),
+        );
+      }
 
       setOpen(false);
       setName("");
@@ -188,6 +198,21 @@ export function ManualBookingForm({ onCreated }: ManualBookingFormProps) {
             className="luxury-input mt-3"
           />
         </label>
+        <label className="block">
+          <span className="label-caps">Booking source</span>
+          <select
+            value={source}
+            onChange={(e) => setSource(e.target.value as BookingSource)}
+            className="luxury-input mt-3"
+          >
+            <option value="phone" className="bg-surface">
+              Phone
+            </option>
+            <option value="walk_in" className="bg-surface">
+              Walk-in
+            </option>
+          </select>
+        </label>
         <label className="block sm:col-span-2">
           <span className="label-caps">Notes</span>
           <input
@@ -196,6 +221,18 @@ export function ManualBookingForm({ onCreated }: ManualBookingFormProps) {
             className="luxury-input mt-3"
             placeholder="Dietary requirements, celebrations…"
           />
+        </label>
+        <label className="flex items-start gap-3 sm:col-span-2">
+          <input
+            type="checkbox"
+            checked={overrideCapacity}
+            onChange={(e) => setOverrideCapacity(e.target.checked)}
+            className="mt-1.5 h-5 w-5 accent-gold"
+          />
+          <span className="text-base text-muted">
+            Override capacity / closed day (manager only — allow booking when the
+            slot is full or marked closed)
+          </span>
         </label>
       </div>
 

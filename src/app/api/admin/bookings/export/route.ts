@@ -19,10 +19,14 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl;
     const date = searchParams.get("date") ?? undefined;
+    const from = searchParams.get("from") ?? undefined;
+    const to = searchParams.get("to") ?? undefined;
     const status = searchParams.get("status") as BookingStatus | undefined;
 
     const bookings = await listBookings({
       date,
+      from,
+      to,
       locationSlug: "finchley-road",
       status,
     });
@@ -61,7 +65,10 @@ export async function GET(request: NextRequest) {
       .map((row) => row.map((cell) => escapeCsv(cell)).join(","))
       .join("\n");
 
-    const filename = `pho-ta-bookings-${date ?? "all"}.csv`;
+    const filename =
+      from && to
+        ? `pho-ta-bookings-${from}_to_${to}.csv`
+        : `pho-ta-bookings-${date ?? "all"}.csv`;
 
     return new NextResponse(csv, {
       headers: {

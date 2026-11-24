@@ -19,6 +19,7 @@ export function AdminBookingEdit({
 }: AdminBookingEditProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [overrideCapacity, setOverrideCapacity] = useState(false);
   const [form, setForm] = useState({
     date: booking.date,
     time: booking.time,
@@ -43,10 +44,18 @@ export function AdminBookingEdit({
           id: booking.id,
           locationSlug: LOCATION_SLUG,
           ...form,
+          overrideCapacity,
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Update failed");
+      if (!res.ok) {
+        throw new Error(
+          data.error ??
+            (res.status === 409
+              ? "Slot full or closed — enable override or pick another time"
+              : "Update failed"),
+        );
+      }
       onSaved(data.booking);
       onClose();
     } catch (err) {
@@ -193,6 +202,18 @@ export function AdminBookingEdit({
             />
           </label>
         </div>
+
+        <label className="mt-6 flex items-start gap-3">
+          <input
+            type="checkbox"
+            checked={overrideCapacity}
+            onChange={(e) => setOverrideCapacity(e.target.checked)}
+            className="mt-1.5 h-5 w-5 accent-gold"
+          />
+          <span className="text-base text-muted">
+            Override capacity / closed day when saving date, time, or party size
+          </span>
+        </label>
 
         <div className="mt-8 flex justify-end gap-3">
           <Button type="button" variant="outline" onClick={onClose}>

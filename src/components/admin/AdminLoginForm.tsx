@@ -25,7 +25,10 @@ export function AdminLoginForm() {
       router.push("/admin");
       router.refresh();
     } else {
-      setError("Invalid password");
+      const data = await res.json().catch(() => ({}));
+      setError(
+        typeof data.error === "string" ? data.error : "Invalid password",
+      );
     }
     setLoading(false);
   }
