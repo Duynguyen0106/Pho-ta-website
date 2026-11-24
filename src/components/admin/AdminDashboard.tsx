@@ -86,29 +86,68 @@ export function AdminDashboard({ initialTab }: AdminDashboardProps) {
   const [bookingsLayout, setBookingsLayout] = useState<
     "list" | "day" | "week"
   >("list");
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  const today = format(new Date(), "yyyy-MM-dd");
+
+  const weekRange = useMemo(() => {
+    const anchor = parse(date, "yyyy-MM-dd", new Date());
+    const weekStart = startOfWeek(anchor, { weekStartsOn: 1 });
+    const weekEnd = addDays(weekStart, 6);
+    return {
+      from: format(weekStart, "yyyy-MM-dd"),
+      to: format(weekEnd, "yyyy-MM-dd"),
+    };
+  }, [date]);
+
+  const serviceTitle = useMemo(() => {
+    if (bookingsLayout === "week") {
+      return `Service week · ${format(parse(weekRange.from, "yyyy-MM-dd", new Date()), "d MMM")} – ${format(parse(weekRange.to, "yyyy-MM-dd", new Date()), "d MMM yyyy")}`;
+    }
+  }, [bookingsLayout, weekRange.from, weekRange.to]);
+
+  const dateTitle =
+    date === today
+      ? "Today's service"
+      : `Service · ${format(parse(date, "yyyy-MM-dd", new Date()), "EEE d MMM yyyy")}`;
 
   const fetchBookings = useCallback(async () => {
     setLoading(true);
+    setLoadError(null);
     const params = new URLSearchParams();
     if (bookingsLayout === "week") {
-      const anchor = parse(date, "yyyy-MM-dd", new Date());
-      const weekStart = startOfWeek(anchor, { weekStartsOn: 1 });
-      const weekEnd = addDays(weekStart, 6);
-      params.set("from", format(weekStart, "yyyy-MM-dd"));
-      params.set("to", format(weekEnd, "yyyy-MM-dd"));
+      params.set("from", weekRange.from);
+      params.set("to", weekRange.to);
     } else {
       params.set("date", date);
     }
     if (statusFilter) params.set("status", statusFilter);
-    const res = await fetch(`/api/admin/bookings?${params}`);
-    const data = await res.json();
-    if (res.ok) setBookings(data.bookings);
-    setLoading(false);
-  }, [date, statusFilter, bookingsLayout]);
+    try {
+      const res = await fetch(`/api/admin/bookings?${params}`);
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error ?? "Failed to load bookings");
+      }
+      setBookings(data.bookings);
+    } catch (err) {
+      setBookings([]);
+      setLoadError(err instanceof Error ? err.message : "Failed to load bookings");
+    } finally {
+      setLoading(false);
+    }
+  }, [date, statusFilter, bookingsLayout, weekRange.from, weekRange.to]);
 
   useEffect(() => {
     fetchBookings();
   }, [fetchBookings]);
+
+  useEffect(() => {
+    if (view !== "bookings") return;
+    const interval = window.setInterval(() => {
+      void fetchBookings();
+    }, 60_000);
+    return () => window.clearInterval(interval);
+  }, [view, fetchBookings]);
 
   useEffect(() => {
     setTableNumber(selected?.seatedAtTable ?? "");
@@ -174,12 +213,17 @@ export function AdminDashboard({ initialTab }: AdminDashboardProps) {
 
 
   function exportCsv() {
-    const params = new URLSearchParams({ date });
+    const params = new URLSearchParams();
+    if (bookingsLayout === "week") {
+      params.set("from", weekRange.from);
+      params.set("to", weekRange.to);
+    } else {
+      params.set("date", date);
+    }
     if (statusFilter) params.set("status", statusFilter);
     window.location.href = `/api/admin/bookings/export?${params}`;
   }
 
-  const today = format(new Date(), "yyyy-MM-dd");
   const activeBookings = bookings.filter((b) => b.status !== "cancelled");
   const confirmedCount = bookings.filter((b) => b.status === "confirmed").length;
   const seatedCount = bookings.filter((b) => b.status === "seated").length;
@@ -208,10 +252,11 @@ export function AdminDashboard({ initialTab }: AdminDashboardProps) {
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <h2 className="font-display text-4xl font-normal text-foreground">
-                Today&apos;s service
+                {bookingsLayout === "week" ? serviceTitle : dateTitle}
               </h2>
               <p className="mt-2 text-xl text-muted">
                 Manage reservations, seating, and walk-ins
+                {view === "bookings" ? " · refreshes every minute" : ""}
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -233,6 +278,18 @@ export function AdminDashboard({ initialTab }: AdminDashboardProps) {
             />
             <AdminStatCard label="Total covers" value={totalCovers} />
           </div>
+
+          {loadError && (
+            <div
+              role="alert"
+              className="flex flex-wrap items-center justify-between gap-4 border border-red-800/40 bg-red-950/25 px-5 py-4"
+            >
+              <p className="text-lg text-red-200">{loadError}</p>
+              <Button type="button" variant="outline" size="sm" onClick={fetchBookings}>
+                Retry
+              </Button>
+            </div>
+          )}
 
           <div className="fine-dining-panel p-6">
             <div className="flex flex-wrap gap-4">
@@ -526,6 +583,15 @@ function BookingDetailPanel({
         </div>
         {booking.specialRequests && (
           <DetailRow label="Requests" value={booking.specialRequests} />
+        )}
+        {booking.confirmationSentAt && (
+          <DetailRow
+            label="Confirmation sent"
+            value={format(
+              new Date(booking.confirmationSentAt),
+              "d MMM yyyy, HH:mm",
+            )}
+          />
         )}
       </dl>
 
